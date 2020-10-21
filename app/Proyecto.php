@@ -31,7 +31,7 @@ class Proyecto extends Model
     }
 
     public function Documentos(){
-	    return $this->belongsToMany('App\Documento', 'Proyecto_documento','proyecto_id', 'documento_id')->withTimestamps();
+	    return $this->belongsToMany('App\Documento', 'proyecto_documento','proyecto_id', 'documento_id')->withTimestamps();
 	}
 
     public function crearProcesos(){

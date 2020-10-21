@@ -16,6 +16,6 @@ class Accesorio extends Model
     }
 
     public function Productos(){
-        return $this->belongsToMany('App\Producto', 'Productos_accesorios', 'accesorio_id','producto_id')->withPivot('cantidad');
+        return $this->belongsToMany('App\Producto', 'productos_accesorios', 'accesorio_id','producto_id')->withPivot('cantidad');
     }
 }
