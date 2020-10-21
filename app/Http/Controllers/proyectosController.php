@@ -36,10 +36,12 @@ class proyectosController extends Controller
             $proyecto->numero_parte = 'PY-'.str_pad($proyecto->id + 1, 8, "0", STR_PAD_LEFT);
             $proyecto->crearProcesos();
             $proyecto->update();
+
+            /* insertmaos los materiales del producto*/
+            $proyecto->insertProductos(request()->get('productos'),Auth::id());
         }
 		
-        /* insertmaos los materiales del producto*/
-        $proyecto->insertProductos(request()->get('productos'),Auth::id());
+        
     }
 
     /* Funcion para eliminar con id */

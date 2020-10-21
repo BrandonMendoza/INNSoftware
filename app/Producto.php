@@ -11,15 +11,15 @@ class Producto extends Model
     protected $fillable = ['id','cliente_id','numero_parte_cliente','numero_parte','descripcion','peso_kg','peso_lbs','deleted_at','created_at','updated_at','pintura_id'];
 
     public function Materiales(){
-	    return $this->belongsToMany('App\Material', 'Productos_materiales','producto_id', 'material_id')->withPivot('cantidad')->withTimestamps();
+	    return $this->belongsToMany('App\Material', 'productos_materiales','producto_id', 'material_id')->withPivot('cantidad')->withTimestamps();
 	}
 
 	public function Accesorios(){
-	    return $this->belongsToMany('App\Accesorio', 'Productos_accesorios','producto_id', 'accesorio_id')->withPivot('cantidad')->withTimestamps();
+	    return $this->belongsToMany('App\Accesorio', 'productos_accesorios','producto_id', 'accesorio_id')->withPivot('cantidad')->withTimestamps();
 	}
 
 	public function Documentos(){
-	    return $this->belongsToMany('App\Documento', 'Producto_documento','producto_id', 'documento_id')->withTimestamps();
+	    return $this->belongsToMany('App\Documento', 'producto_documento','producto_id', 'documento_id')->withTimestamps();
 	}
 
 	public function Cliente()

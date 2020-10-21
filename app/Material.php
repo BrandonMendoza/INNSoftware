@@ -21,7 +21,7 @@ class Material extends Model
     }
 
     public function Productos(){
-        return $this->belongsToMany('App\Producto', 'Productos_materiales', 'material_id','producto_id')->withPivot('cantidad');
+        return $this->belongsToMany('App\Producto', 'productos_materiales', 'material_id','producto_id')->withPivot('cantidad');
     }
 
     public function getNombreMaterial()
