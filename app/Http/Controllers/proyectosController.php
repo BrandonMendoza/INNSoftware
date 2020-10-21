@@ -59,14 +59,14 @@ class proyectosController extends Controller
 	        $docNombre = 'dc-'.$docDate.'.'.$doc->clientExtension();
 	        $nombreOriginal = $doc->getClientOriginalName();
 
-	        $doc->storeAs('uploads\proyectos\\'.$proyecto->numero_parte.'\documentos', $docNombre);
+	        $doc->storeAs('public\uploads\proyectos\\'.$proyecto->numero_parte.'\documentos', $docNombre);
 
 	        $documento = [
 	        	'nombre_usuario' => $nombreOriginal,
 	        	'nombre_real' => $nombreOriginal,
 	        	'nombre_sistema' => $docNombre,
 	        	'tipo_documento' => $doc->getClientOriginalExtension(),
-	        	'url'=> 'uploads\proyectos\\'.$proyecto->numero_parte.'\documentos',
+	        	'url'=> 'public\uploads\proyectos\\'.$proyecto->numero_parte.'\documentos',
 	        ];
 
 	        $save = Documento::create($documento);
@@ -87,7 +87,7 @@ class proyectosController extends Controller
 	}
 	/** Funcion para descargar archivos */
 	public function downloadDocumento($documento_id){
-		$documento = Documento::find($documento_id);
+        $documento = Documento::find($documento_id);
 		$path = storage_path('app\\'.$documento->url."\\".$documento->nombre_sistema);
 		$headers = array('Content-Type'=> 'application/'.$documento->tipo_documento);
 		$nombre_doc = $documento->nombre_usuario;

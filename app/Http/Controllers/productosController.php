@@ -64,17 +64,17 @@ class productosController extends Controller
 			$producto = Producto::find($request->producto_id);
 			$doc = $request->file('file');
 		    $docDate = date('YmdHis');
-	        $docNombre = 'dc-'.$docDate.'.'.$doc->clientExtension();
+	        $docNombre = 'doc-'.$docDate.'.'.$doc->clientExtension();
 	        $nombreOriginal = $doc->getClientOriginalName();
 
-	        $doc->storeAs('uploads\productos\\'.$producto->numero_parte.'\documentos', $docNombre);
+			$doc->storeAs('public\uploads\productos\\'.$producto->numero_parte.'\documentos', $docNombre);
 
 	        $documento = [
 	        	'nombre_usuario' => $nombreOriginal,
 	        	'nombre_real' => $nombreOriginal,
 	        	'nombre_sistema' => $docNombre,
 	        	'tipo_documento' => $doc->getClientOriginalExtension(),
-	        	'url'=> 'uploads\productos\\'.$producto->numero_parte.'\documentos',
+	        	'url'=> 'public\uploads\productos\\'.$producto->numero_parte.'\documentos',
 	        ];
 
 	        $save = Documento::create($documento);
