@@ -35,7 +35,11 @@
                     prop="created_at"
                     label="Fecha de carga"
                     align="center" 
-                    show-overflow-tooltip/>
+                    show-overflow-tooltip>
+                        <template slot-scope="scope">
+                            {{scope.row.created_at | moment("YYYY-MMM-DD")}}
+                        </template>
+                    </el-table-column>
 
                     <el-table-column
                     align="center"
