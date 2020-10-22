@@ -58,15 +58,17 @@ class proyectosController extends Controller
 		    $docDate = date('YmdHis');
 	        $docNombre = 'dc-'.$docDate.'.'.$doc->clientExtension();
 	        $nombreOriginal = $doc->getClientOriginalName();
-
-	        $doc->storeAs('public\uploads\proyectos\\'.$proyecto->numero_parte.'\documentos', $docNombre);
+            $location = 'uploads/proyectos/'.$proyecto->numero_parte.'/documentos';
+            
+            
+            Storage::disk('public')->put($location.'/'.$docNombre, file_get_contents($doc));
 
 	        $documento = [
 	        	'nombre_usuario' => $nombreOriginal,
 	        	'nombre_real' => $nombreOriginal,
 	        	'nombre_sistema' => $docNombre,
 	        	'tipo_documento' => $doc->getClientOriginalExtension(),
-	        	'url'=> 'public\uploads\proyectos\\'.$proyecto->numero_parte.'\documentos',
+	        	'url'=> $location,
 	        ];
 
 	        $save = Documento::create($documento);
@@ -80,18 +82,27 @@ class proyectosController extends Controller
 	public function deleteDocumento(){
 		$proyecto = Proyecto::find(request()->get('proyecto_id'));
 		$proyecto->Documentos()->detach(request()->get('documento_id'));
-		$documento = Documento::find(request()->get('documento_id'));
-        Storage::delete($documento->url."\\".$documento->nombre_sistema);
-		$documento->delete();
+        $documento = Documento::find(request()->get('documento_id'));
+        $path = '/public/'.$documento->url."/".$documento->nombre_sistema;
+        if (Storage::disk('public')->exists($documento->url.'/'.$documento->nombre_sistema)) {
+            Storage::delete($path);
+            $documento->delete();
+        }
+		
 		return (Proyecto::where('id',request()->get('proyecto_id'))->with(['Documentos'])->first());
-	}
+    }
+    
 	/** Funcion para descargar archivos */
 	public function downloadDocumento($documento_id){
         $documento = Documento::find($documento_id);
-		$path = storage_path('app\\'.$documento->url."\\".$documento->nombre_sistema);
+		$path = storage_path('app/'.$documento->url."/".$documento->nombre_sistema);
 		$headers = array('Content-Type'=> 'application/'.$documento->tipo_documento);
-		$nombre_doc = $documento->nombre_usuario;
-		return response()->download($path,$nombre_doc,$headers);
+        $nombre_documento = $documento->nombre_usuario;
+        
+        $path = '/public/'.$documento->url."/".$documento->nombre_sistema;
+        if (Storage::disk('public')->exists($documento->url.'/'.$documento->nombre_sistema)) {
+            return Storage::download($path, $nombre_documento, $headers);
+        }
 	}
 
     public function getProcesosFromProyecto(Request $request){

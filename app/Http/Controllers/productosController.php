@@ -66,15 +66,15 @@ class productosController extends Controller
 		    $docDate = date('YmdHis');
 	        $docNombre = 'doc-'.$docDate.'.'.$doc->clientExtension();
 	        $nombreOriginal = $doc->getClientOriginalName();
-
-			$doc->storeAs('public\uploads\productos\\'.$producto->numero_parte.'\documentos', $docNombre);
-
+			$location = 'uploads/productos/'.$producto->numero_parte.'/documentos';
+			
+			Storage::disk('public')->put($location.'/'.$docNombre, file_get_contents($doc));
 	        $documento = [
 	        	'nombre_usuario' => $nombreOriginal,
 	        	'nombre_real' => $nombreOriginal,
 	        	'nombre_sistema' => $docNombre,
 	        	'tipo_documento' => $doc->getClientOriginalExtension(),
-	        	'url'=> 'public\uploads\productos\\'.$producto->numero_parte.'\documentos',
+	        	'url'=> $location,
 	        ];
 
 	        $save = Documento::create($documento);
@@ -88,18 +88,28 @@ class productosController extends Controller
 		$producto = Producto::find(request()->get('producto_id'));
 		$producto->Documentos()->detach(request()->get('documento_id'));
 		$documento = Documento::find(request()->get('documento_id'));
-
-		Storage::delete($documento->url."\\".$documento->nombre_sistema);
-		$documento->delete();
+		$path = '/public/'.$documento->url."/".$documento->nombre_sistema;
+		
+		if (Storage::disk('public')->exists($documento->url.'/'.$documento->nombre_sistema)) {
+            Storage::delete($path);
+            $documento->delete();
+		}
+		
 		return (Producto::where('id',request()->get('producto_id'))->with(['Documentos'])->first());
 	}
 	/** Funcion para guardar archivos */
 	public function downloadDocumento($documento_id){
 		$documento = Documento::find($documento_id);
-		$path = storage_path('app\\'.$documento->url."\\".$documento->nombre_sistema);
+		$path = storage_path('app/'.$documento->url."/".$documento->nombre_sistema);
 		$headers = array('Content-Type'=> 'application/'.$documento->tipo_documento);
 		$nombre_doc = $documento->nombre_usuario;
-		return response()->download($path,$nombre_doc,$headers);
+
+		$nombre_documento = $documento->nombre_usuario;
+        
+        $path = '/public/'.$documento->url."/".$documento->nombre_sistema;
+        if (Storage::disk('public')->exists($documento->url.'/'.$documento->nombre_sistema)) {
+            return Storage::download($path, $nombre_documento, $headers);
+        }
 	}
 
 	
