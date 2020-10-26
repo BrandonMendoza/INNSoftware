@@ -77,16 +77,11 @@ import Pagination from '@/components/Pagination'; // Secondary package based on 
                 let url = '/acerosMateriales';
                 me.loading = true;
                 axios.get(url).then(function (response) {
-                    //creamos un array y guardamos el contenido que nos devuelve el response
-                    console.table("Materials:");
-                    console.log(response.data);
-                    console.table(response.data);
                     me.acerosMateriales = response.data;
                     me.loading = false;
                 })
                 .catch(function (error) {
-                    // handle error
-                    me.notificarError();
+                     me.$message.error("Hubo un error");
                     console.log(error);
                 });
             },
@@ -101,29 +96,16 @@ import Pagination from '@/components/Pagination'; // Secondary package based on 
                 me.loading = true;
                 console.log("DELETE FUNCTION");
                 axios.post('/acerosMateriales/delete',{'id':id}).then(function (response) {
-                    console.log("Response:");
-                    console.log(response);
                     me.getList();   
-                    me.notificarSuccess('Eliminado correctamente.');
+                    me.$message.success('Eliminado correctamente.');
                     me.loading = false;
                 })
                 .catch(function (error) {
-                    me.notificarError();
+                    me.$message.error("Hubo un error");
                     console.log(error);
                     me.loading = false;
                 });
-            },
-            notificarSuccess(mensaje = 'Agregado correctamente.') {
-                this.$message({
-                    message: mensaje,
-                    type: 'success'
-                });
-            },
-            notificarError(mensaje = "Hubo un error.") {
-                this.$message.error({
-                    message: mensaje,
-                });
-            },
+            }
         },
         mounted() {
            this.getList();

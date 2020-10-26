@@ -22,10 +22,17 @@
             </el-form-item>
 
             <el-form-item label="Acero" prop="acero_id" >
-                <el-select v-model="form.acero_id"  style="width:100%">
-                    <el-option :label="acero.nombre" :value="acero.id" v-for="acero in aceros" :key="acero.id"/>
+
+                <el-select v-model="form.acero_id" :value="form.acero_id"  style="width:100%">
+                    <el-option 
+                    v-for="acero in aceros"
+                    :label="acero.nombre" 
+                    :value="acero.id" 
+                    :key="acero.id"/>
                 </el-select>
             </el-form-item>
+
+            
 
             <el-row :gutter="20" align="bottom">
                 <el-col :span="10">
@@ -91,7 +98,7 @@
                 { required: true, message: 'Ingresa una descripcion', trigger: 'blur' },
             ],
             acero_id: [
-                { required: true, message: 'selecciona una cantidad de datos', trigger: 'change' }
+                { required: true, message: 'selecciona un acero', trigger: 'change' }
             ],
             descripcion: [
                 { required: true, message: 'ingresa una descripción', trigger: 'change' }
@@ -121,17 +128,14 @@
                     let me = this;
                     
                     axios.put('/accesorios/insert',me.form).then(function (response) {
-                        console.log("Response:");
-                        console.log(response);
-                        
-                        me.$parent.getList();//llamamos al metodo getTask(); para que refresque nuestro array y muestro los nuevos datos
-                        me.clearFields();//Limpiamos los campos e inicializamos la variable update a 0
+                        me.$parent.getList();
+                        me.clearFields();
                         me.close(); 
                         loadingInstance.close();
-                        me.notificarSuccess();
+                        me.$message.success('Guardado correctamente.');
                     })
                     .catch(function (error) {
-                        me.notificarError();
+                        me.$message.error('Hubo un error.');
                         console.log(error);
                     });
                 } else {
@@ -141,26 +145,22 @@
         },
         getAceros(){
             let me =this;
-            let url = '/acerosMateriales' //Ruta que hemos creado para que nos devuelva todas las tareas
+            let url = '/acerosMateriales';
             axios.get(url).then(function (response) {
-                //creamos un array y guardamos el contenido que nos devuelve el response
-                console.table("RESPONSE:");
-                console.log(response.data);
                 me.aceros = response.data;
             })
             .catch(function (error) {
-                // handle error
-                me.notificarError();
+                me.$message.error('Hubo un error.');
                 console.log(error);
             });
         },
-        clearFields(){/*Limpia los campos e inicializa la variable update a 0*/
+        clearFields(){
             this.form.id = 0;
             this.form.numero_parte = "";
             this.form.descripcion = "";
             this.form.acero_id = "";
             this.form.peso_kg = "";
-            this.$refs['form'].resetFields();
+            //this.$refs['form'].resetFields();
         },
         handleClose(done) {
             this.$confirm('Está seguro que deseas salir?')
@@ -169,18 +169,7 @@
                 this.close(); //cerramos modal
             })
             .catch(_ => {});
-        },
-        notificarSuccess(mensaje = 'Agregado correctamente.') {
-            this.$message({
-                message: mensaje,
-                type: 'success'
-            });
-        },
-        notificarError(mensaje = "Hubo un error.") {
-            this.$message.error({
-                message: mensaje,
-            });
-        },
+        }
     },
   };
 </script>

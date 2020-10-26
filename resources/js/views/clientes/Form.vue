@@ -14,20 +14,6 @@
                 <input v-model="form.id" hidden/>
                 <input v-model="form.clave_cliente" hidden/>
 
-                <!-- <el-upload
-                class="upload-demo"
-                ref="upload"
-                action="https://jsonplaceholder.typicode.com/posts/"
-                :auto-upload="false">
-                    <el-button slot="trigger" size="small" type="primary">select file</el-button>
-                    <el-button style="margin-left: 10px;" size="small" type="success" @click="submitUpload">upload to server</el-button>
-
-                    <img v-if="form.foto" :src="form.foto" class="avatar">
-                    <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-
-                    <div class="el-upload__tip" slot="tip">jpg/png files with a size less than 500kb</div>
-                </el-upload> -->
-
                 <el-divider content-position="left"> <p style="font-size: 14px; color: #5e6d82; line-height: 1.5em;">General</p></el-divider>
                 <el-form-item label="Nombre Comercial" prop="nombre_cliente">
                     <el-input v-model="form.nombre_cliente"/>
@@ -44,7 +30,8 @@
                 <el-divider content-position="left"><p style="font-size: 14px; color: #5e6d82; line-height: 1.5em;">Datos Fiscales</p></el-divider>
 
                 <el-form-item label="RFC" prop="rfc" >
-                    <the-mask class="el-input__inner" v-model="form.rfc" :mask="['AAAA######FFF','AAA######FFF']" :tokens="hexTokens" placeholder="AAAA666666WW2"/>
+                    <el-input v-model="form.rfc" maxlength="13"/>
+                    <!-- <the-mask class="el-input__inner" v-model="form.rfc" :mask="['AAAA######FFF','AAA######FFF']" :tokens="hexTokens" placeholder="AAAA666666WW2"/> -->
                 </el-form-item>
 
                 <el-form-item label="Razón Social" prop="razon_social" >
@@ -184,25 +171,21 @@
             this.dialogoAgregar = false;
         },
         insert(form){/*Update o Insert Proceso*/
-            this.$refs[form].validate((valid) => { //validacion del form
+            this.$refs[form].validate((valid) => { 
                 if (valid) {
                     var loadingInstance = this.$loading({
                         target: '.el-dialog'
                     });
                     let me = this;
-                    
                     axios.put('/clientes/insert',me.form).then(function (response) {
-                        console.log("Response:");
-                        console.log(response);
-                        
-                        me.$parent.getList();//llamamos al metodo getTask(); para que refresque nuestro array y muestro los nuevos datos
-                        me.clearFields();//Limpiamos los campos e inicializamos la variable update a 0
+                        me.$parent.getList();
+                        me.clearFields();
                         me.close(); 
                         loadingInstance.close();
-                        me.notificarSuccess();
+                        me.$message.success('Guardado correctamente.');
                     })
                     .catch(function (error) {
-                        me.notificarError();
+                        me.$message.error('Hubo un error.');
                         console.log(error);
                     });
                 } else {
@@ -224,8 +207,6 @@
             this.form.codigo_postal = "";
             this.form.estado = "";
             this.form.ciudad = "";
-
-            this.$refs['form'].resetFields();
         },
         handleClose(done) {
             this.$confirm('Está seguro que deseas salir?')
@@ -235,32 +216,6 @@
             })
             .catch(_ => {});
         },
-        notificarSuccess(mensaje = 'Agregado correctamente.') {
-            this.$message({
-                message: mensaje,
-                type: 'success'
-            });
-        },
-        notificarError(mensaje = "Hubo un error.") {
-            this.$message.error({
-                message: mensaje,
-            });
-        },
-        handleAvatarSuccess(res, file) {
-            this.imageUrl = URL.createObjectURL(file.raw);
-        },
-        beforeAvatarUpload(file) {
-            const isJPG = file.type === 'image/jpeg';
-            const isLt2M = file.size / 1024 / 1024 < 2;
-
-            if (!isJPG) {
-                this.$message.error('Avatar picture must be JPG format!');
-            }
-            if (!isLt2M) {
-                this.$message.error('Avatar picture size can not exceed 2MB!');
-            }
-            return isJPG && isLt2M;
-        }
     },
   };
 </script>

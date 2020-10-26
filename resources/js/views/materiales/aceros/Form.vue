@@ -5,8 +5,8 @@
         :ref="dialogRef"
         :before-close="handleClose"
         :visible.sync="dialogoAgregar">
-            <span v-if="form.id == 0" slot="title"><i class="el-icon-plus"></i> Agregar Tipo de Material</span>
-            <span v-if="form.id != 0" slot="title"><i class="el-icon-edit"></i> Editar Tipo de Material </span>
+            <span v-if="form.id == 0" slot="title"><i class="el-icon-plus"></i> Agregar Tipo de Acero</span>
+            <span v-if="form.id != 0" slot="title"><i class="el-icon-edit"></i> Editar Tipo de Acero </span>
             <!-- Id del proceso que se esta editando ("0" si es agregar) -->
             <input v-model="form.id" hidden/>
             
@@ -73,17 +73,14 @@
                     let me = this;
                     
                     axios.put('/acerosMateriales/insert',me.form).then(function (response) {
-                        console.log("Response:");
-                        console.log(response);
-                        
-                        me.$parent.getList();//llamamos al metodo getTask(); para que refresque nuestro array y muestro los nuevos datos
-                        me.clearFields();//Limpiamos los campos e inicializamos la variable update a 0
+                        me.$parent.getList();
+                        me.clearFields();
                         me.close(); 
                         loadingInstance.close();
-                        me.notificarSuccess();
+                        me.$message.success('Guardado correctamente.');
                     })
                     .catch(function (error) {
-                        notificarError();
+                        me.$message.error('Hubo un error.');
                         console.log(error);
                     });
                 } else {
@@ -91,7 +88,7 @@
                 }
             });
         },
-        clearFields(){/*Limpia los campos e inicializa la variable update a 0*/
+        clearFields(){
             this.form.id = 0;
             this.form.nombre = "";
             this.form.simbolo = "";
@@ -100,21 +97,10 @@
         handleClose(done) {
             this.$confirm('Está seguro que deseas salir?')
             .then(_ => {
-                this.clearFields(); //limpiamos campos
-                this.close(); //cerramos modal
+                this.clearFields(); 
+                this.close(); 
             })
             .catch(_ => {});
-        },
-        notificarSuccess(mensaje = 'Agregado correctamente.') {
-            this.$message({
-                message: mensaje,
-                type: 'success'
-            });
-        },
-        notificarError(mensaje = "Hubo un error.") {
-            this.$message.error({
-                message: mensaje,
-            });
         },
     },
   };

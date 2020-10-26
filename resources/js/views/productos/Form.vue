@@ -16,7 +16,7 @@
             <el-row :gutter="20">
                 <el-col :span="6">
                     <el-form-item label="Cliente" prop="cliente_id"  >
-                        <el-select v-model="form.cliente_id" style="width: 100%;" filterable :loading="loadingCliente">
+                        <el-select v-model="form.cliente_id" :value="form.cliente_id" style="width: 100%;" filterable :loading="loadingCliente">
                             <el-option 
                                 :label="cliente.nombre_cliente" 
                                 :value="cliente.id" 
@@ -30,7 +30,7 @@
                     </el-form-item>  
 
                     <el-form-item label="Pintura" prop="pintura_id"  >
-                        <el-select v-model="form.pintura_id" style="width: 100%;" filterable :loading="loadingPinturas">
+                        <el-select v-model="form.pintura_id" :value="form.pintura_id" style="width: 100%;" filterable :loading="loadingPinturas">
                             <el-option 
                                 :label="pintura.simbolo" 
                                 :value="pintura.id" 
@@ -289,16 +289,14 @@ import { CommentDropdown } from '../articles/components/Dropdown';
                     });
                     let me = this;
                     axios.put('/productos/insert',me.form).then(function (response) {
-                        console.log("Response:");
-                        console.log(response);
                         me.$parent.getList();
                         me.clearFields();
                         me.close(); 
                         loadingInstance.close();
-                        me.notificarSuccess("Agregado Correctamente");
+                        me.$message.success('Guardado correctamente.');
                     })
                     .catch(function (error) {
-                        me.notificarError();
+                        me.$message.error('Hubo un error.');
                         console.log(error);
                     });
                 } else {
@@ -324,26 +322,11 @@ import { CommentDropdown } from '../articles/components/Dropdown';
             })
             .catch(_ => {});
         },
-        notificarSuccess(mensaje = 'Agregado correctamente.') {
-            this.$message({
-                message: mensaje,
-                type: 'success'
-            });
-        },
-        notificarError(mensaje = "Hubo un error.") {
-            this.$message.error({
-                message: mensaje,
-            });
-        },
         getMateriales(){
             let me =this;
             let url = '/materialesNombreCompleto' 
             //this.loadingMaterialAccesorio = true;
             axios.get(url).then(function (response) {
-                //creamos un array y guardamos el contenido que nos devuelve el response
-                console.table("RESPONSE Materiales Accesorios:");
-                console.log(response.data);
-                console.table(response.data);
                 me.materialesSelect = response.data;
 
                 me.materialesSelect.forEach(element => {
@@ -359,19 +342,15 @@ import { CommentDropdown } from '../articles/components/Dropdown';
             })
             .catch(function (error) {
                 // handle error
-                me.notificarError();
+                me.$message.error('Hubo un error.');
                 console.log(error);
             });
         },
         getAccesorios(){
             let me =this;
-            let url = '/accesorios' 
+            let url = '/accesorios';
             
             axios.get(url).then(function (response) {
-                //creamos un array y guardamos el contenido que nos devuelve el response
-                console.table("RESPONSE Materiales Accesorios:");
-                console.log(response.data);
-                console.table(response.data);
                 me.accesoriosSelect = response.data;
                 me.accesoriosSelect.forEach(element => {
                     me.form.accesorios.forEach(accesorio => {
@@ -384,8 +363,7 @@ import { CommentDropdown } from '../articles/components/Dropdown';
                 });
             })
             .catch(function (error) {
-                // handle error
-                me.notificarError();
+                me.$message.error('Hubo un error.');
                 console.log(error);
             });
         },
@@ -394,16 +372,11 @@ import { CommentDropdown } from '../articles/components/Dropdown';
             let url = '/clientes';
             this.loadingClientes = true;
             axios.get(url).then(function (response) {
-                //creamos un array y guardamos el contenido que nos devuelve el response
-                console.table("RESPONSE Clientes:");
-                console.log(response.data);
-                console.table(response.data);
                 me.clientes = response.data;
                 me.loadingClientes = false;
             })
             .catch(function (error) {
-                // handle error
-                me.notificarError();
+                me.$message.error('Hubo un error.');
                 console.log(error);
                 me.loadingClientes = false;
             });
@@ -413,16 +386,11 @@ import { CommentDropdown } from '../articles/components/Dropdown';
             let url = '/pinturas';
             this.loadingPinturas = true;
             axios.get(url).then(function (response) {
-                //creamos un array y guardamos el contenido que nos devuelve el response
-                console.table("RESPONSE Clientes:");
-                console.log(response.data);
-                console.table(response.data);
                 me.pinturas = response.data;
                 me.loadingPinturas = false;
             })
             .catch(function (error) {
-                // handle error
-                me.notificarError();
+                me.$message.error('Hubo un error.');
                 console.log(error);
                 me.loadingPinturas = false;
             });
@@ -440,17 +408,14 @@ import { CommentDropdown } from '../articles/components/Dropdown';
         },
         agregarMaterial(){
             if(this.materialAgregar.material.id == "" ){
-                this.notificarError('Selecciona un material');
+                me.$message.error('Selecciona un material.');
                 return false;
             }
             if(this.materialAgregar.pivot.cantidad == "" || this.materialAgregar.pivot.cantidad == 0){
-                this.notificarError('Ingresa una cantidad valida');
+                me.$message.error('Ingresa una cantidad valida');
                 return false;
             }
-            console.log("MATERIAL AGREGAR:");
-            console.log(this.materialAgregar);
             this.materialAgregar.material['pivot'] = JSON.parse(JSON.stringify(this.materialAgregar.pivot));
-            //this.materialAgregar.material['pivot'] = this.materialAgregar.pivot;
             this.form.materiales.push(this.materialAgregar.material);
             this.materialAgregar.material = "";
             this.materialAgregar.pivot.cantidad = 1;
@@ -459,25 +424,20 @@ import { CommentDropdown } from '../articles/components/Dropdown';
         agregarAccesorio(){
             
             if(this.accesorioAgregar.accesorio.id == "" ){
-                this.notificarError('Selecciona un accesorio');
+                me.$message.error('Selecciona un accesorio');
                 return false;
             }
             if(this.accesorioAgregar.pivot.cantidad == "" || this.accesorioAgregar.pivot.cantidad == 0){
-                this.notificarError('Ingresa una cantidad valida');
+                me.$message.error('Ingresa una cantidad valida');
                 return false;
             }
-            console.log("ACCESORIO AGREGAR:");
-            console.log(this.accesorioAgregar);
             this.accesorioAgregar.accesorio['pivot'] = JSON.parse(JSON.stringify(this.accesorioAgregar.pivot));
-            // this.accesorioAgregar.accesorio['pivot'] = this.accesorioAgregar.pivot;
             this.form.accesorios.push(this.accesorioAgregar.accesorio);
             this.accesorioAgregar.accesorio = "";
             this.accesorioAgregar.pivot.cantidad = 1;
             this.dialogoAccesorios = false;
         },
         actualizarSelectMateriales(){
-            console.log("MATERIALES SELECT");
-            console.log(this.materialesSelect);
             this.materialesSelect.forEach(element => {
                 element['disabled'] = false;
             });
@@ -490,8 +450,6 @@ import { CommentDropdown } from '../articles/components/Dropdown';
             });
         },
         actualizarSelectAccesorios(){
-            console.log("Accesorios SELECT");
-            console.log(this.accesoriosSelect);
             this.accesoriosSelect.forEach(element => {
                 element['disabled'] = false;
             });
@@ -504,13 +462,11 @@ import { CommentDropdown } from '../articles/components/Dropdown';
             });
         },
         deleteRowMateriales(row){
-            console.log("Entro en DELETE");
-            let i = this.form.materiales.map(material => material.id).indexOf(row.id) // find index of your object
+            let i = this.form.materiales.map(material => material.id).indexOf(row.id);
             this.form.materiales.splice(i, 1);
         },
         deleteRowAccesorios(row){
-            console.log("Entro en DELETE");
-            let i = this.form.materiales.map(material => material.id).indexOf(row.id) // find index of your object
+            let i = this.form.materiales.map(material => material.id).indexOf(row.id);
             this.form.materiales.splice(i, 1);
         },
     },

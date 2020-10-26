@@ -27,16 +27,6 @@
                 prop="clave_cliente"
                 label="Clave"/>
 
-                <!-- <el-table-column
-                label=""
-                align="center"
-                class-name="fixed-width"
-                width="80">
-                    <template slot-scope="scope">
-                        <el-avatar size="small" v-if="scope.row.foto_cliente ==null" icon="el-icon-user-solid"></el-avatar>
-                    </template>
-                </el-table-column> -->
-
                 <el-table-column
                 prop="nombre_cliente"
                 label="Nombre Comercial"
@@ -103,7 +93,7 @@ import Pagination from '@/components/Pagination';
                     type: undefined,
                     sort: '+id',
                 },
-                list:[], //Este array contendrá las tareas de nuestra bd
+                list:[], 
             }
         },
         components: { 
@@ -113,24 +103,18 @@ import Pagination from '@/components/Pagination';
         methods:{
             async getList(){
                 let me =this;
-                let url = '/clientes' //Ruta que hemos creado para que nos devuelva todas las tareas
+                let url = '/clientes';
                 axios.get(url).then(function (response) {
-                    //creamos un array y guardamos el contenido que nos devuelve el response
-                    console.table("RESPONSE:");
-                    console.log(response.data);
-                    console.table(response.data);
                     me.list = response.data;
                     me.loading = false;
                 })
                 .catch(function (error) {
-                    // handle error
-                    me.notificarError();
+                    
+                    me.$message.error('Hubo un error.');
                     console.log(error);
                 });
             },
-            loadFieldsUpdate(data){ //Esta función rellena los campos y la variable update, con la tarea que queremos modificar
-                console.log("DATA:");
-                console.log(data);
+            loadFieldsUpdate(data){
                 this.$refs.myForm.form.id = data.id;
                 this.$refs.myForm.form.foto_cliente = data.foto_cliente;
                 this.$refs.myForm.form.clave_cliente = data.clave_cliente;
@@ -152,29 +136,16 @@ import Pagination from '@/components/Pagination';
                 me.loading = true;
                 console.log("DELETE FUNCTION");
                 axios.post('/clientes/delete',{'id':id}).then(function (response) {
-                    console.log("Response:");
-                    console.log(response);
                     me.getList();   
-                    me.notificarSuccess('Eliminado correctamente.');
+                    me.$message.success('Eliminado correctamente.');
                     me.loading = false;
                 })
                 .catch(function (error) {
-                    me.notificarError();
+                    me.$message.error('Hubo un error.');
                     console.log(error);
                     me.loading = false;
                 });
-            },
-            notificarSuccess(mensaje = 'Agregado correctamente.') {
-                this.$message({
-                    message: mensaje,
-                    type: 'success'
-                });
-            },
-            notificarError(mensaje = "Hubo un error.") {
-                this.$message.error({
-                    message: mensaje,
-                });
-            },
+            }
         },
         mounted() {
            this.getList();

@@ -94,23 +94,15 @@ import moment from 'moment';
                 let me = this;
                 me.loading = true;
                 axios.get(me.listUrl).then(function (response) {
-                    //creamos un array y guardamos el contenido que nos devuelve el response
-                    console.table("RESPONSE:");
-                    console.log(response.data);
-                    console.table(response.data);
                     me.list = response.data;
                     me.loading = false;
                 })
                 .catch(function (error) {
-                    // handle error
                     me.$message.error('Hubo un error.');
                     console.log(error);
                 });
             },
             loadFieldsUpdate(data){ 
-                console.log("Load fields update DATA:");
-                console.log(data);
-
                 this.$refs.myForm.form.id = data.id;
                 this.$refs.myForm.form.nombre = data.nombre;
                 this.$refs.myForm.form.simbolo = data.simbolo;
@@ -125,8 +117,6 @@ import moment from 'moment';
                 let me = this;
                 me.loading = true;
                 axios.post(me.deleteUrl,{'id':id}).then(function (response) {
-                    console.log("Response:");
-                    console.log(response);
                     me.getList();   
                     me.$message.success('Eliminado correctamente.');
                     me.loading = false;

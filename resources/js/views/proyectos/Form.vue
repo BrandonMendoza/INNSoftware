@@ -223,8 +223,6 @@ import { CommentDropdown } from '../articles/components/Dropdown';
                     });
                     let me = this;
                     axios.put('/proyectos/insert',me.form).then(function (response) {
-                        console.log("Response:");
-                        console.log(response);
                         me.$parent.getList();
                         me.clearFields();
                         me.close(); 
@@ -263,12 +261,7 @@ import { CommentDropdown } from '../articles/components/Dropdown';
             let url = '/productos' 
             //this.loadingMaterialAccesorio = true;
             axios.get(url).then(function (response) {
-                //creamos un array y guardamos el contenido que nos devuelve el response
-                console.table("RESPONSE Materiales Accesorios:");
-                console.log(response.data);
-                console.table(response.data);
                 me.productosSelect = response.data;
-
                 me.productosSelect.forEach(element => {
                     me.form.productos.forEach(producto => {
                         if(element['id'] == producto['id']){
@@ -291,10 +284,6 @@ import { CommentDropdown } from '../articles/components/Dropdown';
             let url = '/clientes';
             this.loadingClientes = true;
             axios.get(url).then(function (response) {
-                //creamos un array y guardamos el contenido que nos devuelve el response
-                console.table("RESPONSE Clientes:");
-                console.log(response.data);
-                console.table(response.data);
                 me.clientes = response.data;
                 me.loadingClientes = false;
             })
@@ -342,7 +331,6 @@ import { CommentDropdown } from '../articles/components/Dropdown';
             });
         },
         deleteRowProductos(row){
-            console.log("Entro en DELETE");
             let i = this.form.productos.map(producto => producto.id).indexOf(row.id) // find index of your object
             this.form.productos.splice(i, 1);
         },

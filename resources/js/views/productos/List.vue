@@ -131,24 +131,17 @@ import Pagination from '@/components/Pagination';
             },
             async getList(){
                 let me =this;
-                let url = '/productos' //Ruta que hemos creado para que nos devuelva todas las tareas
+                let url = '/productos';
                 axios.get(url).then(function (response) {
-                    //creamos un array y guardamos el contenido que nos devuelve el response
-                    console.table("RESPONSE:");
-                    console.log(response.data);
-                    console.table(response.data);
                     me.list = response.data;
                     me.loading = false;
                 })
                 .catch(function (error) {
-                    // handle error
-                    me.notificarError();
+                    me.$message.error('Hubo un error.');
                     console.log(error);
                 });
             },
             loadFieldsUpdate(data){ 
-                console.log("LOad fields update DATA:");
-                console.log(data);
                 this.$refs.myForm.form.id = data.id;
                 this.$refs.myForm.form.cliente_id = data.cliente_id;
                 this.$refs.myForm.form.pintura_id = data.pintura_id;
@@ -164,49 +157,27 @@ import Pagination from '@/components/Pagination';
             },
             loadDocumentos(data){
                 this.$refs.documentosDialog.form.id = data.id;
-                console.log("DOCUMENTOS:");
-                console.log(data.documentos);
                 this.$refs.documentosDialog.form.documentos = JSON.parse(JSON.stringify(data.documentos));
                 this.$refs.documentosDialog.open()
             },
-            documentos(data){ 
-                console.log("LOad fields update DATA:");
-                console.log(data);
+            documentos(data){
                 this.$refs.myForm.form.id = data.id;
-
-                // this.$refs.myForm.form.materiales = JSON.parse(JSON.stringify(data.materiales));
-                // this.$refs.myForm.form.accesorios = JSON.parse(JSON.stringify(data.accesorios));
-
                 this.$refs.myForm.open();
             },
             deleteRow(id){
                 let me = this;
                 me.loading = true;
-                console.log("DELETE FUNCTION");
                 axios.post('/productos/delete',{'id':id}).then(function (response) {
-                    console.log("Response:");
-                    console.log(response);
                     me.getList();   
-                    me.notificarSuccess('Eliminado correctamente.');
+                    me.$message.success('Eliminado correctamente.');
                     me.loading = false;
                 })
                 .catch(function (error) {
-                    me.notificarError();
+                    me.$message.error('Hubo un error.');
                     console.log(error);
                     me.loading = false;
                 });
-            },
-            notificarSuccess(mensaje = 'Agregado correctamente.') {
-                this.$message({
-                    message: mensaje,
-                    type: 'success'
-                });
-            },
-            notificarError(mensaje = "Hubo un error.") {
-                this.$message.error({
-                    message: mensaje,
-                });
-            },
+            }
         },
         
         mounted() {

@@ -6,8 +6,8 @@
         :ref="dialogRef"
         :before-close="handleClose"
         :visible.sync="dialogoAgregar">
-            <span v-if='form.id === ""' slot="title"><i class="el-icon-plus"></i> Agregar Pintura</span>
-            <span v-if='form.id !== ""' slot="title"><i class="el-icon-edit"></i> Editar Pintura </span>
+            <span v-if="form.id == 0" slot="title"><i class="el-icon-plus"></i> Agregar Pintura</span>
+            <span v-if="form.id != 0" slot="title"><i class="el-icon-edit"></i> Editar Pintura </span>
 
             
             <!-- Id del proceso que se esta editando ("0" si es agregar) -->
@@ -50,9 +50,9 @@
             <span slot="footer" class="dialog-footer">
                 <el-button @click="clearFields();dialogoAgregar = false" class="float-left">Cancelar</el-button>
                 <!-- Botón que añade los datos del formulario, solo se muestra si la variable update es igual a 0-->
-                <el-button type="success" v-if='form.id === ""' @click="insert('form');" icon="el-icon-check">Agregar</el-button>
+                <el-button type="success" v-if="form.id == 0" @click="insert('form');" icon="el-icon-check">Agregar</el-button>
                 <!-- Botón que modifica la tarea que anteriormente hemos seleccionado, solo se muestra si la variable update es diferente a 0-->
-                <el-button type="success"  v-if='form.id !== ""' @click="insert('form');" icon="el-icon-check">Guardar</el-button>
+                <el-button type="success"  v-if="form.id != 0" @click="insert('form');" icon="el-icon-check">Guardar</el-button>
             </span>
         </el-dialog>
 
@@ -87,7 +87,7 @@ import { CommentDropdown } from '../articles/components/Dropdown';
         productosSelect:[],
         activeName: 'first',
         form:{
-            id:"",
+            id:0,
             nombre:"",
             simbolo:"",
             numero_capas:1,
@@ -112,8 +112,6 @@ import { CommentDropdown } from '../articles/components/Dropdown';
     methods: {
         open() {
             this.dialogoAgregar = true;
-            console.log("FORM");
-            console.log(this.form);
         },
         close() {
             this.dialogoAgregar = false;
@@ -126,8 +124,6 @@ import { CommentDropdown } from '../articles/components/Dropdown';
                     });
                     let me = this;
                     axios.put('/pinturas/insert',me.form).then(function (response) {
-                        console.log("Response:");
-                        console.log(response);
                         me.$parent.getList();
                         me.clearFields();
                         me.close(); 
@@ -144,7 +140,7 @@ import { CommentDropdown } from '../articles/components/Dropdown';
             });
         },
         clearFields(){/*Limpia los campos e inicializa la variable update a 0*/
-            this.form.id = "";
+            this.form.id = 0;
             this.form.nombre = "";
             this.form.simbolo = "";
             this.form.numero_capas = 1;

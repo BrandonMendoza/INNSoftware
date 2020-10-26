@@ -5,16 +5,8 @@
             
         </el-row>
         <div class="filter-container">
-            <el-button class="filter-item" type="primary" icon="el-icon-plus" @click="$refs.myForm.clearFields();$refs.myForm.open()">Agregar</el-button>
+            <el-button class="filter-item" type="primary" icon="el-icon-plus" @click="$refs.myForm.open();$refs.myForm.clearFields();">Agregar</el-button>
         </div>
-            <!-- 
-                
-            <th>#</th>
-            <th>Núm de Parte</th>
-            <th>Descripción</th>
-            <th>Acero</th>
-            <th>Peso (kg)</th>
-            <th data-orderable="false"></th> -->
         <el-row >
             <el-table
             :data="list"
@@ -84,7 +76,7 @@ import Pagination from '@/components/Pagination';
                     type: undefined,
                     sort: '+id',
                 },
-                list:[], //Este array contendrá las tareas de nuestra bd
+                list:[],
             }
         },
         components: { 
@@ -94,29 +86,23 @@ import Pagination from '@/components/Pagination';
         methods:{
             async getList(){
                 let me =this;
-                let url = '/accesorios' //Ruta que hemos creado para que nos devuelva todas las tareas
+                let url = '/accesorios';
                 axios.get(url).then(function (response) {
-                    //creamos un array y guardamos el contenido que nos devuelve el response
-                    console.table("RESPONSE:");
-                    console.log(response.data);
-                    console.table(response.data);
                     me.list = response.data;
                     me.loading = false;
                 })
                 .catch(function (error) {
-                    // handle error
-                    me.notificarError();
+                    me.$message.error('Hubo un error.');
                     console.log(error);
                 });
             },
-            loadFieldsUpdate(data){ //Esta función rellena los campos y la variable update, con la tarea que queremos modificar
+            loadFieldsUpdate(data){
                 this.$refs.myForm.form.id = data.id;
                 this.$refs.myForm.form.catalogo = data.catalogo;
                 this.$refs.myForm.form.numero_parte = data.numero_parte;
                 this.$refs.myForm.form.descripcion = data.descripcion;
                 this.$refs.myForm.form.acero_id = data.acero_id;
                 this.$refs.myForm.form.peso_kg = data.peso_kg;
-
                 this.$refs.myForm.open();
             },
             deleteRow(id){
@@ -124,29 +110,16 @@ import Pagination from '@/components/Pagination';
                 me.loading = true;
                 console.log("DELETE FUNCTION");
                 axios.post('/accesorios/delete',{'id':id}).then(function (response) {
-                    console.log("Response:");
-                    console.log(response);
                     me.getList();   
-                    me.notificarSuccess('Eliminado correctamente.');
+                    me.$message.success('Eliminado correctamente.');
                     me.loading = false;
                 })
                 .catch(function (error) {
-                    me.notificarError();
+                    me.$message.success('Hubo un error.');
                     console.log(error);
                     me.loading = false;
                 });
-            },
-            notificarSuccess(mensaje = 'Agregado correctamente.') {
-                this.$message({
-                    message: mensaje,
-                    type: 'success'
-                });
-            },
-            notificarError(mensaje = "Hubo un error.") {
-                this.$message.error({
-                    message: mensaje,
-                });
-            },
+            }
         },
         mounted() {
            this.getList();
