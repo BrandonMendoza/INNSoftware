@@ -12,7 +12,6 @@ Homestead.json
 Homestead.yaml
 npm-debug.log
 yarn-error.log
-/public/js
 /public/css/*.css
 /public/css/*.map
 /public/css/*.gz
@@ -25,3 +24,4 @@ yarn-error.log
 .idea
 .DS_Store
 /app/Providers/AppServiceProvider.php
+README.md
