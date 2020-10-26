@@ -18,9 +18,16 @@ class accesoriosController extends Controller
     public function insert()
     {
         $accesorio = new Accesorio;
+        /*Creando sus procesos*/
+        
         /*Aqui se actualiza/crea con la informacion que enviamos al request*/
         $accesorio = $accesorio     ->fill(request()->all())
                                         ->updateOrCreate(['id' => request()->get('id')],$accesorio->toArray());
+        /**Crear numero parte si esta vacia */
+        if(request()->get('numero_parte') == ""){
+            $accesorio->numero_parte = 'ACC-'.str_pad($proyecto->id + 1, 8, "0", STR_PAD_LEFT);
+            $accesorio->update();
+        }
     }
 
     /* Funcion para eliminar con id */
@@ -34,14 +41,4 @@ class accesoriosController extends Controller
 		$data['accesorios'] = Accesorio::All();
 		return view('accesorios.show')->with($data);
 	}
-
-	// public function delete(Request $request){
-	// 	//buscar y eliminar
-	// 	$accesorio = Accesorio::find($request->id);
-	// 	$accesorio->delete();
-
-	// 	//Obtener listado actualizado para mostrar en Show.blade.php
-    //     $accesorios = Accesorio::with(['Acero'])->get();
-    //     return response()->json($accesorios);//Fin
-	// }
 }

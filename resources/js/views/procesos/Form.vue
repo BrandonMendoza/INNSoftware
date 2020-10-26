@@ -8,12 +8,11 @@
             <span v-if="form.id == 0" slot="title"><i class="el-icon-plus"></i> Agregar Proceso</span>
             <span v-if="form.id != 0" slot="title"><i class="el-icon-edit"></i> Editar Proceso </span>
             <!-- Id del proceso que se esta editando ("0" si es agregar) -->
-                <input v-model="form.id" hidden/>
+            <input v-model="form.id" hidden/>
             
 
             <el-form-item class="text-right">
                 <el-switch v-model="form.activo" active-text="Activo" :active-value="1" :inactive-value="0"></el-switch>    
-                
             </el-form-item>
 
             <el-form-item label="Nombre del Proceso" prop="nombre">
@@ -128,17 +127,14 @@
                         target: '.el-dialog'
                     });
                     axios.put('/proceso/insert',me.form).then(function (response) {
-                        console.log("Response:");
-                        console.log(response);
-                        
-                        me.$parent.getProcesos();//llamamos al metodo getTask(); para que refresque nuestro array y muestro los nuevos datos
-                        me.clearFields();//Limpiamos los campos e inicializamos la variable update a 0
+                        me.$parent.getProcesos();
+                        me.clearFields();
                         me.close(); 
                         loadingInstance.close();
-                        me.notificarSuccess();
+                        me.$message.success('Guardado correctamente.');
                     })
                     .catch(function (error) {
-                        notificarError();
+                        me.$message.success('Hubo un error.');
                         console.log(error);
                     });
                 } else {
@@ -161,19 +157,7 @@
                 this.close(); //cerramos modal
             })
             .catch(_ => {});
-        },
-        notificarSuccess() {
-            this.$message({
-                message: 'Agregado correctamente.',
-                type: 'success'
-            });
-        },
-        notificarError() {
-            this.$message({
-                message: 'Hubo un error.',
-                type: 'danger'
-            });
-        },
+        }
     },
   };
 </script>

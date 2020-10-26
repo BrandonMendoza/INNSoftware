@@ -18,13 +18,13 @@
             </el-form-item>
 
             <el-form-item label="Tipo de Material" prop="tipo_material_id" >
-                <el-select v-model="form.tipo_material_id" style="width:100%"> 
+                <el-select v-model="form.tipo_material_id" :value="form.tipo_material_id" style="width:100%"> 
                     <el-option :label="tipoMaterial.nombre" :value="tipoMaterial.id" v-for="tipoMaterial in tiposMateriales" :key="tipoMaterial.id" style="widht:100%"/>
                 </el-select>
             </el-form-item>
 
             <el-form-item label="Acero" prop="acero_id" >
-                <el-select v-model="form.acero_id" style="width:100%">
+                <el-select v-model="form.acero_id" :value="form.acero_id" style="width:100%">
                     <el-option :label="acero.nombre" :value="acero.id" v-for="acero in aceros" :key="acero.id"/>
                 </el-select>
             </el-form-item>
@@ -32,11 +32,7 @@
             <el-row :gutter="20" align="bottom">
                 <el-col :span="10">
                     <el-form-item label="Peso(kg)" prop="peso_kg">
-                        <!-- <el-input-number v-model="form.peso_kg" :precision="2" :controls="false" :min="0"  @keypress="justNumber"></el-input-number> -->
                         <el-input v-model="form.peso_kg" />
-                        <!-- <el-input v-model="form.peso_kg" onkeypress='return (event.charCode >= 48 && event.charCode <= 57) || event.charCode == 46' /> -->
-                        <!-- onkeypress='return event.charCode > 31 && (event.charCode < 48 || event.charCode > 57)) && event.charCode !== 46' /> -->
-                        
                     </el-form-item>
                 </el-col>
                 <el-col :span="14"/>
@@ -68,11 +64,9 @@
                 </el-col>
             </el-row>
 
-            <!-- <input v-model="message" v-on:keypress="isNumber(event)"> -->
-
 
             <span slot="footer" class="dialog-footer">
-                <el-button @click="clearFields();dialogoAgregar = false" class="float-left">Cancelar</el-button>
+                <el-button @click="dialogoAgregar = false;clearFields();" class="float-left">Cancelar</el-button>
                 <!-- Botón que añade los datos del formulario, solo se muestra si la variable update es igual a 0-->
                 <el-button type="success" v-if="form.id == 0" @click="insert('form');" icon="el-icon-check">Agregar</el-button>
                 <!-- Botón que modifica la tarea que anteriormente hemos seleccionado, solo se muestra si la variable update es diferente a 0-->
@@ -158,19 +152,15 @@
                         target: '.el-dialog'
                     });
                     let me = this;
-                    
                     axios.put('/materiales/insert',me.form).then(function (response) {
-                        console.log("Response:");
-                        console.log(response);
-                        
-                        me.$parent.getList();//llamamos al metodo getTask(); para que refresque nuestro array y muestro los nuevos datos
-                        me.clearFields();//Limpiamos los campos e inicializamos la variable update a 0
+                        me.$parent.getList();
+                        me.clearFields();
                         me.close(); 
                         loadingInstance.close();
-                        me.notificarSuccess();
+                        me.$message.success('Guardado correctamente.');
                     })
                     .catch(function (error) {
-                        me.notificarError();
+                        me.$message.success('Hubo un error.');
                         console.log(error);
                     });
                 } else {
@@ -180,35 +170,27 @@
         },
         getTiposMateriales(){
             let me =this;
-            let url = '/tiposMateriales' //Ruta que hemos creado para que nos devuelva todas las tareas
+            let url = '/tiposMateriales';
             axios.get(url).then(function (response) {
-                //creamos un array y guardamos el contenido que nos devuelve el response
-                console.table("RESPONSE:");
-                console.log(response.data);
                 me.tiposMateriales = response.data;
             })
             .catch(function (error) {
-                // handle error
-                me.notificarError();
+                me.$message.error('Hubo un error.');
                 console.log(error);
             });
         },
         getAceros(){
             let me =this;
-            let url = '/acerosMateriales' //Ruta que hemos creado para que nos devuelva todas las tareas
+            let url = '/acerosMateriales';
             axios.get(url).then(function (response) {
-                //creamos un array y guardamos el contenido que nos devuelve el response
-                console.table("RESPONSE:");
-                console.log(response.data);
                 me.aceros = response.data;
             })
             .catch(function (error) {
-                // handle error
-                me.notificarError();
+                me.$message.error('Hubo un error.');
                 console.log(error);
             });
         },
-        clearFields(){/*Limpia los campos e inicializa la variable update a 0*/
+        clearFields(){
             this.form.id = 0;
             this.catalogo = 1;
             this.form.numero_parte = "";
@@ -219,7 +201,6 @@
             this.form.medida_2 = "";
             this.form.medida_3 = "";
             this.form.medida_4 = "";
-            this.$refs['form'].resetFields();
         },
         handleClose(done) {
             this.$confirm('Está seguro que deseas salir?')
@@ -228,18 +209,7 @@
                 this.close(); //cerramos modal
             })
             .catch(_ => {});
-        },
-        notificarSuccess(mensaje = 'Agregado correctamente.') {
-            this.$message({
-                message: mensaje,
-                type: 'success'
-            });
-        },
-        notificarError(mensaje = "Hubo un error.") {
-            this.$message.error({
-                message: mensaje,
-            });
-        },
+        }
     },
   };
 </script>

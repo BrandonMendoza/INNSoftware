@@ -67,9 +67,6 @@
             simbolo: [
                 { required: true, message: 'Ingresa un simbolo', trigger: 'blur' }
             ],
-            cantidad_datos: [
-                { required: true, message: 'selecciona una cantidad de datos', trigger: 'change' }
-            ],
         },
         dialogoAgregar: false,
         dialogRef: 'myForm',
@@ -91,17 +88,14 @@
                     let me = this;
                     
                     axios.put('/tiposMateriales/insert',me.form).then(function (response) {
-                        console.log("Response:");
-                        console.log(response);
-                        
-                        me.$parent.getList();//llamamos al metodo getTask(); para que refresque nuestro array y muestro los nuevos datos
-                        me.clearFields();//Limpiamos los campos e inicializamos la variable update a 0
+                        me.$parent.getList();
+                        me.clearFields();
                         me.close(); 
                         loadingInstance.close();
-                        me.notificarSuccess();
+                        me.$message.success('Guardado correctamente.');
                     })
                     .catch(function (error) {
-                        notificarError();
+                        me.$message.error('Hubo un error.');
                         console.log(error);
                     });
                 } else {
@@ -122,17 +116,6 @@
                 this.close(); //cerramos modal
             })
             .catch(_ => {});
-        },
-        notificarSuccess(mensaje = 'Agregado correctamente.') {
-            this.$message({
-                message: mensaje,
-                type: 'success'
-            });
-        },
-        notificarError(mensaje = "Hubo un error.") {
-            this.$message.error({
-                message: mensaje,
-            });
         },
     },
   };

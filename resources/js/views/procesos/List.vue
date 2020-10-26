@@ -118,7 +118,7 @@ import Pagination from '@/components/Pagination';
                     type: undefined,
                     sort: '+id',
                 },
-                procesos:[], //Este array contendrá las tareas de nuestra bd
+                procesos:[], 
             }
         },
         components: { 
@@ -130,24 +130,20 @@ import Pagination from '@/components/Pagination';
         methods:{
             getProcesos(){
                 let me =this;
-                let url = '/procesos' //Ruta que hemos creado para que nos devuelva todas las tareas
+                let url = '/procesos';
                 axios.get(url).then(function (response) {
-                    //creamos un array y guardamos el contenido que nos devuelve el response
-                    console.table("PROCESOS:");
-                    console.table(response.data);
                     me.procesos = response.data;
                     me.loading = false;
                 })
                 .catch(function (error) {
-                    // handle error
+                    me.$message.error('Hubo un error.');
                     console.log(error);
+                    me.loading = false;
                 });
             },
-            loadFieldsUpdate(data){ //Esta función rellena los campos y la variable update, con la tarea que queremos modificar
-                console.log("formDialog");
-                
+            loadFieldsUpdate(data){ 
                 this.$refs.myForm.form.id = data.id;
-                this.$refs.myForm.form.activo = data.activo;
+                this.$refs.myForm.form.activo = parseInt(data.activo);
                 this.$refs.myForm.form.nombre = data.nombre;
                 this.$refs.myForm.form.simbolo = data.simbolo;
                 this.$refs.myForm.form.color = data.color;
@@ -159,29 +155,16 @@ import Pagination from '@/components/Pagination';
                 me.loading = true;
                 console.log("DELETE FUNCTION");
                 axios.post('/proceso/delete',{'id':id}).then(function (response) {
-                    console.log("Response:");
-                    console.log(response);
-                    me.getProcesos();   
-                    me.notificarSuccess('Eliminado correctamente.');
+                    me.getProcesos();
+                    me.$message.success('Eliminado correctamente.');
                     me.loading = false;
                 })
                 .catch(function (error) {
-                    me.notificarError();
+                    me.$message.error('Hubo un error.');
                     console.log(error);
                     me.loading = false;
                 });
-            },
-            notificarSuccess(mensaje = 'Agregado correctamente.') {
-                this.$message({
-                    message: mensaje,
-                    type: 'success'
-                });
-            },
-            notificarError(mensaje = "Hubo un error.") {
-                this.$message.error({
-                    message: mensaje,
-                });
-            },
+            }
         },
         mounted() {
            this.getProcesos();
