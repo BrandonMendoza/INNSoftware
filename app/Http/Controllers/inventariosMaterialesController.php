@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Inventario_Material;
+use App\Inventario_material;
 use App\Material;
 use App\Accesorio;
 use App\Cliente;
@@ -15,7 +15,7 @@ class inventariosMaterialesController extends Controller
 
     /** Funcion para obtener todos los materiales */
     public function inventariosMateriales(){
-        $inventarios = Inventario_Material::with(['Material.Acero','Accesorio.Acero','Material_cliente.Cliente','Status'])->get();    
+        $inventarios = Inventario_material::with(['Material.Acero','Accesorio.Acero','Material_cliente.Cliente','Status'])->get();    
         foreach ($inventarios as $key => $inventario) {
             $inventario->loadPesoMaterial();
             $inventario->loadNombreCompleto();
