@@ -145,6 +145,7 @@ import Pagination from '@/components/Pagination';
                 this.$refs.myForm.form.id = data.id;
                 this.$refs.myForm.form.cliente_id = data.cliente_id;
                 this.$refs.myForm.form.pintura_id = data.pintura_id;
+                this.$refs.myForm.form.numero_parte = data.numero_parte;
                 this.$refs.myForm.form.numero_parte_cliente = data.numero_parte_cliente;
                 this.$refs.myForm.form.peso_kg = data.peso_kg;
                 this.$refs.myForm.form.peso_lbs = data.peso_lbs;
@@ -157,6 +158,8 @@ import Pagination from '@/components/Pagination';
             },
             loadDocumentos(data){
                 this.$refs.documentosDialog.form.id = data.id;
+                this.$refs.documentosDialog.form.numero_parte = data.numero_parte;
+                this.$refs.documentosDialog.form.numero_parte_cliente = data.numero_parte_cliente;
                 this.$refs.documentosDialog.form.documentos = JSON.parse(JSON.stringify(data.documentos));
                 this.$refs.documentosDialog.open()
             },

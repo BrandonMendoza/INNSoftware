@@ -14,15 +14,17 @@
             <input v-model="form.id" hidden/>
             <input v-model="form.numero_parte" hidden/>
 
+            <span style="margin-right: 5px;"><b>Núm. de Parte (Local): </b> {{form.numero_parte}}</span>
+            <br>
             <el-row :gutter="20">
                 <el-col :span="6">
                     <el-form-item label="Cliente" prop="cliente_id"  >
-                        <el-select v-model="form.cliente_id" :value="form.cliente_id" style="width: 100%;" filterable :loading="loadingCliente">
+                        <el-select v-model="form.cliente_id" value-key="form.cliente_id" style="width: 100%;" filterable :loading="loadingCliente">
                             <el-option 
+                                v-for="cliente in clientes"
+                                :key="cliente.id"
                                 :label="cliente.nombre_cliente" 
-                                :value="cliente.id" 
-                                v-for="cliente in clientes" 
-                                :key="cliente.id"/>
+                                :value="cliente.id"/>
                         </el-select>
                     </el-form-item>
 
@@ -147,7 +149,7 @@
             </el-form-item>
 
             <span slot="footer" class="dialog-footer">
-                <el-button @click="dialogoProductos = false">Cancel</el-button>
+                <el-button @click="dialogoProductos = false">Cancelar</el-button>
                 <el-button type="primary" @click="agregarProducto">Confirmar</el-button>
             </span>
         </el-dialog>

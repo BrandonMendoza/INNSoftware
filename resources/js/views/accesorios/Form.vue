@@ -23,12 +23,12 @@
 
             <el-form-item label="Acero" prop="acero_id" >
 
-                <el-select v-model="form.acero_id" :value="form.acero_id"  style="width:100%">
+                <el-select v-model="form.acero_id" value-key="form.acero_id"  style="width:100%">
                     <el-option 
-                    v-for="acero in aceros"
-                    :label="acero.nombre" 
-                    :value="acero.id" 
-                    :key="acero.id"/>
+                        v-for="acero in aceros"
+                        :key="acero.id"
+                        :label="acero.nombre" 
+                        :value="acero.id" />
                 </el-select>
             </el-form-item>
 
