@@ -96,13 +96,13 @@ export const constantRoutes = [
     path: '/profile',
     component: Layout,
     redirect: '/profile/edit',
+    hidden: true,
     children: [
       {
         path: 'edit',
         component: () => import('@/views/users/SelfProfile'),
         name: 'SelfProfile',
         meta: { title: 'userProfile', icon: 'user', noCache: true },
-        hidden: true,
       },
     ],
   },
@@ -116,9 +116,7 @@ export const asyncRoutes = [
     redirect: '/OrdenesAbiertas',
     name: 'Ordenes Abiertas',
     meta: { 
-      title: 'ordenesAbiertas', 
-      icon: 'ordenesAbiertas',  
-      permissions: ['view menu ordenes abiertas']
+      title: 'ordenesAbiertas', icon: 'ordenesAbiertas', permissions: ['view menu ordenes abiertas']
     },
     children: [
       {
@@ -141,11 +139,8 @@ export const asyncRoutes = [
     path: '/inventarios',
     component: Layout,
     redirect: '/inventarios',
-    name: 'Inventarios',
     meta: {
-      title: 'inventarios',
-      icon: 'inventarios',
-      permissions: ['view menu inventarios'],
+      title: 'inventarios', icon: 'inventarios', permissions: ['view menu inventarios'],
     },
     children: [   
       {
@@ -161,7 +156,6 @@ export const asyncRoutes = [
     path: '/proyectos',
     component: Layout,
     redirect: '/Proyectos',
-    name: 'Proyectos',
     meta: { title: 'productos', icon: 'product' , permissions: ['view menu proyectos'] },
     children: [
       {
@@ -192,7 +186,6 @@ export const asyncRoutes = [
     path: '/catalogos',
     component: Layout,
     redirect: '/catalogos',
-    name: 'Catalogos',
     meta: {
       title: 'catalogos',
       icon: 'table',

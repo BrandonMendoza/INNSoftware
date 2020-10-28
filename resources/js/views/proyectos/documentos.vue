@@ -11,7 +11,10 @@
             
             <!-- Id del proceso que se esta editando ("0" si es agregar) -->
             <input v-model="form.id" hidden/>
-
+            <span style="margin-right: 5px;"><b>Núm. de Parte (Local): </b> {{form.numero_parte}}</span>
+            <span style="margin-right: 5px;"><b>Núm. de Parte (Cliente): </b> {{form.numero_parte_cliente}}</span>
+            <br>
+            <br>
             <div class="filter-container">
                 <el-button class="filter-item" type="primary" icon="el-icon-plus" @click="dialogoDocumentos = true;">Agregar</el-button>
             </div>
@@ -109,6 +112,8 @@ import { CommentDropdown } from '../articles/components/Dropdown';
         fileList: [],
         form:{
             id:0,
+            numero_parte:"",
+            numero_parte_cliente:"",
             documentos:[],
         },
         dialogoAgregar: false,

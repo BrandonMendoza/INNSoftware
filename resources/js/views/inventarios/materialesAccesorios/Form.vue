@@ -15,29 +15,34 @@
             <el-row :gutter="20">
                 <el-col :span="8" style="padding-top:55px;">
                     <el-form-item label="Estatus" prop="status_id">
-                        <el-select v-model="form.status_id" style="width: 100%;" :row-class-name="tableRowClassName">
-                            <el-option label="Sin Recibir" :value="1" class="danger-row"></el-option>
-                            <el-option label="Recibido" :value="2" class="success-row"></el-option>
-                            <el-option label="Revisando" :value="3" class="warning-row"></el-option>
+                        <el-select v-model="form.status_id" value-key="form.status_id" style="width: 100%;" :row-class-name="tableRowClassName">
+                            <el-option 
+                                v-for="status in statusList"
+                                :key="status.id"
+                                :label="status.nombre" 
+                                :value="status.id"/>
                         </el-select>
                     </el-form-item>
 
                     <el-form-item label="Categoría" prop="categoria">
-                        <el-select v-model="form.catalogo" style="width: 100%;" @change="getMaterialesAccesorios();changeCategoria()">
-                            <el-option label="Material" :value="1" ></el-option>
-                            <el-option label="Accesorio​" :value="2"></el-option>
+                        <el-select v-model="form.catalogo" value-key="form.catalogo" style="width: 100%;" @change="getMaterialesAccesorios();changeCategoria()">
+                            <el-option 
+                                v-for="categoria in categorias"
+                                :key="categoria.id"
+                                :label="categoria.nombre" 
+                                :value="categoria.id"/>
                         </el-select>
                     </el-form-item>
 
                     
 
                     <el-form-item label="Material/Accesorio" prop="material_id"  >
-                        <el-select v-model="form.material_id" :value="form.material_id" style="width: 100%;" v-loading="loadingMaterialAccesorio" filterable clearable>
+                        <el-select v-model="form.material_id" value-key="form.material_id" style="width: 100%;" v-loading="loadingMaterialAccesorio" filterable clearable>
                             <el-option 
                                 v-for="materialAccesorio in materialesAccesorios"
+                                :key="materialAccesorio.id"
                                 :label="form.catalogo == 1 ? materialAccesorio.nombreCompleto : materialAccesorio.descripcion" 
-                                :value="materialAccesorio.id"  
-                                :key="materialAccesorio.id"/>
+                                :value="materialAccesorio.id"/>
                         </el-select>
                     </el-form-item>
 
@@ -191,6 +196,15 @@
         materialesAccesorios:[],
         clientes:[],
         aceros:[],
+        categorias: [
+            { id: 1, nombre: 'Material' },
+            { id: 2, nombre: 'Accesorio' },
+        ],
+        statusList: [
+            { id: 1, nombre: 'Sin Recibir' },
+            { id: 2, nombre: 'Recibido' }, 
+            { id: 3, nombre: 'Revisando' }
+        ],
         activeName: 'first',
         loadingMaterialAccesorio:true,
         loadingClientes:true,
@@ -252,9 +266,6 @@
                     let me = this;
                     
                     axios.put('/inventariosMaterialesAccesorios/insert',me.form).then(function (response) {
-                        console.log("Response:");
-                        console.log(response);
-                        
                         me.$parent.getList();
                         me.clearFields();
                         me.close(); 
@@ -270,7 +281,7 @@
                 }
             });
         },
-        clearFields(){/*Limpia los campos e inicializa la variable update a 0*/
+        clearFields(){
 
             this.form.id = 0;
             this.form.status_id = 1;
@@ -310,15 +321,10 @@
                 url = '/accesorios' 
             }
             axios.get(url).then(function (response) {
-                //creamos un array y guardamos el contenido que nos devuelve el response
-                console.table("RESPONSE Materiales Accesorios:");
-                console.log(response.data);
-                console.table(response.data);
                 me.materialesAccesorios = response.data;
                 me.loadingMaterialAccesorio = false;
             })
             .catch(function (error) {
-                // handle error
                 me.$message.error('Hubo un error.');
                 console.log(error);
                 me.loadingMaterialAccesorio = false;
@@ -329,10 +335,6 @@
             let url = '/clientes';
             this.loadingClientes = true;
             axios.get(url).then(function (response) {
-                //creamos un array y guardamos el contenido que nos devuelve el response
-                console.table("RESPONSE Clientes:");
-                console.log(response.data);
-                console.table(response.data);
                 me.clientes = response.data;
                 me.loadingClientes = false;
             })
@@ -344,9 +346,7 @@
             });
         },
         changeCategoria(){
-            this.form.material_id = ""; 
-            console.log("CHANGE CATEGORIA:");
-            console.log(this.form.material_id);
+            this.form.material_id = "";
         },
         changeCliente(){
             if(this.form.cliente_id == ""){
@@ -355,13 +355,9 @@
                 let me = this;
                 let url = '/inventariosMaterialesAccesorios/getMaterialClienteByMaterialCliente';
                 axios.put(url,me.form).then(function (response) {
-                    //creamos un array y guardamos el contenido que nos devuelve el response
-                    console.table("RESPONSE Material Cliente:");
-                    console.log(response.data);
                     me.form.numero_parte = response.data.numero_parte;
                     me.form.almacen = response.data.almacen;
                     me.form.locacion_almacen = response.data.locacion_almacen;
-                    //me.form.cliente_id = response.data.cliente_id;
                     me.form.material_cliente_id =  response.data.id;
                 })
                 .catch(function (error) {

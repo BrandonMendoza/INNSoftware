@@ -13,6 +13,7 @@ export default {
     tiposMaterial: 'Tipos de Material',
     tiposAcero: 'Tipos de Acero',
     accesorios: 'Accesorios',
+    catalogos: 'Catalogos',
     /**Old */
     dashboard: 'Tablero',
     introduction: 'Introduccion',

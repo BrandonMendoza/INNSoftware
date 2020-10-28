@@ -176,7 +176,7 @@ import Pagination from '@/components/Pagination';
                     type: undefined,
                     sort: '+id',
                 },
-                list:[], //Este array contendrá las tareas de nuestra bd
+                list:[],
             }
         },
         components: { 
@@ -196,24 +196,17 @@ import Pagination from '@/components/Pagination';
             },
             async getList(){
                 let me =this;
-                let url = '/inventariosMaterialesAccesorios' //Ruta que hemos creado para que nos devuelva todas las tareas
+                let url = '/inventariosMaterialesAccesorios';
                 axios.get(url).then(function (response) {
-                    //creamos un array y guardamos el contenido que nos devuelve el response
-                    console.table("RESPONSE:");
-                    console.log(response.data);
-                    console.table(response.data);
                     me.list = response.data;
                     me.loading = false;
                 })
                 .catch(function (error) {
-                    // handle error
                     me.$message.success('Hubo un error.');
                     console.log(error);
                 });
             },
-            loadFieldsUpdate(data){ //Esta función rellena los campos y la variable update, con la tarea que queremos modificar
-                console.log("DATA:");
-                console.log(data);
+            loadFieldsUpdate(data){ 
 
                 this.$refs.myForm.form.id = data.id;
                 this.$refs.myForm.form.status_id = data.status_id;
@@ -244,8 +237,6 @@ import Pagination from '@/components/Pagination';
                 me.loading = true;
                 console.log("DELETE FUNCTION");
                 axios.post('/inventariosMaterialesAccesorios/delete',{'id':id}).then(function (response) {
-                    console.log("Response:");
-                    console.log(response);
                     me.getList();
                     me.$message.success('Eliminado correctamente.');
                     me.loading = false;

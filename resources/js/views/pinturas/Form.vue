@@ -15,20 +15,20 @@
             <el-row :gutter="20">
                 <el-col :span="6">
 
-                    <el-form-item label="Nombre">
+                    <el-form-item label="Nombre" prop="nombre">
                         <el-input v-model="form.nombre" style="width: auto;"/>
                     </el-form-item>
 
-                     <el-form-item label="Simbolo">
-                        <!-- <el-input v-model="form.simbolo" style="width: auto;"/> -->
-                        <the-mask class="el-input__inner" v-model="form.simbolo" :mask="['AAA','AA']" :tokens="hexTokens" style="width: 165px;"/>
+                     <el-form-item label="Simbolo" prop="simbolo">
+                        <el-input v-model="form.simbolo" style="width: auto;" maxlength="4"/>
+                        <!-- <the-mask class="el-input__inner" v-model="form.simbolo" :mask="['AAA','AA']" :tokens="hexTokens" style="width: 165px;"/> -->
                     </el-form-item>
 
-                    <el-form-item label="Número de Capas">
+                    <el-form-item label="Número de Capas" prop="numero_capas">
                         <el-input-number :min="1" v-model="form.numero_capas" style="width: auto;"/>
                     </el-form-item>
 
-                    <el-form-item label="Tiempo de secada por capa">
+                    <el-form-item label="Tiempo de secada por capa" prop="tiempo_secado_capa">
                         <el-input-number :min="1" v-model="form.tiempo_secado_capa" style="width: auto;"/>
                     </el-form-item>
 
@@ -95,14 +95,17 @@ import { CommentDropdown } from '../articles/components/Dropdown';
             indicaciones:"",
         },
         rules: {
+            nombre: [
+                  { required: true, message: 'Ingresa un nombre', trigger: 'blur' },
+            ],
             simbolo: [
-                  { required: true, message: 'Ingresa un número de parte', trigger: 'blur' },
+                  { required: true, message: 'Ingresa un simbolo', trigger: 'blur' },
             ],
             numero_capas: [
-                { required: true, message: 'Selecciona un cliente', trigger: 'change' },
+                { required: true, message: 'Ingresa un numero de capas', trigger: 'change' },
             ],
             tiempo_secado_capa: [
-                { required: true, message: 'Selecciona una fecha de entrega', trigger: 'blur' },
+                { required: true, message: 'Ingresa tiempo de secado', trigger: 'blur' },
             ],
         },
         dialogoAgregar: false,

@@ -12,16 +12,17 @@
             
             <!-- Id del proceso que se esta editando ("0" si es agregar) -->
             <input v-model="form.id" hidden/>
-
+            <span style="margin-right: 5px;"><b>Núm. de Parte (Local): </b> {{form.numero_parte}}</span>
+            <br>
             <el-row :gutter="20">
                 <el-col :span="6">
                     <el-form-item label="Cliente" prop="cliente_id"  >
-                        <el-select v-model="form.cliente_id" :value="form.cliente_id" style="width: 100%;" filterable :loading="loadingCliente">
+                        <el-select v-model="form.cliente_id" value-key="form.cliente_id" style="width: 100%;" filterable :loading="loadingCliente">
                             <el-option 
+                                v-for="cliente in clientes"
+                                :key="cliente.id"
                                 :label="cliente.nombre_cliente" 
-                                :value="cliente.id" 
-                                v-for="cliente in clientes" 
-                                :key="cliente.id"/>
+                                :value="cliente.id" />
                         </el-select>
                     </el-form-item>
 
@@ -30,12 +31,12 @@
                     </el-form-item>  
 
                     <el-form-item label="Pintura" prop="pintura_id"  >
-                        <el-select v-model="form.pintura_id" :value="form.pintura_id" style="width: 100%;" filterable :loading="loadingPinturas">
+                        <el-select v-model="form.pintura_id" value-key="form.pintura_id" style="width: 100%;" filterable :loading="loadingPinturas">
                             <el-option 
+                                v-for="pintura in pinturas"
+                                :key="pintura.id"
                                 :label="pintura.simbolo" 
-                                :value="pintura.id" 
-                                v-for="pintura in pinturas" 
-                                :key="pintura.id"/>
+                                :value="pintura.id"/>
                         </el-select>
                     </el-form-item>
 
@@ -152,6 +153,7 @@
         title="Agregar Material a Producto"
         :visible.sync="dialogoMateriales"
         width="30%">
+
             <el-form-item label="Material">
                 <el-select v-model="materialAgregar.material" style="width: 100%;" value-key="id" filterable>
                     <el-option 
@@ -168,7 +170,7 @@
             </el-form-item>
 
             <span slot="footer" class="dialog-footer">
-                <el-button @click="dialogoMateriales = false">Cancel</el-button>
+                <el-button @click="dialogoMateriales = false">Cancelar</el-button>
                 <el-button type="primary" @click="agregarMaterial">Confirmar</el-button>
             </span>
         </el-dialog>
@@ -193,7 +195,7 @@
             </el-form-item>
 
             <span slot="footer" class="dialog-footer">
-                <el-button @click="dialogoAccesorios = false">Cancel</el-button>
+                <el-button @click="dialogoAccesorios = false">Cancelar</el-button>
                 <el-button type="primary" @click="agregarAccesorio">Confirmar</el-button>
             </span>
         </el-dialog>
@@ -234,6 +236,7 @@ import { CommentDropdown } from '../articles/components/Dropdown';
         form:{
             id:0,
             descripcion:"",
+            numero_parte:"",
             numero_parte_cliente:"",
             cliente_id:"",
             pintura_id:"",
@@ -272,6 +275,7 @@ import { CommentDropdown } from '../articles/components/Dropdown';
     },
     methods: {
         open() {
+            this.activeName = 'first';
             this.getPinturas();
             this.getClientes();
             this.getMateriales();
@@ -467,8 +471,8 @@ import { CommentDropdown } from '../articles/components/Dropdown';
             this.form.materiales.splice(i, 1);
         },
         deleteRowAccesorios(row){
-            let i = this.form.materiales.map(material => material.id).indexOf(row.id);
-            this.form.materiales.splice(i, 1);
+            let i = this.form.accesorios.map(accesorio => accesorio.id).indexOf(row.id);
+            this.form.accesorios.splice(i, 1);
         },
     },
   };

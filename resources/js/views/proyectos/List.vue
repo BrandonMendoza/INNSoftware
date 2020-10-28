@@ -161,6 +161,8 @@ import Pagination from '@/components/Pagination';
             },
             loadDocumentos(data){
                 this.$refs.documentosDialog.form.id = data.id;
+                this.$refs.documentosDialog.form.numero_parte = data.numero_parte;
+                this.$refs.documentosDialog.form.numero_parte_cliente = data.numero_parte_cliente;
                 this.$refs.documentosDialog.form.documentos = JSON.parse(JSON.stringify(data.documentos));
                 this.$refs.documentosDialog.open()
             },
