@@ -125,7 +125,7 @@ import { CommentDropdown } from '../articles/components/Dropdown';
         close() {
             this.dialogoAgregar = false;
         },
-        clearFields(){/*Limpia los campos e inicializa la variable update a 0*/
+        clearFields(){
             this.form.id = 0;
             this.form.documentos = [];
         },
@@ -136,17 +136,6 @@ import { CommentDropdown } from '../articles/components/Dropdown';
             })
             .catch(_ => {});
         },
-        notificarSuccess(mensaje = 'Agregado correctamente.') {
-            this.$message({
-                message: mensaje,
-                type: 'success'
-            });
-        },
-        notificarError(mensaje = "Hubo un error.") {
-            this.$message.error({
-                message: mensaje,
-            });
-        },
         deleteDocumento(row){
             let me = this;
             me.loading = true;
@@ -156,11 +145,11 @@ import { CommentDropdown } from '../articles/components/Dropdown';
             axios.post('/proyectos/documentos/delete',{'proyecto_id':me.form.id,'documento_id':row.id}).then(function (response) {
                 let i = me.form.documentos.map(documento => documento.id).indexOf(row.id) // find index of your object
                 me.form.documentos = response.data.documentos;
-                me.notificarSuccess('Eliminado correctamente.');
+                me.$message.success('Eliminado correctamente.');
                 loadingInstance.close();
             })
             .catch(function (error) {
-                me.notificarError();
+                me.$message.error('Hubo un error.');
                 console.log(error);
             });
         },
@@ -179,33 +168,26 @@ import { CommentDropdown } from '../articles/components/Dropdown';
             formData.append('proyecto_id', me.form.id);
             axios.post('/proyectos/documentos/store', formData,{headers: {'Content-Type': 'multipart/form-data'}})
             .then(function (response){
-                console.log("RESPONSE UPLOAD");
-                console.log(response);
-                me.$message.success('Subido correctamente');
+                me.$message.success('Guardado correctamente.');
                 me.form.documentos = response.data.documentos;
-                //this.getCardList({ page: 1 });
-                me.fileList = []; //Temporary depicts that the file has been uploaded
+                me.fileList = [];
                 loadingInstance.close();
                 me.dialogoDocumentos = false;
             })
             .catch(function (error) {
-                // handle error
-                me.notificarError();
+                me.$message.error('Hubo un error.');
                 console.log(error);
                 loadingInstance.close();
                 me.dialogoDocumentos = false;
             });
         },
         handleProgress(ev, file, fileLIst) {
-            console.log("PROGRESS");
             file.raw['status'] = "uploading";
         },
         handleSuccess(res, file, fileLIst) {
-            console.log("SUCCESS");
             file.raw['status'] = "success";
         },
         handleUploadChange(file, fileList) {
-            console.log("UPLOAD CHANGE");
             this.fileList = fileList.slice(-1);
         },
     },

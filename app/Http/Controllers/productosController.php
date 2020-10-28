@@ -26,92 +26,55 @@ class productosController extends Controller
 
     /*Funcion para insertar o Actualizar un proyecto*/
     public function insert(){
-		$producto = new Producto;
-		/** Generamos numero de parte */
-		if(request()->get('id') == 0){ 
-			$ultimoProducto = Producto::orderBy('id', 'DESC')->first();//buscamos el ultimo id
-            request()->merge(['numero_parte' =>  'PD-'.str_pad($ultimoProducto->id + 1, 8, "0", STR_PAD_LEFT)]);
-		}
-			
-        /*Aqui se actualiza/crea con la informacion que enviamos al request*/
-        $producto = $producto 	->fill(request()->all())
-								->updateOrCreate(['id' => request()->get('id')],$producto->toArray());
+		DB::transaction(function () {
+			$producto = new Producto;
+				
+			/*Aqui se actualiza/crea con la informacion que enviamos al request*/
+			$producto = $producto 	->fill(request()->all())
+									->updateOrCreate(['id' => request()->get('id')],$producto->toArray());
 
-		
-		/* insertmaos los materiales del producto*/
-		$producto->insertMateriales(request()->get('materiales'),$producto);
+			/** Generamos numero de parte */
+			if(request()->get('numero_parte') == ""){ 
+				$producto->numero_parte = 'PD-'.str_pad($producto->id + 1, 8, "0", STR_PAD_LEFT);
+				$producto->update();
+			}
 
-		/* insertmaos accesorios del producto*/
-		$producto->insertAccesorios(request()->get('accesorios'),$producto);
-		
+			/* insertmaos los materiales del producto*/
+			$producto->insertMateriales(request()->get('materiales'),$producto);
+
+			/* insertmaos accesorios del producto*/
+			$producto->insertAccesorios(request()->get('accesorios'),$producto);
+		});
 	}
 
 	/* Funcion para eliminar producto con id */
     public function delete(){
-		
-		$producto = Producto::find(request()->get('id'));
-		$producto->Materiales()->detach();
-		$producto->Accesorios()->detach();
-		$producto->Documentos()->detach();
-
-		$producto->delete();
+		DB::transaction(function () {
+			(Producto::with(['Documentos'])->find(request()->get('id')))->deleteDetach();
+		});
 	}
 	/** Funcion para guardar archivos */
 	public function store(Request $request)
     {
-		if($request->file('file')){
-			
-			$producto = Producto::find($request->producto_id);
-			$doc = $request->file('file');
-		    $docDate = date('YmdHis');
-	        $docNombre = 'doc-'.$docDate.'.'.$doc->clientExtension();
-	        $nombreOriginal = $doc->getClientOriginalName();
-			$location = 'uploads/productos/'.$producto->numero_parte.'/documentos';
-			
-			Storage::disk('public')->put($location.'/'.$docNombre, file_get_contents($doc));
-	        $documento = [
-	        	'nombre_usuario' => $nombreOriginal,
-	        	'nombre_real' => $nombreOriginal,
-	        	'nombre_sistema' => $docNombre,
-	        	'tipo_documento' => $doc->getClientOriginalExtension(),
-	        	'url'=> $location,
-	        ];
-
-	        $save = Documento::create($documento);
-	        $producto->Documentos()->attach($save->id);
-
-	        return (Producto::where('id',request()->get('producto_id'))->with(['Documentos'])->first());
-		}
+		DB::transaction(function () use ($request){
+			if(request()->file('file')){
+				$producto = Producto::find(request()->get('producto_id'));
+				$producto->Documentos()->attach(Documento::store(request()->file('file'),'uploads/productos/'.$producto->numero_parte.'/documentos'));
+			}
+		});
+		return (Producto::where('id',request()->get('producto_id'))->with(['Documentos'])->first());
     }
 	/** Funcion para eliminar archivos */
 	public function deleteDocumento(){
-		$producto = Producto::find(request()->get('producto_id'));
-		$producto->Documentos()->detach(request()->get('documento_id'));
-		$documento = Documento::find(request()->get('documento_id'));
-		$path = '/public/'.$documento->url."/".$documento->nombre_sistema;
-		
-		if (Storage::disk('public')->exists($documento->url.'/'.$documento->nombre_sistema)) {
-            Storage::delete($path);
-            $documento->delete();
-		}
-		
+		DB::transaction(function () {
+			(Producto::find(request()->get('producto_id')))->Documentos()->detach(request()->get('documento_id'));
+			(Documento::find(request()->get('documento_id')))->deleteStorage();
+		});
+
 		return (Producto::where('id',request()->get('producto_id'))->with(['Documentos'])->first());
 	}
 	/** Funcion para guardar archivos */
 	public function downloadDocumento($documento_id){
-		$documento = Documento::find($documento_id);
-		$path = storage_path('app/'.$documento->url."/".$documento->nombre_sistema);
-		$headers = array('Content-Type'=> 'application/'.$documento->tipo_documento);
-		$nombre_doc = $documento->nombre_usuario;
-
-		$nombre_documento = $documento->nombre_usuario;
-        
-        $path = '/public/'.$documento->url."/".$documento->nombre_sistema;
-        if (Storage::disk('public')->exists($documento->url.'/'.$documento->nombre_sistema)) {
-            return Storage::download($path, $nombre_documento, $headers);
-        }
+		return (Documento::find($documento_id))->download();
 	}
-
-	
-
 }

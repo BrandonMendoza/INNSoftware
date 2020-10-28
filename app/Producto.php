@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Storage;
 
 class Producto extends Model
 {
@@ -35,7 +36,18 @@ class Producto extends Model
     public function Proyectos(){
 	    return $this->belongsToMany('App\Proyecto', 'proyecto_producto','producto_id', 'proyecto_id')->withPivot('id','cantidad','numero_parte_cliente','work_order','item','cantidad','heat_number','notas','hrs_labor','pintura_id','proceso_id')->using('App\ProyectoProducto')->withTimestamps();
 	}
-	
+
+	/** Funcion para eliminar un producto y desvincular sus materiales, accesorios y documentos correctamente */
+	public function deleteDetach(){
+		/**Detach */
+		$this->Materiales()->detach();
+		$this->Accesorios()->detach();
+		$this->deleteAllDocumentos();
+		/**Delete producto*/
+		$this->delete();
+	}
+
+
 	public function insertMateriales($materiales,$producto){
 		$producto->Materiales()->detach();
 		if(isset($materiales)){
@@ -55,38 +67,31 @@ class Producto extends Model
 	}
 
 	public function getProgreso(){
-		/*
-			1.obtener todos los procesos del proyecto en el que esta el producto
-			2.obtener porcentaje por cada proceso del ProyectoProducto
-			3.sumar el porcentaje de cada proceso 'Terminado'
-				ej. si inicio = 0%, fin = 0%, materiales = 0%, 
-					habilitado = 26%, soldadura = 62%, pintura 12%
-
-					si tenemos completado habilitado y soldadura llevamos 88% del progreso del producto
-			4. enviamos el total del progreso return progreso;
-		*/
 		$totalProgreso = 0;
     	foreach ($this->Productos as $id => $producto) {
     		$totalProgreso += (float)$producto->getHrsLabor();
     	}
     	return number_format((float)$totalProgreso, 2, '.', '');
-
-		/*
-			Necesitamos:
-				1.Hacer configuracion de procesos por cada proyecto y tambien una general
-				2.Crear una tabla ProyectoProceso. En esta se guardaran todos los procesos que le configuramos al proyecto. Se podria reconfigurar?
-				3.Crear una tabla PoryectoProductoProceso. Esta tendra relacion con ProyectoProceso. En esta se guardara el proceso en el que va un producto en especifico.
-					Creo que este ultimo no es necesario si guardamos los porcesos en la tabla ProyectoProducto
-
-					Ej. proyectoProducto->Proceso->getProcesoActual()
-
-					Creo que necesitamos inicio y fin por cada proceso
-
-		*/
 	}
 
 	public function getHrsLabor(){
 		$cadencia = 20;
 		return number_format((float)$this->peso_lbs/$cadencia, 2, '.', '');
+	}
+
+	/**Funcion para eliminar todos los documentos de un producto
+	 * 
+	 * Se necesita haber cargado los documentos anteriormente
+	 * 
+	 */
+	public function deleteAllDocumentos(){
+		foreach ($this->documentos as $key => $documento) {
+			$path = '/public/'.$documento->url."/".$documento->nombre_sistema;
+			if (Storage::disk('public')->exists($documento->url.'/'.$documento->nombre_sistema)) {
+				$this->Documentos()->detach($documento->id);
+				$documento->delete();
+				Storage::delete($path);
+			}
+		}
 	}
 }

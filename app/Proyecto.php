@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Storage;
 
 class Proyecto extends Model
 {
@@ -32,6 +33,31 @@ class Proyecto extends Model
 
     public function Documentos(){
 	    return $this->belongsToMany('App\Documento', 'proyecto_documento','proyecto_id', 'documento_id')->withTimestamps();
+    }
+    
+    /** Funcion para eliminar un proyecto y desvincular sus documentos correctamente */
+	public function deleteDetach(){
+		/**Detach */
+		$this->deleteAllDocumentos();
+		/**Delete producto*/
+        $this->delete();
+        
+    }
+    
+    /**Funcion para eliminar todos los documentos de un producto
+	 * 
+	 * Se necesita haber cargado los documentos anteriormente
+	 * 
+	 */
+	public function deleteAllDocumentos(){
+		foreach ($this->documentos as $key => $documento) {
+			$path = '/public/'.$documento->url."/".$documento->nombre_sistema;
+			if (Storage::disk('public')->exists($documento->url.'/'.$documento->nombre_sistema)) {
+				$this->Documentos()->detach($documento->id);
+				$documento->delete();
+				Storage::delete($path);
+			}
+		}
 	}
 
     public function crearProcesos(){
@@ -54,28 +80,34 @@ class Proyecto extends Model
         $productos_id = $productos->map(function ($producto) {
                             return collect($producto)->only(['id'])->all();
                          });
+        
         /*Se eliminan los productos que no hayan venido en el request*/
-        $this->Productos()->where('id','!=',$productos_id)->detach();
+        foreach (ProyectoProducto::where('proyecto_id','=',$this->id)->whereNotIn('producto_id',$productos_id)->get() as $id => $proyectoProducto) {
+            $this->Productos()->detach($proyectoProducto->producto_id);
+        }
 
-        /*obtener proceso n1*/        
+        /*obtener proceso numero 1*/        
         $proceso = $this->procesos->where('es_primero',1)->first();
+        $proyectosProductos = ProyectoProducto::where('proyecto_id',$this->id)->get();
 
-        foreach ($productos as $key => $producto) {
-            $existe = false;
-
-            foreach ($this->productos as $proyectoProducto){
-                /*Se lo encontramos lo actualizamos*/
-                if( $producto->id == $proyectoProducto->id){
-                    $proyectoProducto->pivot->cantidad = $producto->cantidad;
-                    $proyectoProducto->pivot->item = $producto->item;
-                    $proyectoProducto->pivot->work_order = $producto->work_order;
-                    $proyectoProducto->pivot->heat_number = $producto->heat_number;
-                    $proyectoProducto->pivot->update();
-                    $existe = true;
+        foreach ($productos as $producto) {
+            /**Bandera para saber si exste un proyectoProducto */
+            $existe = 0;
+            if(isset($producto['proyecto_producto']['id'])){
+                foreach ($proyectosProductos as $proyectoProducto){
+                    /*Si lo encontramos lo actualizamos*/
+    
+                    if($producto['proyecto_producto']['id'] == $proyectoProducto->id){
+                        $proyectoProducto->cantidad = $producto['proyecto_producto']['cantidad'];
+                        $proyectoProducto->item = $producto['proyecto_producto']['item'];
+                        $proyectoProducto->work_order = $producto['proyecto_producto']['work_order'];
+                        $proyectoProducto->heat_number = $producto['proyecto_producto']['heat_number'];
+                        $proyectoProducto->update();
+                        $existe = 1;
+                    }
                 }
-            }
-            /*Si no lo encontramos lo agregamos y le damos los datos que vienen en el request*/
-            if(!$existe){
+            }else{
+                /*Si no lo encontramos lo agregamos y le damos los datos que vienen en el request*/
                 $this   ->Productos()
                         ->attach($producto['id'],
                         [   'cantidad' => $producto['proyecto_producto']['cantidad'],
@@ -84,7 +116,6 @@ class Proyecto extends Model
                             'heat_number' => $producto['proyecto_producto']['heat_number'],
                             'fecha_entrega' => request()->fecha_entrega,
                         ]);
-
                 $this->attachProyectoProductoProceso($user_id,$producto['id']);
             }
         }
@@ -190,9 +221,7 @@ class Proyecto extends Model
 
     public function attachProyectoProductoProceso($user_id,$producto_id){
         $proyectoProductoAux = $this->getProyectoProductoById($producto_id);
-
         $proyectoProceso = $this->getFirstProceso();
-
         $proyectoProductoAux->ProyectoProcesoProducto()
                             ->attach($proyectoProductoAux->id,[   
                                 'proyecto_proceso_id' => $proyectoProceso->id,
@@ -216,6 +245,7 @@ class Proyecto extends Model
                                     ->where('proyecto_id',$this->id)
                                     ->first();
     }
+
 
 
     

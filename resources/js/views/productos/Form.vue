@@ -267,6 +267,7 @@ import { CommentDropdown } from '../articles/components/Dropdown';
         dialogoMateriales:false,
         dialogoAccesorios:false,
         loadingCliente:false,
+        loadingPinturas:false,
       };
     },
     methods: {

@@ -53,6 +53,7 @@ const adminRoutes = {
       component: () => import('@/views/articles/List'),
       name: 'ArticleList',
       meta: { title: 'articleList', icon: 'list', permissions: ['manage article'] },
+      hidden: true,
     },
   ],
 };
