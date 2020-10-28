@@ -138,22 +138,15 @@ import Pagination from '@/components/Pagination';
             async getList(){
                 let me = this;
                 axios.get(me.listUrl).then(function (response) {
-                    //creamos un array y guardamos el contenido que nos devuelve el response
-                    console.table("RESPONSE:");
-                    console.log(response.data);
-                    console.table(response.data);
                     me.list = response.data;
                     me.loading = false;
                 })
                 .catch(function (error) {
-                    // handle error
                     me.$message.error('Hubo un error.');
                     console.log(error);
                 });
             },
-            loadFieldsUpdate(data){ 
-                console.log("LOad fields update DATA:");
-                console.log(data);
+            loadFieldsUpdate(data){
                 this.$refs.myForm.form.id = data.id;
                 this.$refs.myForm.form.cliente_id = data.cliente_id;
                 this.$refs.myForm.form.numero_parte_cliente = data.numero_parte_cliente;
@@ -168,8 +161,6 @@ import Pagination from '@/components/Pagination';
             },
             loadDocumentos(data){
                 this.$refs.documentosDialog.form.id = data.id;
-                console.log("DOCUMENTOS:");
-                console.log(data.documentos);
                 this.$refs.documentosDialog.form.documentos = JSON.parse(JSON.stringify(data.documentos));
                 this.$refs.documentosDialog.open()
             },
@@ -177,8 +168,6 @@ import Pagination from '@/components/Pagination';
                 let me = this;
                 me.loading = true;
                 axios.post(me.deleteUrl,{'id':id}).then(function (response) {
-                    console.log("Response:");
-                    console.log(response);
                     me.getList();   
                     me.$message.success('Eliminado correctamente.');
                     me.loading = false;
@@ -190,7 +179,6 @@ import Pagination from '@/components/Pagination';
                 });
             },
         },
-        
         mounted() {
            this.getList();
         }

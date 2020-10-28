@@ -17,7 +17,7 @@
             <el-row :gutter="20">
                 <el-col :span="6">
                     <el-form-item label="Cliente" prop="cliente_id"  >
-                        <el-select v-model="form.cliente_id" style="width: 100%;" filterable :loading="loadingCliente">
+                        <el-select v-model="form.cliente_id" :value="form.cliente_id" style="width: 100%;" filterable :loading="loadingCliente">
                             <el-option 
                                 :label="cliente.nombre_cliente" 
                                 :value="cliente.id" 
@@ -258,8 +258,7 @@ import { CommentDropdown } from '../articles/components/Dropdown';
         },
         getProductos(){
             let me =this;
-            let url = '/productos' 
-            //this.loadingMaterialAccesorio = true;
+            let url = '/productos';
             axios.get(url).then(function (response) {
                 me.productosSelect = response.data;
                 me.productosSelect.forEach(element => {
@@ -274,7 +273,6 @@ import { CommentDropdown } from '../articles/components/Dropdown';
                 
             })
             .catch(function (error) {
-                // handle error
                 me.$message.error('Hubo un error.');
                 console.log(error);
             });
@@ -288,14 +286,12 @@ import { CommentDropdown } from '../articles/components/Dropdown';
                 me.loadingClientes = false;
             })
             .catch(function (error) {
-                // handle error
                 me.$message.error('Hubo un error.');
                 console.log(error);
                 me.loadingClientes = false;
             });
         },
         handleClick(tab, event) {
-            //console.log(tab, event);
         },
         agregarProducto(){
             /** "Validacion" */

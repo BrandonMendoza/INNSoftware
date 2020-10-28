@@ -93,339 +93,175 @@ export const constantRoutes = [
     ],
   },
   {
-    path: '/ordenesAbiertas',
+    path: '/profile',
     component: Layout,
-    redirect: 'OrdenesAbiertas',
+    redirect: '/profile/edit',
     children: [
       {
-        path: '/ordenesAbiertas',
-        component: () => import('@/views/proyectosProductos/List'),
-        name: 'ordenesAbiertas',
-        meta: { title: 'ordenesAbiertas', icon: 'ordenesAbiertas', noCache: false },
-      },
-      {
-        path: '/ordenesAbiertas/UploadExcel',
-        component: () => import('@/views/proyectosProductos/UploadExcel'),
-        name: '',
-        meta: { title: 'Importar excel', noCache: false },
+        path: 'edit',
+        component: () => import('@/views/users/SelfProfile'),
+        name: 'SelfProfile',
+        meta: { title: 'userProfile', icon: 'user', noCache: true },
         hidden: true,
       },
     ],
   },
+];
+
+export const asyncRoutes = [
+  /**ORDENES ABIERTAS */
   {
-    path: '/proyectos',
+    path: '/ordenesAbiertas',
     component: Layout,
-    redirect: 'Proyectos',
-    children: [
-      {
-        path: '/proyectos',
-        component: () => import('@/views/proyectos/List'),
-        name: 'proyectos',
-        meta: { title: 'proyectos', icon: 'proyectos', noCache: false },
-      },
-    ],
-  },
-  {
-    path: '/productos',
-    component: Layout,
-    redirect: 'Productos',
-    meta: { title: 'productos', icon: 'product', noCache: false,
+    redirect: '/OrdenesAbiertas',
+    name: 'Ordenes Abiertas',
+    meta: { 
+      title: 'ordenesAbiertas', 
+      icon: 'ordenesAbiertas',  
+      permissions: ['view menu ordenes abiertas']
     },
     children: [
       {
-        path: '/productos',
-        component: () => import('@/views/productos/List'),
-        name: 'productos',
-        meta: { title: 'productos', icon: 'product', noCache: false },
+        path: 'list',
+        component: () => import('@/views/proyectosProductos/List'),
+        name: 'ordenesAbiertas',
+        meta: { title: 'ordenesAbiertas', icon: 'ordenesAbiertas'},
       },
       {
-        path: '/pinturas',
-        component: () => import('@/views/pinturas/List'),
-        name: 'pinturas',
-        meta: { title: 'pinturas',icon: 'form'  },
+        path: 'UploadExcel',
+        component: () => import('@/views/proyectosProductos/UploadExcel'),
+        name: 'importarExcel',
+        meta: { title: 'ImportarExcel' },
+        hidden: true,
       },
     ],
   },
-  {
-    path: '/procesos',
-    component: Layout,
-    redirect: 'Procesos',
-    children: [
-      {
-        path: '/procesos',
-        component: () => import('@/views/procesos/List'),
-        name: 'Procesos',
-        meta: { title: 'procesos', icon: 'process', noCache: false },
-      },
-    ],
-  },
+  /**INVENTARIOS */
   {
     path: '/inventarios',
     component: Layout,
-    redirect: '/',
-    name: '',
+    redirect: '/inventarios',
+    name: 'Inventarios',
     meta: {
       title: 'inventarios',
-      icon: 'table',
-      permissions: ['view menu table'],
+      icon: 'inventarios',
+      permissions: ['view menu inventarios'],
     },
     children: [   
       {
-        path: '/inventarios',
+        path: 'list',
         component: () => import('@/views/inventarios/materialesAccesorios/List'),
-        name: 'materialesAccesorios',
-        meta: { title: 'inventarios',icon: 'inventarios'  },
+        name: 'Inventarios',
+        meta: { title: 'inventarios',icon: 'inventarios' },
       },
     ],
   },
+  /**PROYECTOS */
   {
-    path: '/clientes',
+    path: '/proyectos',
     component: Layout,
-    redirect: '/',
-    name: '',
+    redirect: '/Proyectos',
+    name: 'Proyectos',
+    meta: { title: 'productos', icon: 'product' , permissions: ['view menu proyectos'] },
+    children: [
+      {
+        path: 'list',
+        component: () => import('@/views/proyectos/List'),
+        name: 'Proyectos',
+        meta: { title: 'proyectos', icon: 'proyectos' },
+      },
+    ],
+  },
+  /**PRODUCTOS */
+  {
+    path: '/productos',
+    component: Layout,
+    redirect: '/Productos',
+    meta: { title: 'productos', icon: 'product' , permissions: ['view menu productos'] },
+    children: [
+      {
+        path: 'list',
+        component: () => import('@/views/productos/List'),
+        name: 'Productos',
+        meta: { title: 'productos', icon: 'product'},
+      },
+    ],
+  },
+  /**CATALOGOS */
+  {
+    path: '/catalogos',
+    component: Layout,
+    redirect: '/catalogos',
+    name: 'Catalogos',
     meta: {
-      title: 'clientes',
+      title: 'catalogos',
       icon: 'table',
-      permissions: ['view menu table'],
+      permissions: ['view menu catalogos'],
     },
     children: [
       {
         path: 'clientes',
         component: () => import('@/views/clientes/List'),
-        name: 'clientes',
-        meta: { title: 'clientes',icon: 'clientes'  },
+        name: 'Clientes',
+        meta: { title: 'clientes',icon: 'clientes', permissions: ['view menu clientes'] },
       },
-    ],
-  },
-  {
-    path: '/mats',
-    component: Layout,
-    redirect: '',
-    name: '',
-    meta: {
-      title: 'materiales',
-      icon: 'table',
-      permissions: ['view menu table'],
-    },
-    children: [
+      {  
+        path: 'procesos',
+        component: () => import('@/views/procesos/List'),
+        name: 'Procesos',
+        meta: { title: 'procesos', icon: 'process', permissions: ['view menu clientes'] },
+      },
       {
-        path: '/materiales',
+        path: 'pinturas',
+        component: () => import('@/views/pinturas/List'),
+        name: 'pinturas',
+        meta: { title: 'pinturas',icon: 'form', permissions: ['view menu pinturas']  },
+      },
+      {
+        path: 'accesorios',
+        component: () => import('@/views/accesorios/List'),
+        name: 'accesorios',
+        meta: { title: 'accesorios',icon: 'form' , permissions: ['view menu accesorios']},
+      },
+      {
+        path: 'materiales',
         component: () => import('@/views/materiales/List'),
         name: 'materiales',
-        meta: { title: 'materiales',icon: 'form'  },
-      },
-      {
-        path: '/materialesClientes',
-        component: () => import('@/views/materialesClientes/List'),
-        name: 'materialesClientes',
-        meta: { title: 'asignarMaterialClientes',icon: 'form'  },
+        meta: { title: 'materiales',icon: 'form'  , permissions: ['view menu materiales']},
       },
       {
         path: 'tiposMateriales',
         component: () => import('@/views/materiales/tipos/List'),
         name: 'tiposMaterial',
-        meta: { title: 'tiposMaterial',icon: 'form'  },
+        meta: { title: 'tiposMaterial',icon: 'form' , permissions: ['view menu tipos material'] },
       },
       {
         path: 'tiposAceros',
         component: () => import('@/views/materiales/aceros/List'),
         name: 'tiposAcero',
-        meta: { title: 'tiposAcero',icon: 'form'  },
+        meta: { title: 'tiposAcero',icon: 'form' , permissions: ['view menu tipos acero']  },
       },
+      // {
+      //   path: '/materialesClientes',
+      //   component: () => import('@/views/materialesClientes/List'),
+      //   name: 'materialesClientes',
+      //   meta: { title: 'asignarMaterialClientes',icon: 'form'  },
+      // },
     ],
   },
-  {
-    path: '/',
-    component: Layout,
-    redirect: '/',
-    name: '',
-    meta: {
-      title: 'accesorios',
-      icon: 'table',
-      permissions: ['view menu table'],
-    },
-    children: [
-      {
-        path: 'accesorios',
-        component: () => import('@/views/accesorios/List'),
-        name: 'accesorios',
-        meta: { title: 'accesorios',icon: 'form'  },
-      },
-      {
-        path: 'tiposAceros',
-        component: () => import('@/views/materiales/aceros/List'),
-        name: 'Tipos de Acero',
-        meta: { title: 'tiposAcero',icon: 'form'  },
-      },
-    ],
-  },
-  // {
-  //   path: '/element-ui',
-  //   component: Layout,
-  //   redirect: '/element-ui/form',
-  //   name: 'Element UI',
-  //   meta: {
-  //     title: 'elementUi',
-  //     icon: 'layout',
-  //     permissions: ['view menu element ui'],
-  //   },
-  //   children: [
-  //     {
-  //       path: 'form',
-  //       name: 'Form',
-  //       component: () => import('@/views/form/index'),
-  //       meta: { title: 'form', icon: 'form' },
-  //     },
-  //     {
-  //       path: 'icons',
-  //       component: () => import('@/views/icons/index'),
-  //       name: 'Icons',
-  //       meta: { title: 'icons', icon: 'el-icon-info', noCache: true },
-  //     },
-  //     {
-  //       path: 'tab',
-  //       component: () => import('@/views/tab'),
-  //       name: 'Tab',
-  //       meta: { title: 'tab', icon: 'tab' },
-  //     },
-  //   ],
-  // },
-  // {
-  //   path: '/documentation',
-  //   component: Layout,
-  //   redirect: '/documentation/index',
-  //   children: [
-  //     {
-  //       path: 'index',
-  //       component: () => import('@/views/documentation/index'),
-  //       name: 'Documentation',
-  //       meta: { title: 'documentation', icon: 'documentation', noCache: true },
-  //     },
-  //   ],
-  // },
-  // {
-  //   path: '/profile',
-  //   component: Layout,
-  //   redirect: '/profile/edit',
-  //   children: [
-  //     {
-  //       path: 'edit',
-  //       component: () => import('@/views/users/SelfProfile'),
-  //       name: 'SelfProfile',
-  //       meta: { title: 'userProfile', icon: 'user', noCache: true },
-  //     },
-  //   ],
-  // },
-  // {
-  //   path: '/guide',
-  //   component: Layout,
-  //   redirect: '/guide/index',
-  //   children: [
-  //     {
-  //       path: 'index',
-  //       component: () => import('@/views/guide/index'),
-  //       name: 'Guide',
-  //       meta: { title: 'guide', icon: 'guide', noCache: true },
-  //     },
-  //   ],
-  // },
-  elementUiRoutes,
-];
-
-export const asyncRoutes = [
   //permissionRoutes,
-  componentRoutes,
+  //componentRoutes,
   //chartsRoutes,
   //nestedRoutes,
   //tableRoutes,
   adminRoutes,
-  // {
-  //   path: '/theme',
-  //   component: Layout,
-  //   redirect: 'noredirect',
-  //   children: [
-  //     {
-  //       path: 'index',
-  //       component: () => import('@/views/theme/index'),
-  //       name: 'Theme',
-  //       meta: { title: 'theme', icon: 'theme' },
-  //     },
-  //   ],
-  // },
-  // {
-  //   path: '/clipboard',
-  //   component: Layout,
-  //   redirect: 'noredirect',
-  //   meta: { permissions: ['view menu clipboard'] },
-  //   children: [
-  //     {
-  //       path: 'index',
-  //       component: () => import('@/views/clipboard/index'),
-  //       name: 'ClipboardDemo',
-  //       meta: { title: 'clipboardDemo', icon: 'clipboard', roles: ['admin', 'manager', 'editor', 'user'] },
-  //     },
-  //   ],
-  // },
   errorRoutes,
-  //excelRoutes,
-  // {
-  //   path: '/zip',
-  //   component: Layout,
-  //   redirect: '/zip/download',
-  //   alwaysShow: true,
-  //   meta: { title: 'zip', icon: 'zip', permissions: ['view menu zip'] },
-  //   children: [
-  //     {
-  //       path: 'download',
-  //       component: () => import('@/views/zip'),
-  //       name: 'ExportZip',
-  //       meta: { title: 'exportZip' },
-  //     },
-  //   ],
-  // },
-  // {
-  //   path: '/pdf',
-  //   component: Layout,
-  //   redirect: '/pdf/index',
-  //   meta: { title: 'pdf', icon: 'pdf', permissions: ['view menu pdf'] },
-  //   children: [
-  //     {
-  //       path: 'index',
-  //       component: () => import('@/views/pdf'),
-  //       name: 'Pdf',
-  //       meta: { title: 'pdf' },
-  //     },
-  //   ],
-  // },
-  // {
+    // {
   //   path: '/pdf/download',
   //   component: () => import('@/views/pdf/Download'),
   //   hidden: true,
   // },
-  // {
-  //   path: '/i18n',
-  //   component: Layout,
-  //   meta: { permissions: ['view menu i18n'] },
-  //   children: [
-  //     {
-  //       path: 'index',
-  //       component: () => import('@/views/i18n'),
-  //       name: 'I18n',
-  //       meta: { title: 'i18n', icon: 'international' },
-  //     },
-  //   ],
-  // },
-  // {
-  //   path: '/external-link',
-  //   component: Layout,
-  //   children: [
-  //     {
-  //       path: 'https://github.com/tuandm/laravue',
-  //       meta: { title: 'externalLink', icon: 'link' },
-  //     },
-  //   ],
-  // },
-  //{ path: '*', redirect: '/404', hidden: true },
+  { path: '*', redirect: '/404', hidden: true },
 ];
 
 const createRouter = () => new Router({

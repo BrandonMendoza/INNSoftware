@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Inventario_material extends Model
 {
-    protected $table = 'Inventario_materiales'; 
+    protected $table = 'inventario_materiales'; 
 
     protected $fillable = [ 'id','material_id','cliente_id','status_id','orden_compra_id','proyecto','tba','cantidad','item','plan_corte',
                             'work_order','heat_number','created_at','updated_at','recibido_el','cantidad_faltante','is_editing','catalogo','material_cliente_id'];
