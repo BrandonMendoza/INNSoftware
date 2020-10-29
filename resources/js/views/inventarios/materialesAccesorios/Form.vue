@@ -15,6 +15,7 @@
             <el-row :gutter="20">
                 <el-col :span="8" style="padding-top:55px;">
                     <el-form-item label="Estatus" prop="status_id">
+
                         <el-select v-model="form" value-key="status_id" style="width: 100%;" :row-class-name="tableRowClassName">
                             <el-option 
                                 v-for="status in statusList"
