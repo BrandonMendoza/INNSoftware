@@ -19,7 +19,7 @@
             <el-row :gutter="20">
                 <el-col :span="6">
                     <el-form-item label="Cliente" prop="cliente_id"  >
-                        <el-select v-model="form.cliente_id" value-key="form.cliente_id" style="width: 100%;" filterable :loading="loadingCliente">
+                        <el-select v-model="form.cliente_id" value-key="id" style="width: 100%;" filterable :loading="loadingCliente">
                             <el-option 
                                 v-for="cliente in clientes"
                                 :key="cliente.id"

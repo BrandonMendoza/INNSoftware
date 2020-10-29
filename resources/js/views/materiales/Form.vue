@@ -18,7 +18,7 @@
             </el-form-item>
 
             <el-form-item label="Tipo de Material" prop="tipo_material_id" >
-                <el-select v-model="form.tipo_material_id" value-key="form.tipo_material_id" style="width:100%"> 
+                <el-select v-model="form.tipo_material_id" value-key="id" style="width:100%"> 
                     <el-option 
                         v-for="tipoMaterial in tiposMateriales" 
                         :key="tipoMaterial.id"
@@ -28,7 +28,7 @@
             </el-form-item>
 
             <el-form-item label="Acero" prop="acero_id" >
-                <el-select v-model="form.acero_id" value-key="form.acero_id" style="width:100%">
+                <el-select v-model="form.acero_id" value-key="id" style="width:100%">
                     <el-option 
                         v-for="acero in aceros" 
                         :key="acero.id"
