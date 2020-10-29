@@ -15,7 +15,7 @@
             <el-row :gutter="20">
                 <el-col :span="8" style="padding-top:55px;">
                     <el-form-item label="Estatus" prop="status_id">
-                        <el-select v-model="form.status_id" value-key="form.status_id" style="width: 100%;" :row-class-name="tableRowClassName">
+                        <el-select v-model="form" value-key="status_id" style="width: 100%;" :row-class-name="tableRowClassName">
                             <el-option 
                                 v-for="status in statusList"
                                 :key="status.id"
@@ -24,8 +24,10 @@
                         </el-select>
                     </el-form-item>
 
+                   
+
                     <el-form-item label="Categoría" prop="categoria">
-                        <el-select v-model="form.catalogo" value-key="form.catalogo" style="width: 100%;" @change="getMaterialesAccesorios();changeCategoria()">
+                        <el-select v-model="form" value-key="catalogo" style="width: 100%;" @change="getMaterialesAccesorios();changeCategoria()">
                             <el-option 
                                 v-for="categoria in categorias"
                                 :key="categoria.id"
@@ -37,7 +39,7 @@
                     
 
                     <el-form-item label="Material/Accesorio" prop="material_id"  >
-                        <el-select v-model="form.material_id" value-key="form.material_id" style="width: 100%;" v-loading="loadingMaterialAccesorio" filterable clearable>
+                        <el-select v-model="form" value-key="material_id" style="width: 100%;" v-loading="loadingMaterialAccesorio" filterable clearable>
                             <el-option 
                                 v-for="materialAccesorio in materialesAccesorios"
                                 :key="materialAccesorio.id"
@@ -257,8 +259,8 @@
         close() {
             this.dialogoAgregar = false;
         },
-        insert(form){/*Update o Insert Proceso*/
-            this.$refs[form].validate((valid) => { //validacion del form
+        insert(form){
+            this.$refs[form].validate((valid) => {
                 if (valid) {
                     var loadingInstance = this.$loading({
                         target: '.el-dialog'
@@ -313,8 +315,6 @@
             let me =this;
             let url = '/inventariosMaterialesAccesorios/getMaterialesAccesoriosByCatalogo';
             this.loadingMaterialAccesorio = true;
-            console.log("GET MATERIALESACC");
-            console.log(this.form.catalogo);
             if(this.form.catalogo == 1){
                url = '/materialesNombreCompleto' 
             }else{
