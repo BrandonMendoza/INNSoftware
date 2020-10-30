@@ -17,7 +17,7 @@ class productosController extends Controller
     
 	/** Funcion para obtener todos los materiales */
     public function productos(){
-		$productos = Producto::with(['Cliente','Accesorios','Materiales','Materiales.Tipo_material','Materiales.Acero','Accesorios.Acero','Documentos'])->get();
+		$productos = Producto::with(['Cliente','Accesorios','Materiales','Materiales.Tipo_material','Materiales.Acero','Accesorios.Acero','Documentos','Pintura'])->get();
 		foreach ($productos as $key => $producto) {
 			($producto->materiales)->each->loadNombreCompleto();
 		}

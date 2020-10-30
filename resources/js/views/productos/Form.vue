@@ -16,15 +16,20 @@
             <br>
             <el-row :gutter="20">
                 <el-col :span="6">
-                    <el-form-item label="Cliente" prop="cliente_id"  >
-                        <el-select v-model="form.cliente_id" value-key="id" style="width: 100%;" filterable :loading="loadingCliente">
+                    <el-form-item label="Cliente" prop="cliente_id">
+                        <el-select 
+                        v-model="form.cliente_nombre" 
+                        value-key="nombre_cliente"
+                        @change="changeCliente()"
+                        filterable>
                             <el-option 
-                                v-for="cliente in clientes"
-                                :key="cliente.id"
-                                :label="cliente.nombre_cliente" 
-                                :value="cliente.id" />
+                            v-for="cliente in clientes"
+                            :key="cliente.id"
+                            :label="cliente.nombre_cliente" 
+                            :value="cliente.nombre_cliente"/>
                         </el-select>
                     </el-form-item>
+
 
                     <el-form-item label="Número de Parte (Cliente)" prop="numero_parte_cliente">
                         <el-input v-model="form.numero_parte_cliente" />
@@ -37,6 +42,20 @@
                                 :key="pintura.id"
                                 :label="pintura.simbolo" 
                                 :value="pintura.id"/>
+                        </el-select>
+                    </el-form-item>
+
+                    <el-form-item label="Pintura" prop="pintura_id">
+                        <el-select 
+                        v-model="form.pintura_nombre" 
+                        value-key="nombre"
+                        @change="changePintura()"
+                        filterable>
+                            <el-option 
+                            v-for="pintura in pinturas"
+                            :key="pintura.id"
+                            :label="pintura.nombre" 
+                            :value="pintura.nombre"/>
                         </el-select>
                     </el-form-item>
 
@@ -239,7 +258,9 @@ import { CommentDropdown } from '../articles/components/Dropdown';
             numero_parte:"",
             numero_parte_cliente:"",
             cliente_id:"",
+            cliente_nombre:"",
             pintura_id:"",
+            pintura_nombre:"",
             peso_kg:"",
             peso_lbs:"",
             materiales:[],
@@ -398,6 +419,20 @@ import { CommentDropdown } from '../articles/components/Dropdown';
                 me.$message.error('Hubo un error.');
                 console.log(error);
                 me.loadingPinturas = false;
+            });
+        },
+        changeCliente(){
+            this.clientes.forEach(cliente => {
+                if(cliente['nombre_cliente'] == this.form.cliente_nombre){
+                    this.form.cliente_id = cliente['id'];
+                }
+            });
+        },
+        changePintura(){
+            this.pinturas.forEach(pintura => {
+                if(pintura['nombre'] == this.form.pintura_nombre){
+                    this.form.pintura_id = pintura['id'];
+                }
             });
         },
         handleClick(tab, event) {

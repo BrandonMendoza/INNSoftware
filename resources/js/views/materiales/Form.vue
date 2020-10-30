@@ -17,23 +17,31 @@
                 <el-input v-model="form.numero_parte" />
             </el-form-item>
 
-            <el-form-item label="Tipo de Material" prop="tipo_material_id" >
-                <el-select v-model="form.tipo_material_id" value-key="id" style="width:100%"> 
+            <el-form-item label="Tipo de Material" prop="tipo_material_id">
+                <el-select 
+                v-model="form.tipo_material_nombre" 
+                value-key="nombre"
+                @change="changeTipoMaterial()"
+                filterable>
                     <el-option 
-                        v-for="tipoMaterial in tiposMateriales" 
-                        :key="tipoMaterial.id"
-                        :label="tipoMaterial.nombre" 
-                        :value="tipoMaterial.id"/>
+                    v-for="tipoMaterial in tiposMateriales"
+                    :key="tipoMaterial.id"
+                    :label="tipoMaterial.nombre" 
+                    :value="tipoMaterial.nombre"/>
                 </el-select>
             </el-form-item>
 
-            <el-form-item label="Acero" prop="acero_id" >
-                <el-select v-model="form.acero_id" value-key="id" style="width:100%">
+            <el-form-item label="Acero" prop="acero_id">
+                <el-select 
+                v-model="form.acero_nombre" 
+                value-key="nombre"
+                @change="changeAcero()"
+                filterable>
                     <el-option 
-                        v-for="acero in aceros" 
-                        :key="acero.id"
-                        :label="acero.nombre" 
-                        :value="acero.id" />
+                    v-for="acero in aceros"
+                    :key="acero.id"
+                    :label="acero.nombre" 
+                    :value="acero.nombre"/>
                 </el-select>
             </el-form-item>
 
@@ -113,7 +121,9 @@
             catalogo:1,
             numero_parte:"",
             tipo_material_id:"",
+            tipo_material_nombre:"",
             acero_id:"",
+            acero_nombre:"",
             peso_kg:"",
             medida_1:"",
             medida_2:"",
@@ -196,6 +206,20 @@
             .catch(function (error) {
                 me.$message.error('Hubo un error.');
                 console.log(error);
+            });
+        },
+        changeTipoMaterial(){
+            this.tiposMateriales.forEach(tipoMaterial => {
+                if(tipoMaterial['nombre'] == this.form.tipo_material_nombre){
+                    this.form.tipo_material_id = tipoMaterial['id'];
+                }
+            });
+        },
+        changeAcero(){
+            this.aceros.forEach(acero => {
+                if(acero['nombre'] == this.form.acero_nombre){
+                    this.form.acero_id = acero['id'];
+                }
             });
         },
         clearFields(){

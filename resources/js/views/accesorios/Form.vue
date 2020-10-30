@@ -21,14 +21,17 @@
                 <el-input v-model="form.descripcion" />
             </el-form-item>
 
-            <el-form-item label="Acero" prop="acero_id" >
-
-                <el-select v-model="form.acero_id" value-key="id"  style="width:100%">
+            <el-form-item label="Acero" prop="acero_id">
+                <el-select 
+                v-model="form.acero_nombre" 
+                value-key="nombre"
+                @change="changeAcero()"
+                filterable>
                     <el-option 
-                        v-for="acero in aceros"
-                        :key="acero.id"
-                        :label="acero.nombre" 
-                        :value="acero.id" />
+                    v-for="acero in aceros"
+                    :key="acero.id"
+                    :label="acero.nombre" 
+                    :value="acero.nombre"/>
                 </el-select>
             </el-form-item>
 
@@ -88,6 +91,7 @@
             numero_parte:"",
             descripcion:"",
             acero_id:"",
+            acero_nombre:"",
             peso_kg:"",
         },
         rules: {
@@ -152,6 +156,13 @@
             .catch(function (error) {
                 me.$message.error('Hubo un error.');
                 console.log(error);
+            });
+        },
+        changeAcero(){
+            this.aceros.forEach(acero => {
+                if(acero['nombre'] == this.form.acero_nombre){
+                    this.form.acero_id = acero['id'];
+                }
             });
         },
         clearFields(){

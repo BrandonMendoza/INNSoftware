@@ -14,37 +14,50 @@
             <input v-model="form.material_cliente_id" hidden/>
             <el-row :gutter="20">
                 <el-col :span="8" style="padding-top:55px;">
+
+                    <!-- <el-select v-model="newUser.role" class="filter-item" placeholder="Please select role">
+                        <el-option v-for="item in nonAdminRoles" :key="item" :label="item | uppercaseFirst" :value="item" />
+                    </el-select> -->
+
                     <el-form-item label="Estatus" prop="status_id">
-                        <el-select v-model="form.status_id" value-key="id" style="width: 100%;" :row-class-name="tableRowClassName">
+                        <el-select 
+                        v-model="form.status_nombre" 
+                        value-key="nombre"
+                        @change="changeStatus()">
                             <el-option 
-                                v-for="status in statusList"
-                                :key="status.id"
-                                :label="status.nombre" 
-                                :value="status.id"/>
-                            </el-select>
+                            v-for="status in statusList"
+                            :key="status.id"
+                            :label="status.nombre" 
+                            :value="status.nombre"/>
+                        </el-select>
                     </el-form-item>
 
-                   
-
                     <el-form-item label="Categoría" prop="categoria">
-                        <el-select v-model="form.catalogo" value-key="id" style="width: 100%;" @change="getMaterialesAccesorios();changeCategoria()">
+                        <el-select 
+                        v-model="form.catalogo_nombre" 
+                        value-key="nombre"
+                        @change="changeCategoria();getMaterialesAccesorios()">
                             <el-option 
                                 v-for="categoria in categorias"
                                 :key="categoria.id"
                                 :label="categoria.nombre" 
-                                :value="categoria.id"/>
+                                :value="categoria.nombre"/>
                         </el-select>
                     </el-form-item>
 
-                    
-
                     <el-form-item label="Material/Accesorio" prop="material_id"  >
-                        <el-select v-model="form.material_id" value-key="id" style="width: 100%;" v-loading="loadingMaterialAccesorio" filterable clearable>
+                        <el-select 
+                        v-model="form.material_nombre" 
+                        :value-key="form.catalogo == 1 ? 'nombreCompleto' : 'descripcion'" 
+                        style="width: 100%;" 
+                        v-loading="loadingMaterialAccesorio" 
+                        @change="changeMaterialesAccesorios()"
+                        filterable clearable>
                             <el-option 
                                 v-for="materialAccesorio in materialesAccesorios"
                                 :key="materialAccesorio.id"
                                 :label="form.catalogo == 1 ? materialAccesorio.nombreCompleto : materialAccesorio.descripcion" 
-                                :value="materialAccesorio.id"/>
+                                :value="form.catalogo == 1 ? materialAccesorio.nombreCompleto : materialAccesorio.descripcion"/>
                         </el-select>
                     </el-form-item>
 
@@ -101,12 +114,16 @@
                             <el-row :gutter="20">
                                 <el-col :span="12">
                                     <el-form-item label="Cliente">
-                                        <el-select v-model="form.cliente_id" style="width: 100%;" @change="changeCliente()" v-loading="loadingClientes" filterable clearable>
+                                        <el-select 
+                                        v-model="form.cliente_nombre" 
+                                        value-key="nombre_cliente"
+                                        @change="changeCliente()"
+                                        filterable clearable>
                                             <el-option 
-                                                v-for="cliente in clientes"
-                                                :label="cliente.nombre_cliente" 
-                                                :value="cliente.id"  
-                                                :key="cliente.id"/>
+                                            v-for="cliente in clientes"
+                                            :key="cliente.id"
+                                            :label="cliente.nombre_cliente" 
+                                            :value="cliente.nombre_cliente"/>
                                         </el-select>
                                     </el-form-item>
                                 </el-col>
@@ -215,8 +232,12 @@
             id:0,
             status_id:1,
             catalogo:1,
+            status_nombre:"",
+            catalogo_nombre:"",
             cliente_id:"",
+            cliente_nombre:"",
             material_id:"",
+            material_nombre:"",
             cantidad:"",
             tba:"",
             heat_number:"",
@@ -287,9 +308,17 @@
 
             this.form.id = 0;
             this.form.status_id = 1;
+            this.form.status_nombre = "Sin Recibir";
+            
             this.form.catalogo = 1;
+            this.form.catalogo_nombre = "Material";
+
+            this.form.material_id = "";
+            this.form.material_nombre = "";
+
             this.form.cliente_id = "";
-            this.form.material_cliente_id = "";
+            this.form.cliente_nombre = "";
+            
             this.form.cantidad = "";
             this.form.tba = "";
             this.form.heat_number = "";
@@ -345,12 +374,64 @@
                 me.loadingClientes = false;
             });
         },
+        changeStatus(){
+            this.statusList.forEach(status => {
+                if(status['nombre'] == this.form.status_nombre){
+                    this.form.status_id = status['id'];
+                }
+            });
+        },
         changeCategoria(){
             this.form.material_id = "";
+            this.form.material_nombre = "";
+            this.categorias.forEach(categoria => {
+                if(categoria['nombre'] == this.form.catalogo_nombre){
+                    this.form.catalogo = categoria['id'];
+                }
+            });
+        },
+        changeMaterialesAccesorios(){
+            this.form.material_id = "";
+            if(this.form.material_nombre != ""){
+                this.materialesAccesorios.forEach(materialAccesorio => {
+                    if(this.form.catalogo == 1){
+                        if(materialAccesorio['nombreCompleto'] == this.form.material_nombre){
+                            this.form.material_id = materialAccesorio['id'];
+                        }
+                    }else{
+                            if(materialAccesorio['descripcion'] == this.form.material_nombre){
+                            this.form.material_id = materialAccesorio['id'];
+                        }
+                    }
+                });
+            }
+
+            if( this.form.material_id == ""){
+                this.form.material_nombre = "";
+                this.form.cliente_id = "";
+                this.form.cliente_nombre = "";
+            }
+            this.changeCliente();
         },
         changeCliente(){
+            if(this.form.cliente_nombre != ""){
+                console.log("FOR EACH");
+                this.clientes.forEach(cliente => {
+                    if(cliente['nombre_cliente'] == this.form.cliente_nombre){
+                        this.form.cliente_id = cliente['id'];
+                    }
+                });
+            }else{
+                this.form.cliente_id = "";
+            }
+
             if(this.form.cliente_id == ""){
                 this.clienteFormDisable = true;
+                this.form.cliente_nombre = "";
+                this.form.numero_parte = "";
+                this.form.almacen = "";
+                this.form.locacion_almacen = "";
+                this.form.material_cliente_id = "";
             }else{
                 let me = this;
                 let url = '/inventariosMaterialesAccesorios/getMaterialClienteByMaterialCliente';

@@ -102,6 +102,7 @@ import Pagination from '@/components/Pagination';
                 this.$refs.myForm.form.numero_parte = data.numero_parte;
                 this.$refs.myForm.form.descripcion = data.descripcion;
                 this.$refs.myForm.form.acero_id = data.acero_id;
+                this.$refs.myForm.form.acero_nombre = data.acero.nombre;
                 this.$refs.myForm.form.peso_kg = data.peso_kg;
                 this.$refs.myForm.open();
             },

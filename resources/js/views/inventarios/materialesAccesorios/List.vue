@@ -210,9 +210,17 @@ import Pagination from '@/components/Pagination';
 
                 this.$refs.myForm.form.id = data.id;
                 this.$refs.myForm.form.status_id = data.status_id;
+                this.$refs.myForm.form.status_nombre = data.status.nombre;
                 this.$refs.myForm.form.catalogo = data.catalogo;
+                if(data.catalogo == 1){
+                    this.$refs.myForm.form.catalogo_nombre = 'Material';
+                }else{
+                    this.$refs.myForm.form.catalogo_nombre = 'Accesorio';
+                }
+                
                 
                 this.$refs.myForm.form.material_id = data.material_id;
+                this.$refs.myForm.form.material_nombre = data.nombreCompleto;
                 this.$refs.myForm.form.cantidad = data.cantidad;
                 this.$refs.myForm.form.tba = data.tba;
                 this.$refs.myForm.form.heat_number = data.heat_number;
@@ -224,7 +232,8 @@ import Pagination from '@/components/Pagination';
                 /**Informacion de Cliente - Material */
                 if(data.material_cliente != null){
                     this.$refs.myForm.form.numero_parte = data.material_cliente.numero_parte;
-                    this.$refs.myForm.form.cliente_id = data.material_cliente.cliente_id;
+                    this.$refs.myForm.form.cliente_id = data.material_cliente.cliente.id;
+                    this.$refs.myForm.form.cliente_nombre = data.material_cliente.cliente.nombre_cliente;
                     this.$refs.myForm.form.material_cliente_id = data.material_cliente_id;
                     this.$refs.myForm.form.almacen = data.material_cliente.almacen;
                     this.$refs.myForm.form.locacion_almacen = data.material_cliente.locacion_almacen;
