@@ -170,6 +170,7 @@
             this.form.numero_parte = "";
             this.form.descripcion = "";
             this.form.acero_id = "";
+            this.form.acero_nombre = "";
             this.form.peso_kg = "";
             //this.$refs['form'].resetFields();
         },

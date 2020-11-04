@@ -227,7 +227,9 @@
             this.catalogo = 1;
             this.form.numero_parte = "";
             this.form.tipo_material_id = "";
+            this.form.tipo_material_nombre = "";
             this.form.acero_id = "";
+            this.form.acero_nombre = "";
             this.form.peso_kg = "";
             this.form.medida_1 = "";
             this.form.medida_2 = "";

@@ -80,11 +80,11 @@
                 <el-table-column
                 type="index"
                 align="center" 
-                width="30"/>
+                width="60"/>
 
                 <el-table-column
                 label="Proceso"
-                width="150">
+                width="220">
                     <template slot-scope="scope">
                         <el-tag :style="'font-weight: bold;background-color:'+scope.row.proyecto_proceso.proceso.color+';color:'+scope.row.proyecto_proceso.proceso.texto_color+';'">
                             <svg-icon icon-class="process"/>
@@ -95,23 +95,13 @@
 
                 <el-table-column
                 prop="iniciado_el"
-                label="Fecha de Inicio"
+                label="Fecha"
                 align="center" 
                 show-overflow-tooltip>
                     <template slot-scope="scope">
                         <span>{{scope.row.iniciado_el == null ? '—' :  scope.row.iniciado_el}}</span>
                     </template>
                 </el-table-column>
-
-                <el-table-column
-                prop="terminado_el"
-                label="Fecha de Termino"
-                align="center" 
-                show-overflow-tooltip>
-                    <template slot-scope="scope">
-                        <span>{{scope.row.terminado_el == null ? '—' :  scope.row.terminado_el}}</span>
-                    </template>
-                </el-table-column> 
 
                 <el-table-column
                 prop="user.name"
@@ -199,6 +189,7 @@ import Pagination from '@/components/Pagination';
             .catch(_ => {});
         },
         increaseDecrease(step){
+            console.log("Entro a IncreaseDecrease");
             this.orden += step;
             if (this.orden > (this.ordenMax + 1)) {
                 this.orden = (this.ordenMax + 1);
@@ -221,9 +212,6 @@ import Pagination from '@/components/Pagination';
             let url = '/proyectosProductos/saveProceso';
             axios.put(url,me.form).then(function (response) {
                 //creamos un array y guardamos el contenido que nos devuelve el response
-                console.table("RESPONSE getProcesosByProducto:");
-                console.log(response.data);
-                console.table(response.data);
                 me.$parent.getList();
                 loadingInstance.close();
                 me.close(); 
@@ -237,14 +225,12 @@ import Pagination from '@/components/Pagination';
             });
         },
         getProcesos(){
+            console.log("Entro a Get Procesos");
             let me =this;
             var loadingInstance = this.$loading({ target: '#dialogoCambiarProceso > .el-dialog' });
             let url = '/proyectosProductos/getProcesosByProducto';
             axios.put(url,me.form).then(function (response) {
                 //creamos un array y guardamos el contenido que nos devuelve el response
-                console.table("RESPONSE getProcesosByProducto:");
-                console.log(response.data);
-                console.table(response.data);
                 //procesos
                 me.procesos = response.data.procesos;
                 //proceso actual
@@ -281,7 +267,7 @@ import Pagination from '@/components/Pagination';
             });
         },
         calcularPorcentaje(){
-            
+            console.log("Entro a Calcular");
             this.percentage = 0;
             var count = 0;
             //si es el primero acomodamos porcentajes
@@ -289,8 +275,6 @@ import Pagination from '@/components/Pagination';
                 this.percentage = 0;
                 this.procesoActual = this.procesoPrimero.proceso;
                 this.form.proceso_nuevo = this.procesoPrimero.id;
-                console.log("PROCESO PRIMERO");
-                console.log(this.procesoPrimero);
                 return false;
             }
             //si es ultimo acomodamos porcentajes
@@ -298,20 +282,24 @@ import Pagination from '@/components/Pagination';
                 this.percentage = 100;
                 this.procesoActual = this.procesoUltimo.proceso;
                 this.form.proceso_nuevo = this.procesoUltimo.id;
-                console.log("PROCESO ULTIMO");
-                console.log(this.procesoUltimo);
                 return false;
             }
-
+            console.log("-------PROCESOS");
+            console.log(this.procesos);
             for (var proceso of this.procesos) {
-                this.percentage += parseInt(proceso.porcentaje);
+                if(parseInt(proceso.porcentaje) != 0){
+                    this.percentage += parseInt(proceso.porcentaje);
+                }
                 if(this.orden == proceso.orden){
                     //cuando encuentras el proceso lo guardas en el proceso actual
                     this.procesoActual = proceso.proceso;
                     //asignamos el nuevo id del proceso
                     this.form.proceso_nuevo = proceso.id;
                     //si no se sale calculamos el porcentaje
-                    this.percentage -= parseInt(proceso.porcentaje)/2;
+                    if(proceso.porcentaje != 0 ){
+                        this.percentage -= parseInt(proceso.porcentaje)/2;
+                    }
+
                     return false;
                 }
             }
@@ -321,10 +309,6 @@ import Pagination from '@/components/Pagination';
             var loadingInstance = this.$loading({ target: '#dialogoHistorial > .el-dialog' });
             let url = '/proyectosProductos/getHistorialProcesos';
             axios.put(url,me.form).then(function (response) {
-                //creamos un array y guardamos el contenido que nos devuelve el response
-                console.table("RESPONSE getProcesosByProducto:");
-                console.log(response.data);
-                console.table(response.data);
                 //cargar barra de porcentaje
                 me.historial = response.data;
                 loadingInstance.close();

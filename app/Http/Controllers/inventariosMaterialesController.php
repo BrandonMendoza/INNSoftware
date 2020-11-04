@@ -15,7 +15,7 @@ class inventariosMaterialesController extends Controller
 
     /** Funcion para obtener todos los materiales */
     public function inventariosMateriales(){
-        $inventarios = Inventario_material::with(['Material.Acero','Accesorio.Acero','Material_cliente.Cliente','Status'])->get();    
+        $inventarios = Inventario_material::orderBy('id','DESC')->with(['Material.Acero','Accesorio.Acero','Material_cliente.Cliente','Status'])->get();    
         foreach ($inventarios as $key => $inventario) {
             $inventario->loadPesoMaterial();
             $inventario->loadNombreCompleto();

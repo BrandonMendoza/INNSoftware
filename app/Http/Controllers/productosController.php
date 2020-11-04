@@ -17,7 +17,7 @@ class productosController extends Controller
     
 	/** Funcion para obtener todos los materiales */
     public function productos(){
-		$productos = Producto::with(['Cliente','Accesorios','Materiales','Materiales.Tipo_material','Materiales.Acero','Accesorios.Acero','Documentos','Pintura'])->get();
+		$productos = Producto::orderBy('id','DESC')->with(['Cliente','Accesorios','Materiales','Materiales.Tipo_material','Materiales.Acero','Accesorios.Acero','Documentos','Pintura'])->get();
 		foreach ($productos as $key => $producto) {
 			($producto->materiales)->each->loadNombreCompleto();
 		}
@@ -35,7 +35,7 @@ class productosController extends Controller
 
 			/** Generamos numero de parte */
 			if(request()->get('numero_parte') == ""){ 
-				$producto->numero_parte = 'PD-'.str_pad($producto->id + 1, 8, "0", STR_PAD_LEFT);
+				$producto->numero_parte = 'PD-'.$producto->id;
 				$producto->update();
 			}
 

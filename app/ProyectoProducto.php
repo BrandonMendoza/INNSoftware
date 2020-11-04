@@ -10,10 +10,13 @@ class ProyectoProducto extends Pivot
 
     protected $fillable = ['id','proyecto_id','producto_id','proceso_id','work_order','item','cantidad','heat_number','notas','hrs_labor','pintura_id','created_at','updated_at','proceso_id','numero_parte_cliente','fecha_entrega'];
     protected $dates = ['fecha_entrega'];
+
     public static function loadOrdenesAbiertasWithAll(){
-        $ordenesAbiertas = ProyectoProducto::with([ 'Producto',
-                                                    'Proyecto',
-                                                    'Proyecto.Cliente'])->get();
+        
+        $ordenesAbiertas = ProyectoProducto::
+                                orderBy('fecha_entrega','DESC')
+                                ->with([ 'Producto','Proyecto','Proyecto.Cliente'])
+                                ->get();
         foreach ($ordenesAbiertas as $key => $ordenAbierta) {
             $ordenAbierta->loadProceso();
         }

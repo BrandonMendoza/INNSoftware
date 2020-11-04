@@ -18,6 +18,7 @@
                 <el-table-column
                 type="index"
                 align="center"
+                sortable
                 fixed/>
 
                 <el-table-column
@@ -86,7 +87,7 @@
                     <template slot-scope="scope">
                         <el-button type="primary" size="mini" @click="loadFieldsUpdate(scope.row);">Editar</el-button>
                         <el-button type="primary" size="mini" @click="loadDocumentos(scope.row);">Docs</el-button>
-                        <el-button type="danger" size="mini" @click="deleteRow(scope.row.id);">Eliminar</el-button>
+                        <el-button type="danger" size="mini" @click="deleteRow(scope.row.id,scope.row.numero_parte);">Eliminar</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -167,18 +168,29 @@ import Pagination from '@/components/Pagination';
                 this.$refs.documentosDialog.form.documentos = JSON.parse(JSON.stringify(data.documentos));
                 this.$refs.documentosDialog.open()
             },
-            deleteRow(id){
-                let me = this;
-                me.loading = true;
-                axios.post(me.deleteUrl,{'id':id}).then(function (response) {
-                    me.getList();   
-                    me.$message.success('Eliminado correctamente.');
-                    me.loading = false;
-                })
-                .catch(function (error) {
-                    me.$message.error('Hubo un error.');
-                    console.log(error);
-                    me.loading = false;
+            deleteRow(id,proyecto){
+                this.$confirm('Esto eliminara permanentemente el proyecto ' + proyecto + '. Quieres continuar?', 'Advertencia', {
+                    confirmButtonText: 'Eliminar',
+                    cancelButtonText: 'Cancelar',
+                    type: 'warning',
+                }).then(() => {
+                    let me = this;
+                    me.loading = true;
+                    axios.post(me.deleteUrl,{'id':id}).then(function (response) {
+                        me.getList();
+                        me.$message.success('Eliminado correctamente.');
+                        me.loading = false;
+                    })
+                    .catch(function (error) {
+                        me.$message.error('Hubo un error.');
+                        console.log(error);
+                        me.loading = false;
+                    });
+                }).catch(() => {
+                    this.$message({
+                    type: 'info',
+                    message: 'Eliminacion cancelada',
+                    });
                 });
             },
         },

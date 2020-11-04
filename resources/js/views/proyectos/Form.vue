@@ -250,6 +250,7 @@ import { CommentDropdown } from '../articles/components/Dropdown';
         clearFields(){/*Limpia los campos e inicializa la variable update a 0*/
             this.form.id = 0;
             this.form.cliente_id = "";
+            this.form.cliente_nombre = "";
             this.form.numero_parte_cliente = "";
             this.form.orden_compra = "";
             this.form.plan_corte = "";

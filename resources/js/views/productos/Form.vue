@@ -35,16 +35,6 @@
                         <el-input v-model="form.numero_parte_cliente" />
                     </el-form-item>  
 
-                    <el-form-item label="Pintura" prop="pintura_id"  >
-                        <el-select v-model="form.pintura_id" value-key="id" style="width: 100%;" filterable :loading="loadingPinturas">
-                            <el-option 
-                                v-for="pintura in pinturas"
-                                :key="pintura.id"
-                                :label="pintura.simbolo" 
-                                :value="pintura.id"/>
-                        </el-select>
-                    </el-form-item>
-
                     <el-form-item label="Pintura" prop="pintura_id">
                         <el-select 
                         v-model="form.pintura_nombre" 
@@ -333,7 +323,9 @@ import { CommentDropdown } from '../articles/components/Dropdown';
         clearFields(){/*Limpia los campos e inicializa la variable update a 0*/
             this.form.id = 0;
             this.form.cliente_id = "";
+            this.form.cliente_nombre = "";
             this.form.pintura_id = "";
+            this.form.pintura_nombre = "";
             this.form.numero_parte_cliente = "";
             this.form.peso_kg = "";
             this.form.peso_lbs = "";
@@ -441,10 +433,16 @@ import { CommentDropdown } from '../articles/components/Dropdown';
         calcularKgsToLbs(){
             this.form.peso_lbs = Number(this.form.peso_kg*2.2046).toFixed(2);
             this.form.peso_kg = Number(this.form.peso_kg).toFixed(2);
+
+            this.form.peso_lbs = Number(this.form.peso_lbs).toLocaleString();
+            this.form.peso_kg = Number(this.form.peso_kg).toLocaleString();
         },
         calcularLbsToKgs(){
             this.form.peso_kg = Number(this.form.peso_lbs/2.2046).toFixed(2);
             this.form.peso_lbs = Number(this.form.peso_lbs).toFixed(2);
+
+            this.form.peso_lbs = Number(this.form.peso_lbs).toLocaleString();
+            this.form.peso_kg = Number(this.form.peso_kg).toLocaleString();
         },
         agregarMaterial(){
             if(this.materialAgregar.material.id == "" ){

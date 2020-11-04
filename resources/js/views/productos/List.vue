@@ -21,6 +21,7 @@
                 type="index"
                 align="center" 
                 width="80"
+                sortable
                 fixed/>
 
                 <el-table-column
@@ -44,14 +45,22 @@
                 label="Peso (kg)"
                 show-overflow-tooltip
                 align="center" 
-                fixed/>
+                fixed>
+                    <template slot-scope="scope">
+                        <span>{{ Number(scope.row.peso_kg).toLocaleString()+" lbs/"+Number(scope.row.peso_kg).toLocaleString()+" kgs"}}</span>
+                    </template>
+                </el-table-column>
 
                 <el-table-column
                 prop="peso_lbs"
                 label="Peso (lbs)"
                 show-overflow-tooltip
                 align="center" 
-                fixed/>
+                fixed>
+                    <template slot-scope="scope">
+                        <span>{{ Number(scope.row.peso_lbs).toLocaleString()+" lbs/"+Number(scope.row.peso_kg).toLocaleString()+" kgs"}}</span>
+                    </template>
+                </el-table-column>
 
 
                 <el-table-column
@@ -62,7 +71,7 @@
                     <template slot-scope="scope">
                         <el-button type="primary" size="mini" @click="loadFieldsUpdate(scope.row);">Editar</el-button>
                         <el-button type="primary" size="mini" @click="loadDocumentos(scope.row);">Docs</el-button>
-                        <el-button type="danger" size="mini" @click="deleteRow(scope.row.id);">Eliminar</el-button>
+                        <el-button type="danger" size="mini" @click="deleteRow(scope.row.id,scope.row.numero_parte,scope.row.numero_parte_cliente);">Eliminar</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -169,18 +178,29 @@ import Pagination from '@/components/Pagination';
                 this.$refs.myForm.form.id = data.id;
                 this.$refs.myForm.open();
             },
-            deleteRow(id){
-                let me = this;
-                me.loading = true;
-                axios.post('/productos/delete',{'id':id}).then(function (response) {
-                    me.getList();   
-                    me.$message.success('Eliminado correctamente.');
-                    me.loading = false;
-                })
-                .catch(function (error) {
-                    me.$message.error('Hubo un error.');
-                    console.log(error);
-                    me.loading = false;
+            deleteRow(id,proyecto,proyecto_cliente){
+                this.$confirm('Esto eliminara permanentemente el producto ' + proyecto + '/'+ proyecto_cliente +'. Quieres continuar?', 'Advertencia', {
+                    confirmButtonText: 'Eliminar',
+                    cancelButtonText: 'Cancelar',
+                    type: 'warning',
+                }).then(() => {
+                    let me = this;
+                    me.loading = true;
+                    axios.post('/productos/delete',{'id':id}).then(function (response) {
+                        me.getList();   
+                        me.$message.success('Eliminado correctamente.');
+                        me.loading = false;
+                    })
+                    .catch(function (error) {
+                        me.$message.error('Hubo un error.');
+                        console.log(error);
+                        me.loading = false;
+                    });
+                }).catch(() => {
+                    this.$message({
+                    type: 'info',
+                    message: 'Eliminacion cancelada',
+                    });
                 });
             }
         },

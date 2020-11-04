@@ -8,11 +8,24 @@
                     Importar    
                 </el-button>
             </router-link>
+            
+            <el-popover
+            placement="right"
+            width="400"
+            trigger="click">    
+                <el-checkbox v-model="showProyecto" class="filter-item" style="margin-left:15px;">Ver Proyecto</el-checkbox>
+                <el-checkbox v-model="showProducto" class="filter-item" style="margin-left:15px;">Ver Producto</el-checkbox>
+
+                
+                <el-button type="primary" icon="el-icon-setting" slot="reference">Columnas</el-button>
+            </el-popover>
+            <!-- <el-checkbox v-model="filtrarTerminados" class="filter-item" style="margin-left:15px;">Mostrar Ordenes Terminadas</el-checkbox> -->
             <!-- <el-button class="filter-item" type="primary" icon="el-icon-plus" @click="$refs.myForm.clearFields();$refs.myForm.open()" hidden>Agregar</el-button> -->
         </div>
         <el-row >
             <el-table
             :data="list"
+            sortable
             border
             tooltip-effect="light"
             fit
@@ -21,10 +34,15 @@
                 <el-table-column
                 type="index"
                 align="center"
+                sortable
                 fixed/>
 
                 <el-table-column
                 label="Proceso"
+                prop="Proceso.proyecto_proceso.proceso.nombre"
+                :filters="procesosFiltroList"
+                :filter-method="filterProcesoHandler"
+                sortable
                 width="150">
                     <template slot-scope="scope">
                         <el-tag :style="'font-weight: bold;background-color:'+scope.row.Proceso.proyecto_proceso.proceso.color+';color:'+scope.row.Proceso.proyecto_proceso.proceso.texto_color+';'">
@@ -34,25 +52,29 @@
                     </template>
                 </el-table-column>  
 
-                 <el-table-column
-                prop="proyecto.cliente.nombre_cliente"
-                label="Cliente"/> 
-
                 <el-table-column
                 prop="producto.numero_parte"
                 label="Núm. de Parte"
                 show-overflow-tooltip
+                width="110"
+                v-if="showProducto"/>
+
+                <el-table-column
+                v-if="showProyecto"
+                prop="proyecto.numero_parte"
+                label="Proyecto"
+                show-overflow-tooltip
                 width="110"/>
+
+                 <el-table-column
+                prop="proyecto.cliente.nombre_cliente"
+                :filters="clientesFiltroList"
+                :filter-method="filterClienteHandler"
+                label="Cliente"/> 
 
                 <el-table-column
                 prop="producto.numero_parte_cliente"
                 label="Núm. de Parte (cliente)"
-                show-overflow-tooltip
-                width="110"/>
-
-                <el-table-column
-                prop="proyecto.numero_parte"
-                label="Proyecto"
                 show-overflow-tooltip
                 width="110"/>
 
@@ -67,23 +89,27 @@
                 prop="work_order"
                 label="Orden de Trabajo"
                 align="center"
+                width="100"
                 show-overflow-tooltip/>
 
                 <el-table-column
                 prop="item"
                 label="Item"
                 align="center"
+                width="80"
                 show-overflow-tooltip/>
 
                 <el-table-column
                 prop="proyecto.orden_compra"
                 label="Orden de Compra"
+                width="100"
                 show-overflow-tooltip/>
 
                 <el-table-column
                 prop="fecha_entrega"
                 label="Fecha de Entrega"
                 width="110"
+                sortable
                 show-overflow-tooltip> 
                     <template slot-scope="scope">
                         <el-tag :type="compareDates(scope.row.fecha_entrega)">
@@ -100,12 +126,21 @@
                 <el-table-column
                 label="Peso"
                 show-overflow-tooltip
-                align="center"
-                width="110">
+                width="200">
                     <template slot-scope="scope">
-                        <span>{{scope.row.producto.peso_lbs+" lbs/"+scope.row.producto.peso_kg+" kgs"}}</span>
+
+                        <span>{{ Number(scope.row.producto.peso_lbs).toLocaleString()+" lbs/"+Number(scope.row.producto.peso_kg).toLocaleString()+" kgs"}}</span>
                     </template>
-                </el-table-column>               
+                </el-table-column> 
+
+                <el-table-column
+                label="Notas"
+                min-width="150px">
+                    <template slot-scope="scope">
+                        <span class="pre-formateado">{{ scope.row.notas }}</span>
+                        <!-- <template v-for="line in scope.row.notas.split('\n')">{{line}}<br></template> -->
+                    </template>
+                </el-table-column> 
 
                 <el-table-column
                 fixed="right"
@@ -133,13 +168,18 @@
 <style>
   .el-table .cell {
     word-break: break-word;
-}
+    }
+
+    .pre-formateado {
+        white-space: pre;
+    }
 </style>
 <script>
 import formDialog from './Form';
 import cambiarProcesoDialog from './cambiarProceso';
 import Pagination from '@/components/Pagination'; 
 import moment from 'moment';
+import uniq from 'lodash/uniq'
 
 
     export default {
@@ -158,6 +198,11 @@ import moment from 'moment';
                     sort: '+id',
                 },
                 list:[],
+                showProyecto:false,
+                showProducto:false,
+                filtrarTerminados:false,
+                procesosFiltroList:[],
+                clientesFiltroList:[],
             }
         },
         components: { 
@@ -169,14 +214,42 @@ import moment from 'moment';
             async getList(){
                 let me = this;
                 me.loading = true;
-                axios.get(me.listUrl).then(function (response) {
+                axios.get(me.listUrl,me.filtrarTerminados).then(function (response) {
                     me.list = response.data;
+                    me.cargarProcesosFiltro();
+                    me.cargarClientesFiltro();
                     me.loading = false;
                 })
                 .catch(function (error) {
                     me.$message.error('Hubo un error.');
                     console.log(error);
                 });
+            },
+            cargarProcesosFiltro(){
+                var filtroItem = {};
+                for (var openOrder of this.list) {
+                    filtroItem = {
+                        value: openOrder.Proceso.proyecto_proceso.proceso.nombre,
+                        text: openOrder.Proceso.proyecto_proceso.proceso.nombre
+                    };
+                    this.procesosFiltroList.push(filtroItem);
+                }
+                
+                var auxList = _.uniqBy(this.procesosFiltroList, 'value')
+                this.procesosFiltroList = auxList;
+            },
+            cargarClientesFiltro(){
+                var filtroItem = {};
+                for (var openOrder of this.list) {
+                    filtroItem = {
+                        value: openOrder.proyecto.cliente.nombre_cliente,
+                        text: openOrder.proyecto.cliente.nombre_cliente
+                    };
+                    this.clientesFiltroList.push(filtroItem);
+                }
+                
+                var auxList = _.uniqBy(this.clientesFiltroList, 'value')
+                this.clientesFiltroList = auxList;
             },
             loadFieldsUpdate(data){ 
                 this.$refs.myForm.form.id = data.id;
@@ -227,7 +300,15 @@ import moment from 'moment';
                 }
 
                 return 'success';
-            }
+            },
+            filterProcesoHandler(value, row, column) {
+                const property = column['property'];
+                return row["Proceso"]["proyecto_proceso"]["proceso"]["nombre"] === value;
+            },
+            filterClienteHandler(value, row, column) {
+                const property = column['property'];
+                return row["proyecto"]["cliente"]["nombre_cliente"] === value;
+            },
         },
         mounted() {
            this.getList();

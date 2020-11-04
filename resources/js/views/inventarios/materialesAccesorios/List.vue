@@ -12,6 +12,7 @@
             <el-table
             :data="list"
             border
+            sortable
             tooltip-effect="light"
             fit
             v-loading="loading"
@@ -20,11 +21,16 @@
                 type="index"
                 align="center" 
                 width="80"
+                sortable
                 fixed/>
 
                 <el-table-column
                 label="Estatus"
+                prop="status_id"
                 width="100"
+                :filters="[{text: 'sin recibir', value: 1},{text: 'recibido', value: 2},{text: 'revisando', value: 3}]"
+                :filter-method="filterHandler"
+                filter-placement="bottom-end"
                 fixed>
                     <template slot-scope="scope">
                         <el-tag :type="statusColor(scope.row.status_id)">
@@ -128,7 +134,7 @@
                 width="180">
                     <template slot-scope="scope">
                         <el-button type="primary" size="mini" @click="loadFieldsUpdate(scope.row);">Editar</el-button>
-                        <el-button type="danger" size="mini" @click="deleteRow(scope.row.id);">Eliminar</el-button>
+                        <el-button type="danger" size="mini" @click="deleteRow(scope.row.id,scope.row.nombreCompleto);">Eliminar</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -241,37 +247,55 @@ import Pagination from '@/components/Pagination';
                 }
                 this.$refs.myForm.open();
             },
-            deleteRow(id){
-                let me = this;
-                me.loading = true;
-                console.log("DELETE FUNCTION");
-                axios.post('/inventariosMaterialesAccesorios/delete',{'id':id}).then(function (response) {
-                    me.getList();
-                    me.$message.success('Eliminado correctamente.');
-                    me.loading = false;
-                })
-                .catch(function (error) {
-                    me.$message.success('Hubo un error.');
-                    console.log(error);
-                    me.loading = false;
+            deleteRow(id,material){
+                this.$confirm('Esto eliminara permanentemente el material ' + material  +' del inventario. Quieres continuar?', 'Advertencia', {
+                    confirmButtonText: 'Eliminar',
+                    cancelButtonText: 'Cancelar',
+                    type: 'warning',
+                }).then(() => {
+                    let me = this;
+                    me.loading = true;
+                    console.log("DELETE FUNCTION");
+                    axios.post('/inventariosMaterialesAccesorios/delete',{'id':id}).then(function (response) {
+                        me.getList();
+                        me.$message.success('Eliminado correctamente.');
+                        me.loading = false;
+                    })
+                    .catch(function (error) {
+                        me.$message.success('Hubo un error.');
+                        console.log(error);
+                        me.loading = false;
+                    });
+                }).catch(() => {
+                    this.$message({
+                    type: 'info',
+                    message: 'Eliminacion cancelada',
+                    });
                 });
             },
             /**Funcion para darle clase a el TAG de acuerdo a la feche de entrega */
             statusColor(status){
                 switch (status) {
                     case 1://sin recibir
-                        return 'danger';
+                        return "danger";
                         break;
                     
                     case 2: //recibido
-                        return 'success';       
+                        return "success";       
                         break;
 
                     case 3://revisando
-                        return 'warning';    
+                        return "warning";    
                         break;
                 
                 }
+            },
+            filterHandler(value, row, column) {
+                const property = column['property'];
+                return row[property] === value;
+            },
+            filterTag(value, row) {
+                return row.tag === value;
             },
         },
         

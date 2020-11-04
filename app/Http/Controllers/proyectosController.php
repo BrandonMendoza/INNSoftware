@@ -20,7 +20,7 @@ class proyectosController extends Controller
 {
     /** Funcion para obtener todos los materiales */
     public function proyectos(){
-        return ((Proyecto::with(['Cliente','Productos','Documentos'])->get())->each->loadTotalHrsLabor())->each->loadProgreso();
+        return ((Proyecto::orderBy('id','DESC')->with(['Cliente','Productos','Documentos'])->get())->each->loadTotalHrsLabor())->each->loadProgreso();
 	}
 
     /*Funcion para insertar o Actualizar un proyecto*/
@@ -36,7 +36,7 @@ class proyectosController extends Controller
                                                 ->updateOrCreate(['id' => request()->get('id')],$proyecto->toArray());
             /*Creando sus procesos*/
             if(request()->get('numero_parte') == ""){
-                $proyecto->numero_parte = 'PY-'.str_pad($proyecto->id + 1, 8, "0", STR_PAD_LEFT);
+                $proyecto->numero_parte = 'PY-'.$proyecto->id;
                 $proyecto->crearProcesos();
                 $proyecto->update();
                 /* insertmaos los productos del proyecto*/
