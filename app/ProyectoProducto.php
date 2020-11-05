@@ -11,6 +11,14 @@ class ProyectoProducto extends Pivot
     protected $fillable = ['id','proyecto_id','producto_id','proceso_id','work_order','item','cantidad','heat_number','notas','hrs_labor','pintura_id','created_at','updated_at','proceso_id','numero_parte_cliente','fecha_entrega'];
     protected $dates = ['fecha_entrega'];
 
+    protected $casts = [
+        'id' => 'integer',
+        'producto_id' => 'integer',
+        'proceso_id' => 'integer',
+        'pintura_id' => 'integer',
+        'proceso_id' => 'integer',
+    ];
+
     public static function loadOrdenesAbiertasWithAll(){
         
         $ordenesAbiertas = ProyectoProducto::

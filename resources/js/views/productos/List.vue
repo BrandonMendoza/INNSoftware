@@ -10,7 +10,7 @@
         
         <el-row >
             <el-table
-            :data="list"
+            :data="displayData"
             border
             tooltip-effect="light"
             fit
@@ -47,7 +47,7 @@
                 align="center" 
                 fixed>
                     <template slot-scope="scope">
-                        <span>{{ Number(scope.row.peso_kg).toLocaleString()+" lbs/"+Number(scope.row.peso_kg).toLocaleString()+" kgs"}}</span>
+                        <vue-numeric v-bind:precision="2" separator="," v-model="scope.row.peso_kg" :read-only="true"></vue-numeric>
                     </template>
                 </el-table-column>
 
@@ -58,7 +58,7 @@
                 align="center" 
                 fixed>
                     <template slot-scope="scope">
-                        <span>{{ Number(scope.row.peso_lbs).toLocaleString()+" lbs/"+Number(scope.row.peso_kg).toLocaleString()+" kgs"}}</span>
+                        <vue-numeric v-bind:precision="2" separator="," v-model="scope.row.peso_lbs" :read-only="true"></vue-numeric>
                     </template>
                 </el-table-column>
 
@@ -68,6 +68,12 @@
                 label=""
                 align="center"
                 width="270">
+                    <template slot="header">
+                        <el-input
+                        v-model="search"
+                        size="mini"
+                        placeholder="buscar"/>
+                    </template>
                     <template slot-scope="scope">
                         <el-button type="primary" size="mini" @click="loadFieldsUpdate(scope.row);">Editar</el-button>
                         <el-button type="primary" size="mini" @click="loadDocumentos(scope.row);">Docs</el-button>
@@ -78,7 +84,13 @@
         </el-row>    
         
         <el-row type="flex" justify="end">
-            <pagination v-show="list.length>0" :total="list.length" :page.sync="list.page" :limit.sync="listQuery.limit" @pagination="getList" />
+                <el-pagination
+                    background
+                    layout="prev, pager, next"
+                    @current-change="handleCurrentChange"
+                    :page-size="pageSize"
+                    :total="total">
+                </el-pagination>
         </el-row>
         <formDialog  ref="myForm" />
 
@@ -111,15 +123,30 @@ import Pagination from '@/components/Pagination';
             
             return{
                 loading : true,
-                listQuery: {
-                    page: 1,
-                    limit: 20,
-                    importance: undefined,
-                    title: undefined,
-                    type: undefined,
-                    sort: '+id',
-                },
                 list:[], //Este array contendrá las tareas de nuestra bd
+                //PAGINATION INTENTO
+                search: '',
+                page: 1,
+                pageSize: 10,
+                total: 0
+            }
+        },
+        computed: {
+            searching() {
+                if (!this.search) {
+                    this.total = this.list.length;
+                    return this.list;
+                }
+                this.page = 1;
+                var resultData = this.list.filter(data => data.numero_parte.toLowerCase().includes(this.search.toLowerCase()));
+                if(resultData.length == 0){
+                    resultData = this.list.filter(data => data.numero_parte_cliente.toLowerCase().includes(this.search.toLowerCase()));
+                }
+                return resultData;
+            },
+            displayData() {
+                this.total = this.searching.length;
+                return this.searching.slice(this.pageSize * this.page - this.pageSize, this.pageSize * this.page);
             }
         },
         components: { 
@@ -128,12 +155,15 @@ import Pagination from '@/components/Pagination';
             Pagination
         },
         methods:{
+            handleCurrentChange (val) {
+                this.page = val
+            },
             tableRowClassName({row, rowIndex}) {
-                if (row.status_id === 1) { //sin recibir
+                if (parseInt(row.status_id) === 1) { //sin recibir
                     return 'danger-row';
-                } else if (row.status_id === 2) {//recibido  
+                } else if (parseInt(row.status_id) === 2) {//recibido  
                     return 'success-row';
-                }else if (row.status_id === 3) {//revisando  
+                }else if (parseInt(row.status_id) === 3) {//revisando  
                     return 'warning-row';
                 }
                 return '';

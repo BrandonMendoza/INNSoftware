@@ -189,7 +189,6 @@ import Pagination from '@/components/Pagination';
             .catch(_ => {});
         },
         increaseDecrease(step){
-            console.log("Entro a IncreaseDecrease");
             this.orden += step;
             if (this.orden > (this.ordenMax + 1)) {
                 this.orden = (this.ordenMax + 1);
@@ -225,7 +224,6 @@ import Pagination from '@/components/Pagination';
             });
         },
         getProcesos(){
-            console.log("Entro a Get Procesos");
             let me =this;
             var loadingInstance = this.$loading({ target: '#dialogoCambiarProceso > .el-dialog' });
             let url = '/proyectosProductos/getProcesosByProducto';
@@ -267,7 +265,6 @@ import Pagination from '@/components/Pagination';
             });
         },
         calcularPorcentaje(){
-            console.log("Entro a Calcular");
             this.percentage = 0;
             var count = 0;
             //si es el primero acomodamos porcentajes
@@ -284,8 +281,6 @@ import Pagination from '@/components/Pagination';
                 this.form.proceso_nuevo = this.procesoUltimo.id;
                 return false;
             }
-            console.log("-------PROCESOS");
-            console.log(this.procesos);
             for (var proceso of this.procesos) {
                 if(parseInt(proceso.porcentaje) != 0){
                     this.percentage += parseInt(proceso.porcentaje);

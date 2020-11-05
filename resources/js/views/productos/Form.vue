@@ -50,11 +50,11 @@
                     </el-form-item>
 
                     <el-form-item label="Peso (kg)" prop="peso_kg">
-                        <el-input v-model="form.peso_kg" @change="calcularKgsToLbs"/>
+                        <vue-numeric class="el-input__inner" v-bind:precision="2" separator="," v-model="form.peso_kg" @blur="calcularKgsToLbs()"></vue-numeric>
                     </el-form-item> 
 
                     <el-form-item label="Peso (lbs)" prop="peso_lbs">
-                        <el-input v-model="form.peso_lbs" @change="calcularLbsToKgs"/>
+                        <vue-numeric class="el-input__inner" v-bind:precision="2" separator="," v-model="form.peso_lbs" @blur="calcularLbsToKgs()"></vue-numeric>
                     </el-form-item> 
                 </el-col>
                 <el-col :span="18">
@@ -232,7 +232,8 @@
   }
 </style>
 <script>
-import { CommentDropdown } from '../articles/components/Dropdown';
+import VueNumeric from 'vue-numeric';
+
   export default {
     data() {
       return {
@@ -431,18 +432,10 @@ import { CommentDropdown } from '../articles/components/Dropdown';
             //console.log(tab, event);
         },
         calcularKgsToLbs(){
-            this.form.peso_lbs = Number(this.form.peso_kg*2.2046).toFixed(2);
-            this.form.peso_kg = Number(this.form.peso_kg).toFixed(2);
-
-            this.form.peso_lbs = Number(this.form.peso_lbs).toLocaleString();
-            this.form.peso_kg = Number(this.form.peso_kg).toLocaleString();
+            this.form.peso_lbs = this.form.peso_kg*2.2046;
         },
         calcularLbsToKgs(){
-            this.form.peso_kg = Number(this.form.peso_lbs/2.2046).toFixed(2);
-            this.form.peso_lbs = Number(this.form.peso_lbs).toFixed(2);
-
-            this.form.peso_lbs = Number(this.form.peso_lbs).toLocaleString();
-            this.form.peso_kg = Number(this.form.peso_kg).toLocaleString();
+            this.form.peso_kg = this.form.peso_lbs/2.2046;
         },
         agregarMaterial(){
             if(this.materialAgregar.material.id == "" ){

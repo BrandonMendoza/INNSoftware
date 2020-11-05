@@ -9,7 +9,7 @@
         </div>
         <el-row >
             <el-table
-            :data="list"
+            :data="displayData"
             border
             tooltip-effect="light"
             fit
@@ -28,7 +28,7 @@
 
                  <el-table-column
                 prop="numero_parte_cliente"
-                label="Núm. de Parte (Cliente)"/> 
+                label="Nombre del Proyecto"/> 
 
                 <el-table-column
                 prop="cliente.nombre_cliente"
@@ -38,11 +38,6 @@
                 <el-table-column
                 prop="orden_compra"
                 label="Orden de Compra"
-                show-overflow-tooltip/>
-
-                <el-table-column
-                prop="plan_corte"
-                label="Plan de Corte"
                 show-overflow-tooltip/>
 
                 <el-table-column
@@ -84,6 +79,12 @@
                 label=""
                 align="center"
                 width="270">
+                    <template slot="header">
+                        <el-input
+                        v-model="search"
+                        size="mini"
+                        placeholder="buscar"/>
+                    </template>
                     <template slot-scope="scope">
                         <el-button type="primary" size="mini" @click="loadFieldsUpdate(scope.row);">Editar</el-button>
                         <el-button type="primary" size="mini" @click="loadDocumentos(scope.row);">Docs</el-button>
@@ -94,7 +95,13 @@
         </el-row>    
         
         <el-row type="flex" justify="end">
-            <pagination v-show="list.length>0" :total="list.length" :page.sync="list.page" :limit.sync="listQuery.limit" @pagination="getList" />
+            <el-pagination
+                background
+                layout="prev, pager, next"
+                @current-change="handleCurrentChange"
+                :page-size="pageSize"
+                :total="total">
+            </el-pagination>
         </el-row>
         <formDialog  ref="myForm" />
 
@@ -105,12 +112,12 @@
     .el-table .cell {
         word-break: break-word;
     }
+
 </style>
 <script>
-import formDialog from './Form';
-import documentosDialog from './documentos';
-import Pagination from '@/components/Pagination'; 
-
+    import formDialog from './Form';
+    import documentosDialog from './documentos';
+    import Pagination from '@/components/Pagination';
 
     export default {
         data(){
@@ -119,15 +126,29 @@ import Pagination from '@/components/Pagination';
                 listUrl:'/proyectos',
                 deleteUrl:'/proyectos/delete',
                 loading : true,
-                listQuery: {
-                    page: 1,
-                    limit: 20,
-                    importance: undefined,
-                    title: undefined,
-                    type: undefined,
-                    sort: '+id',
-                },
                 list:[],
+                search: '',
+                page: 1,
+                pageSize: 10,
+                total: 0
+            }
+        },
+        computed: {
+            searching() {
+                if (!this.search) {
+                    this.total = this.list.length;
+                    return this.list;
+                }
+                this.page = 1;
+                var resultData = this.list.filter(data => data.numero_parte.toLowerCase().includes(this.search.toLowerCase()));
+                if(resultData.length == 0){
+                    resultData = this.list.filter(data => data.numero_parte_cliente.toLowerCase().includes(this.search.toLowerCase()));
+                }
+                return resultData;
+            },
+            displayData() {
+                this.total = this.searching.length;
+                return this.searching.slice(this.pageSize * this.page - this.pageSize, this.pageSize * this.page);
             }
         },
         components: { 
@@ -136,6 +157,9 @@ import Pagination from '@/components/Pagination';
             Pagination
         },
         methods:{
+            handleCurrentChange (val) {
+                this.page = val
+            },
             async getList(){
                 let me = this;
                 axios.get(me.listUrl).then(function (response) {

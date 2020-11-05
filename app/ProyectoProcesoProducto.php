@@ -10,6 +10,12 @@ class ProyectoProcesoProducto extends Pivot
 
     protected $fillable = ['id','proyecto_proceso_id','proyecto_producto_id','user_id','created_at','updated_at','terminado_el','iniciado_el','notas'];
 
+    protected $casts = [
+        'id' => 'integer',
+        'proyecto_proceso_id' => 'integer',
+        'proyecto_producto_id' => 'integer'
+    ];
+
     public function ProyectoProceso()
     {
         return $this->hasOne('App\ProyectoProceso','id','proyecto_proceso_id');

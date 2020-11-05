@@ -10,6 +10,13 @@ class ProyectoProceso extends Model
 
     protected $fillable = ['id','proyecto_id','proceso_id','created_id','updated_id','orden','porcentaje','es_ultimo','es_primero','es_estatico'];
 
+    protected $casts = [
+        'id' => 'integer',
+        'proyecto_id' => 'integer',
+        'proceso_id' => 'integer',
+        'orden' => 'integer'
+    ];
+
     public function Proceso()
     {
         return $this->hasOne('App\Proceso','id','proceso_id');

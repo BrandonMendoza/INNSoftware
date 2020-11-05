@@ -9,7 +9,13 @@ import router from '@/router';
 import i18n from './lang'; // Internationalization
 import '@/icons'; // icon
 import '@/permission'; // permission control
+//Nuevas librerias
 import VueTheMask from 'vue-the-mask';
+import VueNumeric from 'vue-numeric';
+import AFTableColumn from 'af-table-column'
+//import PerfectScrollbar from 'perfect-scrollbar';
+//import "perfect-scrollbar/css/perfect-scrollbar.css";
+
 
 
 
@@ -19,13 +25,18 @@ Vue.use(ElementUI, {
   size: Cookies.get('size') || 'medium', // set element-ui default size
   i18n: (key, value) => i18n.t(key, value),
 });
-Vue.use(VueTheMask);
+
 // register global utility filters.
 Object.keys(filters).forEach(key => {
   Vue.filter(key, filters[key]);
 });
 
+//Nuevas librerias
+Vue.use(VueTheMask);
+Vue.use(VueNumeric)
 Vue.use(require('vue-moment'));
+Vue.use(AFTableColumn)
+//Vue.use(PerfectScrollbar);
 
 Vue.config.productionTip = false;
 

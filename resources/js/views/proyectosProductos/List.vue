@@ -24,88 +24,92 @@
         </div>
         <el-row >
             <el-table
-            :data="list"
+            :data="displayData"
             sortable
             border
             tooltip-effect="light"
             fit
             v-loading="loading"
             style="width: 100%; word-wrap: break-word;">
-                <el-table-column
+                <af-table-column
                 type="index"
                 align="center"
                 sortable
                 fixed/>
 
-                <el-table-column
+                <af-table-column
                 label="Proceso"
                 prop="Proceso.proyecto_proceso.proceso.nombre"
                 :filters="procesosFiltroList"
                 :filter-method="filterProcesoHandler"
                 sortable
-                width="150">
+                fixed>
                     <template slot-scope="scope">
                         <el-tag :style="'font-weight: bold;background-color:'+scope.row.Proceso.proyecto_proceso.proceso.color+';color:'+scope.row.Proceso.proyecto_proceso.proceso.texto_color+';'">
                             <svg-icon icon-class="process" :style="'background-color:'+scope.row.Proceso.proyecto_proceso.proceso.color+';color:'+scope.row.Proceso.proyecto_proceso.proceso.texto_color+';'"/>
                             {{scope.row.Proceso.proyecto_proceso.proceso.nombre}}
                         </el-tag>
                     </template>
-                </el-table-column>  
+                </af-table-column>  
 
-                <el-table-column
+                <af-table-column
                 prop="producto.numero_parte"
                 label="Núm. de Parte"
                 show-overflow-tooltip
                 width="110"
-                v-if="showProducto"/>
+                v-if="showProducto"
+                fixed/>
 
-                <el-table-column
+                <af-table-column
+                prop="producto.numero_parte_cliente"
+                label="Núm. de Parte (cliente)"
+                show-overflow-tooltip
+                width="110"
+                fixed/>
+
+                <af-table-column
                 v-if="showProyecto"
                 prop="proyecto.numero_parte"
                 label="Proyecto"
                 show-overflow-tooltip
                 width="110"/>
 
-                 <el-table-column
+                 <af-table-column
                 prop="proyecto.cliente.nombre_cliente"
                 :filters="clientesFiltroList"
                 :filter-method="filterClienteHandler"
                 label="Cliente"/> 
 
-                <el-table-column
-                prop="producto.numero_parte_cliente"
-                label="Núm. de Parte (cliente)"
-                show-overflow-tooltip
-                width="110"/>
+                
 
-                <el-table-column
+                <af-table-column
                 prop="cantidad"
                 label="Cantidad"
                 show-overflow-tooltip
                 width="85"
                 align="center"  />
                 
-                <el-table-column
+                <af-table-column
                 prop="work_order"
                 label="Orden de Trabajo"
                 align="center"
                 width="100"
                 show-overflow-tooltip/>
 
-                <el-table-column
+                <af-table-column
                 prop="item"
                 label="Item"
                 align="center"
                 width="80"
                 show-overflow-tooltip/>
 
-                <el-table-column
+                <af-table-column
                 prop="proyecto.orden_compra"
                 label="Orden de Compra"
                 width="100"
                 show-overflow-tooltip/>
 
-                <el-table-column
+                <af-table-column
                 prop="fecha_entrega"
                 label="Fecha de Entrega"
                 width="110"
@@ -116,37 +120,42 @@
                             {{scope.row.fecha_entrega | moment("YYYY-MMM-DD")}}
                         </el-tag>
                     </template>
-                </el-table-column>
+                </af-table-column>
 
-                <el-table-column
+                <af-table-column
                 prop="proyecto.plan_corte"
                 label="Plan de Corte"
                 show-overflow-tooltip/>
 
-                <el-table-column
+                <af-table-column
                 label="Peso"
-                show-overflow-tooltip
-                width="200">
+                show-overflow-tooltip>
                     <template slot-scope="scope">
-
-                        <span>{{ Number(scope.row.producto.peso_lbs).toLocaleString()+" lbs/"+Number(scope.row.producto.peso_kg).toLocaleString()+" kgs"}}</span>
+                        <vue-numeric v-bind:precision="2" separator="," v-model="scope.row.producto.peso_lbs" :read-only="true"></vue-numeric> lbs
+                        <br/>
+                        <vue-numeric v-bind:precision="2" separator="," v-model="scope.row.producto.peso_kg" :read-only="true"></vue-numeric> Kgs
                     </template>
-                </el-table-column> 
+                </af-table-column> 
 
-                <el-table-column
-                label="Notas"
-                min-width="150px">
+                <af-table-column
+                label="Notas">
                     <template slot-scope="scope">
                         <span class="pre-formateado">{{ scope.row.notas }}</span>
-                        <!-- <template v-for="line in scope.row.notas.split('\n')">{{line}}<br></template> -->
                     </template>
-                </el-table-column> 
+                </af-table-column>
+
+                
 
                 <el-table-column
-                fixed="right"
                 label=""
                 align="center"
                 width="170">
+                    <template slot="header">
+                        <el-input
+                        v-model="search"
+                        size="mini"
+                        placeholder="buscar"/>
+                    </template>
                     <template slot-scope="scope">
                         <el-button type="primary" title="Cambiar proceso" size="mini" @click="cambiarProceso(scope.row);"><svg-icon icon-class="process" /></el-button>
                         <el-button type="primary" title="Editar proceso" size="mini" @click="loadFieldsUpdate(scope.row);">Editar</el-button>
@@ -158,7 +167,13 @@
         </el-row>    
         
         <el-row type="flex" justify="end">
-            <pagination v-show="list.length>0" :total="list.length" :page.sync="list.page" :limit.sync="listQuery.limit" @pagination="getList" />
+            <el-pagination
+                background
+                layout="prev, pager, next"
+                @current-change="handleCurrentChange"
+                :page-size="pageSize"
+                :total="total">
+            </el-pagination>
         </el-row>
         <formDialog  ref="myForm" />
 
@@ -166,13 +181,15 @@
     </div>
 </template>
 <style>
-  .el-table .cell {
-    word-break: break-word;
-    }
+    
 
     .pre-formateado {
         white-space: pre;
     }
+    .el-table .cell {
+        word-break: break-word;
+    }
+    
 </style>
 <script>
 import formDialog from './Form';
@@ -189,20 +206,34 @@ import uniq from 'lodash/uniq'
                 listUrl:'/proyectosProductos',
                 deleteUrl:'/proyectosProductos/delete',
                 loading : true,
-                listQuery: {
-                    page: 1,
-                    limit: 20,
-                    importance: undefined,
-                    title: undefined,
-                    type: undefined,
-                    sort: '+id',
-                },
                 list:[],
                 showProyecto:false,
                 showProducto:false,
                 filtrarTerminados:false,
                 procesosFiltroList:[],
                 clientesFiltroList:[],
+                search: '',
+                page: 1,
+                pageSize: 10,
+                total: 0
+            }
+        },
+        computed: {
+            searching() {
+                if (!this.search) {
+                    this.total = this.list.length;
+                    return this.list;
+                }
+                this.page = 1;
+                var resultData = this.list.filter(data => data.producto.numero_parte.toLowerCase().includes(this.search.toLowerCase()));
+                if(resultData.length == 0){
+                    resultData = this.list.filter(data => data.producto.numero_parte_cliente.toLowerCase().includes(this.search.toLowerCase()));
+                }
+                return resultData;
+            },
+            displayData() {
+                this.total = this.searching.length;
+                return this.searching.slice(this.pageSize * this.page - this.pageSize, this.pageSize * this.page);
             }
         },
         components: { 
@@ -211,6 +242,9 @@ import uniq from 'lodash/uniq'
             Pagination
         },
         methods:{
+            handleCurrentChange (val) {
+                this.page = val
+            },
             async getList(){
                 let me = this;
                 me.loading = true;

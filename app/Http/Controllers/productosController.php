@@ -21,6 +21,7 @@ class productosController extends Controller
 		foreach ($productos as $key => $producto) {
 			($producto->materiales)->each->loadNombreCompleto();
 		}
+		
         return $productos;
 	}
 

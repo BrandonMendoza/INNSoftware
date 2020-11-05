@@ -34,16 +34,12 @@
                         </el-select>
                     </el-form-item>
 
-                    <el-form-item label="Número de Parte (Cliente)" prop="numero_parte_cliente">
+                    <el-form-item label="Nombre del Proyecto" prop="numero_parte_cliente">
                         <el-input v-model="form.numero_parte_cliente" />
                     </el-form-item>  
 
                     <el-form-item label="Orden de Compra (Cliente)" prop="orden_compra">
                         <el-input v-model="form.orden_compra" />
-                    </el-form-item>  
-
-                    <el-form-item label="Plan de Corte" prop="plan_corte">
-                        <el-input v-model="form.plan_corte" />
                     </el-form-item>
 
                     <el-form-item label="Fecha de Entrega" prop="fecha_entrega">
