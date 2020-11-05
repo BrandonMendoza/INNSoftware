@@ -5,6 +5,10 @@
             
         </el-row>
         <div class="filter-container">
+            <el-input  v-model="presearch" style="width: 200px;" class="filter-item" placeholder="buscar" @change="handlePresearchChange()"/>
+            <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleSearch">
+                Buscar
+            </el-button>
             <el-button class="filter-item" type="primary" icon="el-icon-plus" @click="$refs.myForm.clearFields();$refs.myForm.open()">Agregar</el-button>
         </div>
         
@@ -68,12 +72,6 @@
                 label=""
                 align="center"
                 width="270">
-                    <template slot="header">
-                        <el-input
-                        v-model="search"
-                        size="mini"
-                        placeholder="buscar"/>
-                    </template>
                     <template slot-scope="scope">
                         <el-button type="primary" size="mini" @click="loadFieldsUpdate(scope.row);">Editar</el-button>
                         <el-button type="primary" size="mini" @click="loadDocumentos(scope.row);">Docs</el-button>
@@ -115,7 +113,8 @@
 <script>
 import formDialog from './Form';
 import documentosDialog from './documentos';
-import Pagination from '@/components/Pagination'; 
+import Pagination from '@/components/Pagination';
+import waves from '@/directive/waves'; // Waves directive
 
 
     export default {
@@ -125,6 +124,7 @@ import Pagination from '@/components/Pagination';
                 loading : true,
                 list:[], //Este array contendrá las tareas de nuestra bd
                 //PAGINATION INTENTO
+                presearch:'',
                 search: '',
                 page: 1,
                 pageSize: 10,
@@ -149,6 +149,7 @@ import Pagination from '@/components/Pagination';
                 return this.searching.slice(this.pageSize * this.page - this.pageSize, this.pageSize * this.page);
             }
         },
+        directives: { waves },
         components: { 
             formDialog : formDialog,
             documentosDialog : documentosDialog,
@@ -157,6 +158,14 @@ import Pagination from '@/components/Pagination';
         methods:{
             handleCurrentChange (val) {
                 this.page = val
+            },
+            handlePresearchChange(){
+                if(!this.presearch){
+                    this.search = '';
+                }
+            },
+            handleSearch () {
+                this.search = this.presearch;
             },
             tableRowClassName({row, rowIndex}) {
                 if (parseInt(row.status_id) === 1) { //sin recibir

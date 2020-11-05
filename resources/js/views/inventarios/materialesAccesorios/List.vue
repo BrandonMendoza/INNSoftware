@@ -275,7 +275,7 @@ import Pagination from '@/components/Pagination';
             },
             /**Funcion para darle clase a el TAG de acuerdo a la feche de entrega */
             statusColor(status){
-                switch (status) {
+                switch (parseInt(status)) {
                     case 1://sin recibir
                         return "danger";
                         break;

@@ -3,22 +3,30 @@
 
         
         <div class="filter-container">
-            <router-link :to="'/ordenesAbiertas/UploadExcel'">
+            <!-- BUSCAR INPUT -->
+            <el-input  v-model="presearch" style="width: 200px;" class="filter-item" placeholder="buscar" @change="handlePresearchChange()"/>
+            <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleSearch">
+                Buscar
+            </el-button>
+            <!-- IMPORTAR BUTTON -->
+            <router-link class="filter-item"  :to="'/ordenesAbiertas/UploadExcel'">
                 <el-button type="primary" icon="el-icon-edit">
                     Importar    
                 </el-button>
             </router-link>
-            
+            <!-- COLUMNAS BUTTON -->
             <el-popover
             placement="right"
             width="400"
-            trigger="click">    
+            trigger="click"
+            class="filter-item">    
                 <el-checkbox v-model="showProyecto" class="filter-item" style="margin-left:15px;">Ver Proyecto</el-checkbox>
                 <el-checkbox v-model="showProducto" class="filter-item" style="margin-left:15px;">Ver Producto</el-checkbox>
 
                 
                 <el-button type="primary" icon="el-icon-setting" slot="reference">Columnas</el-button>
             </el-popover>
+            
             <!-- <el-checkbox v-model="filtrarTerminados" class="filter-item" style="margin-left:15px;">Mostrar Ordenes Terminadas</el-checkbox> -->
             <!-- <el-button class="filter-item" type="primary" icon="el-icon-plus" @click="$refs.myForm.clearFields();$refs.myForm.open()" hidden>Agregar</el-button> -->
         </div>
@@ -150,12 +158,6 @@
                 label=""
                 align="center"
                 width="170">
-                    <template slot="header">
-                        <el-input
-                        v-model="search"
-                        size="mini"
-                        placeholder="buscar"/>
-                    </template>
                     <template slot-scope="scope">
                         <el-button type="primary" title="Cambiar proceso" size="mini" @click="cambiarProceso(scope.row);"><svg-icon icon-class="process" /></el-button>
                         <el-button type="primary" title="Editar proceso" size="mini" @click="loadFieldsUpdate(scope.row);">Editar</el-button>
@@ -196,7 +198,8 @@ import formDialog from './Form';
 import cambiarProcesoDialog from './cambiarProceso';
 import Pagination from '@/components/Pagination'; 
 import moment from 'moment';
-import uniq from 'lodash/uniq'
+import uniq from 'lodash/uniq';
+import waves from '@/directive/waves'; // Waves directive
 
 
     export default {
@@ -212,6 +215,7 @@ import uniq from 'lodash/uniq'
                 filtrarTerminados:false,
                 procesosFiltroList:[],
                 clientesFiltroList:[],
+                presearch:'',
                 search: '',
                 page: 1,
                 pageSize: 10,
@@ -225,7 +229,7 @@ import uniq from 'lodash/uniq'
                     return this.list;
                 }
                 this.page = 1;
-                var resultData = this.list.filter(data => data.producto.numero_parte.toLowerCase().includes(this.search.toLowerCase()));
+                let resultData = this.list.filter(data => data.producto.numero_parte.toLowerCase().includes(this.search.toLowerCase()));
                 if(resultData.length == 0){
                     resultData = this.list.filter(data => data.producto.numero_parte_cliente.toLowerCase().includes(this.search.toLowerCase()));
                 }
@@ -241,9 +245,18 @@ import uniq from 'lodash/uniq'
             cambiarProcesoDialog : cambiarProcesoDialog,
             Pagination
         },
+        directives: { waves },
         methods:{
             handleCurrentChange (val) {
-                this.page = val
+                this.page = val;
+            },
+            handlePresearchChange(){
+                if(!this.presearch){
+                    this.search = '';
+                }
+            },
+            handleSearch () {
+                this.search = this.presearch;
             },
             async getList(){
                 let me = this;
