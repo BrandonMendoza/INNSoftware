@@ -12,9 +12,11 @@ import '@/permission'; // permission control
 //Nuevas librerias
 import VueTheMask from 'vue-the-mask';
 import VueNumeric from 'vue-numeric';
-import AFTableColumn from 'af-table-column'
+import AFTableColumn from 'af-table-column';
+import VueBarcodeScanner from 'vue-barcode-scanner';
 //import PerfectScrollbar from 'perfect-scrollbar';
 //import "perfect-scrollbar/css/perfect-scrollbar.css";
+
 
 
 
@@ -30,13 +32,23 @@ Vue.use(ElementUI, {
 Object.keys(filters).forEach(key => {
   Vue.filter(key, filters[key]);
 });
+/**VueBarcodeScanner OPTIONS */
+let options = {
+  sound: false, // default is false
+  // soundSrc: '/static/sound.wav', // default is blank
+  sensitivity: 10, // default is 100
+  requiredAttr: true, // default is false
+  controlSequenceKeys: ['NumLock', 'Clear'], // default is null
+  callbackAfterTimeout: true // default is false
+}
 
 //Nuevas librerias
 Vue.use(VueTheMask);
 Vue.use(VueNumeric)
 Vue.use(require('vue-moment'));
 Vue.use(AFTableColumn)
-//Vue.use(PerfectScrollbar);
+Vue.use(VueBarcodeScanner, options);
+
 
 Vue.config.productionTip = false;
 

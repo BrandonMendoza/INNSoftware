@@ -8,7 +8,33 @@ class ProyectoProducto extends Pivot
 {
 	protected $table = 'proyecto_producto'; 
 
-    protected $fillable = ['id','proyecto_id','producto_id','proceso_id','work_order','item','cantidad','heat_number','notas','hrs_labor','pintura_id','created_at','updated_at','proceso_id','numero_parte_cliente','fecha_entrega'];
+    protected $attributes = array(
+        'precio_pesos' => 0,
+        'precio_dlls' => 0,
+     );
+
+    protected $fillable = 
+    [   
+        'id',
+        'proyecto_id',
+        'producto_id',
+        'proceso_id',
+        'work_order',
+        'item',
+        'cantidad',
+        'heat_number',
+        'notas','hrs_labor',
+        'pintura_id',
+        'created_at',
+        'updated_at',
+        'proceso_id',
+        'numero_parte_cliente',
+        'fecha_entrega',
+        'precio_pesos',
+        'precio_dlls',
+        'numero_parte',//Este dato se utiliza para los codigos de barra locales
+        'codigo_barras_cliente'//este dato se utiliza para los codigos de barra de cliente
+    ];
     protected $dates = ['fecha_entrega'];
 
     protected $casts = [
@@ -17,6 +43,8 @@ class ProyectoProducto extends Pivot
         'proceso_id' => 'integer',
         'pintura_id' => 'integer',
         'proceso_id' => 'integer',
+        'precio_pesos' => 'float',
+        'precio_dlls' => 'float',
     ];
 
     public static function loadOrdenesAbiertasWithAll(){

@@ -5,12 +5,32 @@
             
         </el-row>
         <div class="filter-container">
-            <el-button class="filter-item" type="primary" icon="el-icon-plus" @click="$refs.myForm.clearFields();$refs.myForm.open()">Agregar</el-button>
+
+             <!-- BUSCAR INPUT -->
+            <!-- <div class="filter-item">
+                <el-input class="input-with-select" size="small" placeholder="buscar" v-model="presearch" @change="handlePresearchChange()" clearable>
+                    <el-select v-model="selectSearch" slot="prepend" size="small" placeholder="Select">
+                        <el-option label="Nom. del Proyecto"  value="numero_parte_cliente"></el-option>
+                        <el-option label="Núm. de Parte (Local)"    value="numero_parte"></el-option>
+                        <el-option label="Cliente"                  value="nombre_cliente"></el-option>
+                    </el-select>
+                    <el-button slot="append" v-waves size="small" type="primary" icon="el-icon-search" @click="handleSearch"></el-button>
+                </el-input>
+            </div> -->
+
+            <el-button class="filter-item" type="primary" size="small" icon="el-icon-plus" @click="$refs.myForm.clearFields();$refs.myForm.open()">Agregar</el-button>
+             <!-- SELECT ROW -->
+            <el-button v-waves type="primary" size="small" class="filter-item" icon="el-icon-edit" style="margin-left:0px;" :disabled="disableEditar" @click="loadFieldsUpdate(currentRow)">Editar</el-button>
+            <el-button  v-waves type="danger" size="small" class="filter-item" icon="el-icon-delete" style="margin-left:0px;" :disabled="disableEditar"
+                        @click="deleteRow(currentRow.id,currentRow.numero_parte,currentRow.nombreCompleto);">Eliminar</el-button>
         </div>
         
         <el-row >
             <el-table
-            :data="list"
+            :data="displayData"
+            ref="tableList" 
+            highlight-current-row
+            @current-change="handleCurrentChangeTable"
             border
             sortable
             tooltip-effect="light"
@@ -127,46 +147,52 @@
                 label="Item"
                 align="center"/>                
 
-                <el-table-column
-                fixed="right"
-                label=""
-                align="center"
-                width="180">
-                    <template slot-scope="scope">
-                        <el-button type="primary" size="mini" @click="loadFieldsUpdate(scope.row);">Editar</el-button>
-                        <el-button type="danger" size="mini" @click="deleteRow(scope.row.id,scope.row.nombreCompleto);">Eliminar</el-button>
-                    </template>
-                </el-table-column>
             </el-table>
         </el-row>    
         
         <el-row type="flex" justify="end">
-            <pagination v-show="list.length>0" :total="list.length" :page.sync="list.page" :limit.sync="listQuery.limit" @pagination="getList" />
+            <el-pagination
+                background
+                layout="prev, pager, next"
+                @current-change="handleCurrentChangePagination"
+                :page-size="pageSize"
+                :total="total">
+            </el-pagination>
+
         </el-row>
         <formDialog  ref="myForm" />
     </div>
 </template>
 
 <style>
-  .el-table .danger-row {
-    background: #FDE2E2;
-  }
+    .el-select .el-input {
+        width: 180px;
+    }
 
-  .el-table .success-row {
-    background: #E1F3D8;
-  }
+    .input-with-select .el-input-group__prepend {
+        background-color: #fff;
+    }
 
-  .el-table .warning-row {
-    background: #FAECD8;
-  }
-  .el-table .cell {
-    word-break: break-word;
-}
+    .el-table .danger-row {
+        background: #FDE2E2;
+    }
+
+    .el-table .success-row {
+        background: #E1F3D8;
+    }
+
+    .el-table .warning-row {
+        background: #FAECD8;
+    }
+    .el-table .cell {
+        word-break: break-word;
+    }
 </style>
 
 <script>
 import formDialog from './Form';
 import Pagination from '@/components/Pagination'; 
+import waves from '@/directive/waves'; // Waves directive
 
 
     export default {
@@ -174,22 +200,64 @@ import Pagination from '@/components/Pagination';
             
             return{
                 loading : true,
-                listQuery: {
-                    page: 1,
-                    limit: 20,
-                    importance: undefined,
-                    title: undefined,
-                    type: undefined,
-                    sort: '+id',
-                },
                 list:[],
+                presearch:'',
+                search: '',
+                page: 1,
+                pageSize: 10,
+                total: 0,
+                currentRow: null,
+                selectSearch:'',
+                
             }
         },
+        computed: {
+            searching() {
+                if (!this.search) {
+                    this.total = this.list.length;
+                    return this.list;
+                }
+                this.page = 1;
+                if(this.selectSearch == "nombre_cliente"){
+                   return this.list.filter(data => data['cliente']['nombre_cliente'].toLowerCase().includes(this.search.toLowerCase()));
+                }
+                return this.list.filter(data => data[this.selectSearch].toLowerCase().includes(this.search.toLowerCase()));
+            },
+            displayData() {
+                this.total = this.searching.length;
+                return this.searching.slice(this.pageSize * this.page - this.pageSize, this.pageSize * this.page);
+            },
+            disableEditar() {
+                if(this.currentRow == null){
+                    return true;
+                }
+                return false;
+            }
+        },
+        directives: { waves },
         components: { 
             formDialog : formDialog,
             Pagination
         },
         methods:{
+            setCurrent(row) {
+                this.$refs.tableList.setCurrentRow(row);
+            },
+            //SELECTROW
+            handleCurrentChangeTable(val) {
+                this.currentRow = val;
+            },
+            handleCurrentChangePagination (val) {
+                this.page = val
+            },
+            handlePresearchChange(){
+                if(!this.presearch){
+                    this.search = '';
+                }
+            },
+            handleSearch () {
+                this.search = this.presearch;
+            },
             tableRowClassName({row, rowIndex}) {
                 if (row.status_id === 1) { //sin recibir
                     return 'danger-row';

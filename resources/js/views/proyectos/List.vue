@@ -5,15 +5,32 @@
             
         </el-row>
         <div class="filter-container">
-            <el-input  v-model="presearch" style="width: 200px;" class="filter-item" placeholder="buscar" @change="handlePresearchChange()"/>
-            <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleSearch">
-                Buscar
-            </el-button>
-            <el-button class="filter-item" type="primary" icon="el-icon-plus" @click="$refs.myForm.clearFields();$refs.myForm.open()">Agregar</el-button>
+            <!-- BUSCAR INPUT -->
+            <div class="filter-item">
+                <el-input class="input-with-select" size="small" placeholder="buscar" v-model="presearch" @change="handlePresearchChange()" clearable>
+                    <el-select v-model="selectSearch" slot="prepend" size="small" placeholder="Select">
+                        <el-option label="Nom. del Proyecto"  value="numero_parte_cliente"></el-option>
+                        <el-option label="Núm. de Parte (Local)"    value="numero_parte"></el-option>
+                        <el-option label="Cliente"                  value="nombre_cliente"></el-option>
+                    </el-select>
+                    <el-button slot="append" v-waves size="small" type="primary" icon="el-icon-search" @click="handleSearch"></el-button>
+                </el-input>
+            </div>
+
+            <el-button class="filter-item" type="primary" size="small" icon="el-icon-plus" @click="$refs.myForm.clearFields();$refs.myForm.open()">Agregar</el-button>
+             <!-- SELECT ROW -->
+            <el-button v-waves type="primary" size="small" class="filter-item" icon="el-icon-edit" style="margin-left:0px;" :disabled="disableEditar" @click="loadFieldsUpdate(currentRow)">Editar</el-button>
+            <el-button v-waves type="primary" size="small" class="filter-item" icon="el-icon-document" style="margin-left:0px;" :disabled="disableEditar" @click="loadDocumentos(currentRow)">Documentos</el-button>
+            <el-button  v-waves type="danger" size="small" class="filter-item" icon="el-icon-delete" style="margin-left:0px;" :disabled="disableEditar"
+                        @click="deleteRow(currentRow.id,currentRow.numero_parte,currentRow.numero_parte_cliente);">Eliminar</el-button>
+
         </div>
         <el-row >
             <el-table
             :data="displayData"
+            ref="tableList" 
+            highlight-current-row
+            @current-change="handleCurrentChangeTable"
             border
             tooltip-effect="light"
             fit
@@ -28,7 +45,8 @@
                 <el-table-column
                 prop="numero_parte"
                 label="Núm. de Parte (Local)"
-                width="110"/>  
+                width="110"
+                sortable/>  
 
                  <el-table-column
                 prop="numero_parte_cliente"
@@ -56,6 +74,7 @@
                 <el-table-column
                 label="Fecha de Entrega"
                 show-overflow-tooltip
+                sortable
                 align="center"> 
                     <template slot-scope="scope">
                         <el-tag>
@@ -75,20 +94,6 @@
                 label="Productos"
                 show-overflow-tooltip
                 align="center"/>
-
-                
-
-                <el-table-column
-                fixed="right"
-                label=""
-                align="center"
-                width="270">
-                    <template slot-scope="scope">
-                        <el-button type="primary" size="mini" @click="loadFieldsUpdate(scope.row);">Editar</el-button>
-                        <el-button type="primary" size="mini" @click="loadDocumentos(scope.row);">Docs</el-button>
-                        <el-button type="danger" size="mini" @click="deleteRow(scope.row.id,scope.row.numero_parte);">Eliminar</el-button>
-                    </template>
-                </el-table-column>
             </el-table>
         </el-row>    
         
@@ -96,7 +101,7 @@
             <el-pagination
                 background
                 layout="prev, pager, next"
-                @current-change="handleCurrentChange"
+                @current-change="handleCurrentChangePagination"
                 :page-size="pageSize"
                 :total="total">
             </el-pagination>
@@ -107,6 +112,14 @@
     </div>
 </template>
 <style>
+    .el-select .el-input {
+        width: 180px;
+    }
+
+    .input-with-select .el-input-group__prepend {
+        background-color: #fff;
+    }
+
     .el-table .cell {
         word-break: break-word;
     }
@@ -130,7 +143,9 @@
                 search: '',
                 page: 1,
                 pageSize: 10,
-                total: 0
+                total: 0,
+                currentRow: null,
+                selectSearch:'numero_parte_cliente'
             }
         },
         computed: {
@@ -140,15 +155,20 @@
                     return this.list;
                 }
                 this.page = 1;
-                var resultData = this.list.filter(data => data.numero_parte.toLowerCase().includes(this.search.toLowerCase()));
-                if(resultData.length == 0){
-                    resultData = this.list.filter(data => data.numero_parte_cliente.toLowerCase().includes(this.search.toLowerCase()));
+                if(this.selectSearch == "nombre_cliente"){
+                   return this.list.filter(data => data['cliente']['nombre_cliente'].toLowerCase().includes(this.search.toLowerCase()));
                 }
-                return resultData;
+                return this.list.filter(data => data[this.selectSearch].toLowerCase().includes(this.search.toLowerCase()));
             },
             displayData() {
                 this.total = this.searching.length;
                 return this.searching.slice(this.pageSize * this.page - this.pageSize, this.pageSize * this.page);
+            },
+            disableEditar() {
+                if(this.currentRow == null){
+                    return true;
+                }
+                return false;
             }
         },
         directives: { waves },
@@ -158,7 +178,14 @@
             Pagination
         },
         methods:{
-            handleCurrentChange (val) {
+            setCurrent(row) {
+                this.$refs.tableList.setCurrentRow(row);
+            },
+            //SELECTROW
+            handleCurrentChangeTable(val) {
+                this.currentRow = val;
+            },
+            handleCurrentChangePagination (val) {
                 this.page = val
             },
             handlePresearchChange(){

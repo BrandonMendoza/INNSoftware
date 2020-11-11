@@ -7,8 +7,8 @@
         :ref="dialogRef"
         :before-close="handleClose"
         :visible.sync="dialogoAgregar">
-            <span slot="title"><i class="el-icon-edit"></i> Cambiar Proceso </span>
-
+            <span slot="title"><svg-icon icon-class="process"/> Cambiar Proceso </span>
+             
             
             <!-- Id del proceso que se esta editando ("0" si es agregar) -->
             <!-- proyecto_producto_id -->

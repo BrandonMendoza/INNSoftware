@@ -39,6 +39,8 @@ Route::group(['middleware' => 'web'], function () {
         Route::put('/proyectosProductos/saveProceso','proyectosProductosController@saveProceso');
             //->Historial de procesos
             Route::put('/proyectosProductos/getHistorialProcesos','proyectosProductosController@getHistorialProcesos');
+        //->Codigo Barras    
+        Route::put('/proyectosProductos/saveCodigoBarras','proyectosProductosController@saveCodigoBarras');
     //Proyectos
     Route::get('/proyectos','proyectosController@proyectos');
     Route::put('/proyectos/insert','proyectosController@insert');

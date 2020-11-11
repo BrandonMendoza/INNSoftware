@@ -4,6 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Storage;
+use Str;
 
 class Proyecto extends Model
 {
@@ -19,7 +20,7 @@ class Proyecto extends Model
 
     public function Productos(){
         return $this->belongsToMany('App\Producto', 'proyecto_producto','proyecto_id', 'producto_id')
-                    ->withPivot('id','cantidad','numero_parte_cliente','work_order','item','cantidad','heat_number','notas','hrs_labor','pintura_id','proceso_id','fecha_entrega')
+                    ->withPivot('id','cantidad','numero_parte_cliente','work_order','item','cantidad','heat_number','notas','hrs_labor','pintura_id','proceso_id','fecha_entrega','precio_pesos','precio_dlls','numero_parte','codigo_barras_cliente')
                     ->using('App\ProyectoProducto')
                     ->as('ProyectoProducto')
                     ->withTimestamps();
@@ -102,6 +103,8 @@ class Proyecto extends Model
                         $proyectoProducto->item = $producto['proyecto_producto']['item'];
                         $proyectoProducto->work_order = $producto['proyecto_producto']['work_order'];
                         $proyectoProducto->heat_number = $producto['proyecto_producto']['heat_number'];
+                        $proyectoProducto->precio_pesos = $producto['proyecto_producto']['precio_pesos'];
+                        $proyectoProducto->precio_dlls = $producto['proyecto_producto']['precio_dlls'];
                         $proyectoProducto->update();
                         $existe = 1;
                     }
@@ -114,11 +117,24 @@ class Proyecto extends Model
                             'item' => $producto['proyecto_producto']['item'],
                             'work_order' => $producto['proyecto_producto']['work_order'],
                             'heat_number' => $producto['proyecto_producto']['heat_number'],
+                            'precio' => $producto['proyecto_producto']['precio'],
+                            'precio_pesos' => $producto['proyecto_producto']['precio_pesos'],
+                            'precio_dlls' => $producto['proyecto_producto']['precio_dlls'],
                             'fecha_entrega' => request()->fecha_entrega,
                         ]);
                 $this->attachProyectoProductoProceso($user_id,$producto['id']);
+                /**Buscamos el producto para crearle su numero de parte con random string */
+
             }
         }
+        /**Si no tiene numero parte de actualiza */
+        foreach ($proyectosProductos as $proyectoProducto){
+            if($proyectoProducto->numero_parte == null)
+                $proyectoProducto->numero_parte = $proyectoProducto->id.''.Str::random(8);
+            $proyectoProducto->update();
+        }
+
+        
     }
     
     public function updateProductosByRequest($user_id){

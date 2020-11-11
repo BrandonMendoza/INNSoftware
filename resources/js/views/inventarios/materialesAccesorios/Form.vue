@@ -154,7 +154,7 @@
             </el-row>
 
             <span slot="footer" class="dialog-footer">
-                <el-button @click="clearFields();dialogoAgregar = false" class="float-left">Cancelar</el-button>
+                <el-button @click="clearFields();close();" class="float-left">Cancelar</el-button>
                 <!-- Botón que añade los datos del formulario, solo se muestra si la variable update es igual a 0-->
                 <el-button type="success" v-if="form.id == 0" @click="insert('form');" icon="el-icon-check">Agregar</el-button>
                 <!-- Botón que modifica la tarea que anteriormente hemos seleccionado, solo se muestra si la variable update es diferente a 0-->
@@ -275,9 +275,11 @@
         open() {
             this.getMaterialesAccesorios();
             this.getClientes();
+            
             this.dialogoAgregar = true;
         },
         close() {
+            this.$parent.setCurrent();
             this.dialogoAgregar = false;
         },
         insert(form){

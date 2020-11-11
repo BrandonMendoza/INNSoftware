@@ -81,6 +81,15 @@ class proyectosProductosController extends Controller
     	/*Se hace el insert*/
     	ProyectoProcesoProducto::create($proyectoProcesoProductoNuevo);
 	}
+
+	/**Funcion para guardar el dato del codigo de barras del cliente*/
+    public function saveCodigoBarras(){
+		/*Se busca el PPP de el producto y el proceso*/
+		$proyectoProducto = ProyectoProducto::orderBy('created_at','DESC')->where('id',request()->get('id'))->first();
+		$proyectoProducto->codigo_barras_cliente = request()->get('codigo_barras_cliente');
+		$proyectoProducto->update();
+	}
+
 	/** Funcion para obtener todos los procesos de un porducto con sus fechas */
 	public function getHistorialProcesos(){
 		return 	(ProyectoProcesoProducto::orderBy('created_at','DESC')->with('ProyectoProceso.Proceso','User')->where('proyecto_producto_id',request()->get('id'))->get());

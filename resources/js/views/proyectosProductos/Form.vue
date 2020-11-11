@@ -11,55 +11,77 @@
 
             
             <!-- Id del proceso que se esta editando ("0" si es agregar) -->
-            <input v-model="form.id" hidden/>
-
-                
-                    <span style="margin-right: 5px;"><b>Proyecto: </b> {{form.proyecto}}</span>
-                    <span                           ><b>Producto: </b> {{form.producto}}/{{form.producto_local}}</span>    
-                    <br>
-            <el-row :gutter="20">
-                <!-- cantidad work_order item heat_number -->
-                <el-col :span="6">
-                    <el-form-item label="Cantidad">
-                        <el-input-number :min="1" v-model="form.cantidad" style="width: auto;"/>
-                    </el-form-item>
-
-                    <el-form-item label="Fecha de Entrega" prop="fecha_entrega">
-                        <el-date-picker v-model="form.fecha_entrega" type="date" style="width:auto"/>
-                    </el-form-item>
-
-                    <el-form-item label="Item">
-                        <el-input v-model="form.item" style="width: auto;"/>
-                    </el-form-item>
-
-                    <el-form-item label="Orden de Trabajo">
-                        <el-input  v-model="form.work_order" style="width: auto;"/>
-                    </el-form-item>
-
-                    <el-form-item label="Heat Number" hidden>
-                        <el-input v-model="form.heat_number" />
-                    </el-form-item>
-                </el-col>
-                <el-col :span="18">
+            <input v-model="form.id" hidden/>    
+            <span style="margin-right: 5px;"><b>Proyecto: </b> {{form.proyecto}}</span>
+            <span                           ><b>Producto: </b> {{form.producto}}/{{form.producto_local}}</span>    
+            <br>
                     <el-tabs v-model="activeName" @tab-click="handleClick">
-                        <!-- Tab Materiales -->
-                        <el-tab-pane label="Notas" name="first">
+                        <!-- Tab General -->
+                        <el-tab-pane label="General" name="first">
+
+                            
+
+                            <el-row :gutter="20">
+                                <el-col :span="12">
+                                    <el-form-item label="Cantidad">
+                                        <el-input-number :min="1" v-model="form.cantidad"/>
+                                    </el-form-item>
+                                </el-col>
+                                <el-col :span="12">
+                                    <el-form-item label="Fecha de Entrega" prop="fecha_entrega">
+                                        <el-date-picker v-model="form.fecha_entrega" type="date" />
+                                    </el-form-item>
+                                </el-col>
+                            </el-row>
+
+
+                            <el-row :gutter="20">
+                                <el-col :span="12">
+                                   <el-form-item label="Orden de Trabajo">
+                                        <el-input  v-model="form.work_order"/>
+                                    </el-form-item>
+                                </el-col>
+                                <el-col :span="12">
+                                    <el-form-item label="Item">
+                                        <el-input v-model="form.item"/>
+                                    </el-form-item>
+                                </el-col>
+                            </el-row>
+
+                            <el-row :gutter="20">
+                                <el-col :span="12">
+                                    <el-form-item label="Precio (pesos)">
+                                        <vue-numeric class="el-input__inner" v-bind:precision="2"  currency="$" separator="," v-model="form.precio_pesos"></vue-numeric>
+                                    </el-form-item>
+                                </el-col>
+                                <el-col :span="12">
+                                    <el-form-item label="Precio (dlls)">
+                                        <vue-numeric class="el-input__inner" v-bind:precision="2"  currency="$" separator="," v-model="form.precio_dlls"></vue-numeric>
+                                    </el-form-item>
+                                </el-col>
+                            </el-row>
+
+                            
+
+                            <el-form-item label="Heat Number" hidden>
+                                <el-input v-model="form.heat_number" />
+                            </el-form-item>
+                        </el-tab-pane>
+                        <!-- Tab Notas -->
+                        <el-tab-pane label="Notas" name="second">
                             <el-input type="textarea" 
                             v-model="form.notas"
                             :autosize="{ minRows: 16, maxRows: 16}"/>
                             
                         </el-tab-pane>
                     </el-tabs>
-                </el-col>
-                
-            </el-row>
 
             <span slot="footer" class="dialog-footer">
-                <el-button @click="clearFields();dialogoAgregar = false" class="float-left">Cancelar</el-button>
+                <el-button v-waves @click="clearFields();close();" class="float-left">Cancelar</el-button>
                 <!-- Botón que añade los datos del formulario, solo se muestra si la variable update es igual a 0-->
-                <el-button type="success" v-if="form.id == 0" @click="insert('form');" icon="el-icon-check">Agregar</el-button>
+                <el-button v-waves type="success" v-if="form.id == 0" @click="insert('form');" icon="el-icon-check">Agregar</el-button>
                 <!-- Botón que modifica la tarea que anteriormente hemos seleccionado, solo se muestra si la variable update es diferente a 0-->
-                <el-button type="success" v-if="form.id != 0" @click="insert('form');" icon="el-icon-check">Guardar</el-button>
+                <el-button v-waves type="success" v-if="form.id != 0" @click="insert('form');" icon="el-icon-check">Guardar</el-button>
             </span>
         </el-dialog>
 
@@ -75,6 +97,10 @@
 
 <script>
 import { CommentDropdown } from '../articles/components/Dropdown';
+import moment from 'moment';
+import VueNumeric from 'vue-numeric';
+import waves from '@/directive/waves'; // Waves directive
+
   export default {
     data() {
       return {
@@ -92,6 +118,8 @@ import { CommentDropdown } from '../articles/components/Dropdown';
             producto:"",
             producto_local:"",
             notas:"",
+            precio_pesos:"",
+            precio_dlls:""
         },
         rules: {
             // numero_parte_cliente: [
@@ -110,11 +138,14 @@ import { CommentDropdown } from '../articles/components/Dropdown';
         loadingCliente:false,
       };
     },
+    directives: { waves },
     methods: {
         open() {
+            this.activeName = 'first';
             this.dialogoAgregar = true;
         },
         close() {
+            this.$parent.setCurrent();
             this.dialogoAgregar = false;
         },
         insert(form){/*Update o Insert Proceso*/
@@ -148,6 +179,13 @@ import { CommentDropdown } from '../articles/components/Dropdown';
             this.form.item = "";
             this.form.work_order = "";
             this.form.heat_number = "";
+            this.form.notas = "";
+            this.form.proyecto = "";
+            this.form.producto = "";
+            this.form.producto_local = "";
+            this.form.fecha_entrega = moment();
+            this.form.precio_pesos = 0;
+            this.form.precio_dlls = 0;
         },
         handleClose(done) {
             this.$confirm('Está seguro que deseas salir?')

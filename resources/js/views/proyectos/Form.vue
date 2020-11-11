@@ -84,6 +84,30 @@
                                 align="center"
                                 width="85"/>
 
+                                <af-table-column
+                                    label="Precio (pesos)"
+                                    align="center"
+                                    width="85"
+                                    show-overflow-tooltip>
+                                        <template slot-scope="scope">
+                                            <vue-numeric v-if="scope.row.proyecto_producto.precio_pesos" v-bind:precision="2"  currency="$" separator="," v-model="scope.row.proyecto_producto.precio_pesos" :read-only="true">                                                
+                                            </vue-numeric>
+                                            <span v-else>$ 0.00 </span>
+                                        </template>
+                                </af-table-column> 
+
+                                <af-table-column
+                                    label="Precio (dlls)"
+                                    align="center"
+                                    width="85"
+                                    show-overflow-tooltip>
+                                        <template slot-scope="scope">
+                                            <vue-numeric v-if="scope.row.proyecto_producto.precio_dlls" v-bind:precision="2"  currency="$" separator="," v-model="scope.row.proyecto_producto.precio_dlls" :read-only="true">                                                
+                                            </vue-numeric>
+                                            <span v-else>$ 0.00 </span>
+                                        </template>
+                                </af-table-column> 
+
                                 <el-table-column
                                 prop="proyecto_producto.work_order"
                                 label="Orden de Trabajo"
@@ -110,7 +134,7 @@
             </el-row>
 
             <span slot="footer" class="dialog-footer">
-                <el-button @click="clearFields();dialogoAgregar = false" class="float-left">Cancelar</el-button>
+                <el-button @click="clearFields();close();" class="float-left">Cancelar</el-button>
                 <!-- Botón que añade los datos del formulario, solo se muestra si la variable update es igual a 0-->
                 <el-button type="success" v-if="form.id == 0" @click="insert('form');" icon="el-icon-check">Agregar</el-button>
                 <!-- Botón que modifica la tarea que anteriormente hemos seleccionado, solo se muestra si la variable update es diferente a 0-->
@@ -144,6 +168,18 @@
 
             <el-form-item label="Orden de Trabajo">
                 <el-input  v-model="productoAgregar.proyecto_producto.work_order" />
+            </el-form-item>
+
+            <el-form-item label="Precio (pesos)" >
+                <vue-numeric    class="el-input__inner" 
+                                v-bind:precision="2"  
+                                currency="$" separator="," v-model="productoAgregar.proyecto_producto.precio_pesos" style="width: auto;"></vue-numeric>
+            </el-form-item>
+
+            <el-form-item label="Precio (dlls)" >
+                <vue-numeric    class="el-input__inner" 
+                                v-bind:precision="2"  
+                                currency="$" separator="," v-model="productoAgregar.proyecto_producto.precio_dlls" style="width: auto;"></vue-numeric>
             </el-form-item>
 
             <el-form-item label="Heat Number" hidden>
@@ -190,7 +226,9 @@ import { CommentDropdown } from '../articles/components/Dropdown';
                 cantidad:1,
                 heat_number:"",
                 work_order:"",
-                item:""
+                item:"",
+                precio_pesos:0,
+                precio_dlls:0
             },
         },
         rules: {
@@ -218,6 +256,7 @@ import { CommentDropdown } from '../articles/components/Dropdown';
             this.dialogoAgregar = true;
         },
         close() {
+            this.$parent.setCurrent();
             this.dialogoAgregar = false;
         },
         insert(form){/*Update o Insert Proceso*/
@@ -325,6 +364,8 @@ import { CommentDropdown } from '../articles/components/Dropdown';
             this.productoAgregar.proyecto_producto.heat_number="";
             this.productoAgregar.proyecto_producto.work_order="";
             this.productoAgregar.proyecto_producto.item="";
+            this.productoAgregar.proyecto_producto.precio_pesos = 0;
+            this.productoAgregar.proyecto_producto.precio_dlls = 0;
             this.dialogoProductos = false;
         },
         actualizarSelectProductos(){
