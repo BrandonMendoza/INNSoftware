@@ -8,7 +8,7 @@
                 <el-input class="input-with-select" size="small" placeholder="buscar" v-model="presearch" @change="handlePresearchChange()" clearable>
                     <el-select v-model="selectSearch" size="small" slot="prepend" placeholder="Select" >
                         <el-option label="Núm. de Parte (Cliente)"      value="numero_parte_cliente"></el-option>
-                        <el-option label="Núm. de Parte (Producto)"     value="numero_parte"></el-option>
+                        <el-option label="Núm. de Parte (Producto)"     value="numero_parte_producto"></el-option>
                         <el-option label="Proyecto"                     value="proyecto"></el-option>
                         <el-option label="Cliente"                      value="nombre_cliente"></el-option>
                         <el-option label="Codigo de Barras (Local)"     value="codigo_barras"></el-option>
@@ -43,7 +43,7 @@
             <el-popover placement="left-start" size="small" width="400"  trigger="click" class="filter-item">
                 <!-- <el-checkbox v-model="showProyecto" class="filter-item" style="margin-left:15px;">Ver Nombre del Proyecto (local)</el-checkbox>     -->
                 <el-checkbox v-model="showProyecto" class="filter-item" style="margin-left:15px;">Ver Núm. de Parte Proyecto (local)</el-checkbox>
-                <el-checkbox v-model="showProducto" class="filter-item" style="margin-left:15px;">Ver Núm. de Parte (local)</el-checkbox>
+                <el-checkbox v-model="showProducto" class="filter-item" style="margin-left:15px;">Ver Núm. de Parte Producto (local)</el-checkbox>
 
                 
                 <el-button type="primary" size="small" icon="el-icon-setting" slot="reference">Columnas</el-button>
@@ -315,6 +315,8 @@ import waves from '@/directive/waves'; // Waves directive
         directives: { waves },
         computed: {
             searching() {
+                console.log("LISTA SEARCHING: ");
+                console.log(this.list);
                 this.loading = true;
                 if (!this.search) {
                     this.loading = false;
@@ -324,25 +326,25 @@ import waves from '@/directive/waves'; // Waves directive
                 this.page = 1;
                 let dataReturned = [];
                 if(this.selectSearch == "nombre_cliente"){
-                   dataReturned = this.list.filter(data => data['proyecto']['cliente']['nombre_cliente'].toLowerCase().includes(this.search.toLowerCase()));
+                   dataReturned = this.list.filter(data => !!data['proyecto']['cliente']['nombre_cliente'].toLowerCase().includes(this.search.toLowerCase()));
                 }
                 else if(this.selectSearch == "proyecto"){
-                   dataReturned = this.list.filter(data => data['proyecto']['numero_parte'].toLowerCase().includes(this.search.toLowerCase()));
+                   dataReturned = this.list.filter(data => !!data['proyecto']['numero_parte'].toLowerCase().includes(this.search.toLowerCase()));
                 }
                 else if(this.selectSearch == "orden_compra"){
-                   dataReturned = this.list.filter(data => data['proyecto']['orden_compra'].toLowerCase().includes(this.search.toLowerCase()));
+                   dataReturned = this.list.filter(data => !!data['proyecto']['orden_compra'].toLowerCase().includes(this.search.toLowerCase()));
                 }
                 else if(this.selectSearch == "numero_parte_cliente"){
-                   dataReturned = this.list.filter(data => data['producto']['numero_parte_cliente'].toLowerCase().includes(this.search.toLowerCase()));
+                   dataReturned = this.list.filter(data => !!data['producto']['numero_parte_cliente'].toLowerCase().includes(this.search.toLowerCase()));
                 }
-                else if(this.selectSearch == "numero_parte"){
-                   dataReturned = this.list.filter(data => data['numero_parte'].toLowerCase().includes(this.search.toLowerCase()));
+                else if(this.selectSearch == "numero_parte_producto"){
+                   dataReturned = this.list.filter(data => !!data['producto']['numero_parte'].toLowerCase().includes(this.search.toLowerCase()));
                 }
                 else if(this.selectSearch == "codigo_barras"){
-                   dataReturned = this.list.filter(data => data['numero_parte'].toLowerCase().includes(this.search.toLowerCase()));
+                   dataReturned = this.list.filter(data => !!data['numero_parte'].toLowerCase().includes(this.search.toLowerCase()));
                 }
                 else if(this.selectSearch == "codigo_barras_cliente"){
-                   dataReturned = this.list.filter(data => data['codigo_barras_cliente'].toLowerCase().includes(this.search.toLowerCase()));
+                   dataReturned = this.list.filter(data => !!data['codigo_barras_cliente'].toLowerCase().includes(this.search.toLowerCase()));
                 }
                 else {
                     dataReturned = this.list.filter(data => data[this.selectSearch].toLowerCase().includes(this.search.toLowerCase()));

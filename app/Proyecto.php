@@ -81,7 +81,6 @@ class Proyecto extends Model
         $productos_id = $productos->map(function ($producto) {
                             return collect($producto)->only(['id'])->all();
                          });
-        
         /*Se eliminan los productos que no hayan venido en el request*/
         foreach (ProyectoProducto::where('proyecto_id','=',$this->id)->whereNotIn('producto_id',$productos_id)->get() as $id => $proyectoProducto) {
             $this->Productos()->detach($proyectoProducto->producto_id);
@@ -90,8 +89,9 @@ class Proyecto extends Model
         /*obtener proceso numero 1*/        
         $proceso = $this->procesos->where('es_primero',1)->first();
         $proyectosProductos = ProyectoProducto::where('proyecto_id',$this->id)->get();
-
+        
         foreach ($productos as $producto) {
+            
             /**Bandera para saber si exste un proyectoProducto */
             $existe = 0;
             if(isset($producto['proyecto_producto']['id'])){
@@ -117,14 +117,12 @@ class Proyecto extends Model
                             'item' => $producto['proyecto_producto']['item'],
                             'work_order' => $producto['proyecto_producto']['work_order'],
                             'heat_number' => $producto['proyecto_producto']['heat_number'],
-                            'precio' => $producto['proyecto_producto']['precio'],
                             'precio_pesos' => $producto['proyecto_producto']['precio_pesos'],
                             'precio_dlls' => $producto['proyecto_producto']['precio_dlls'],
                             'fecha_entrega' => request()->fecha_entrega,
                         ]);
-                $this->attachProyectoProductoProceso($user_id,$producto['id']);
-                /**Buscamos el producto para crearle su numero de parte con random string */
 
+                $this->attachProyectoProductoProceso($user_id,$producto['id']);
             }
         }
         /**Si no tiene numero parte de actualiza */
@@ -133,54 +131,37 @@ class Proyecto extends Model
                 $proyectoProducto->numero_parte = $proyectoProducto->id.''.Str::random(8);
             $proyectoProducto->update();
         }
-
-        
     }
-    
-    public function updateProductosByRequest($user_id){
-        //cargar Request como collection
-        $request = collect(request());
 
-        //contamos la cantidad para poder hacer el loop
-        $cant_prod = count(collect($request)->get('prod_id'));
-
-        /*obtener proceso n1*/        
-        $proceso = $this->procesos->where('es_primero',1)->first();
-        
-        /*Se eliminan los productos que no hayan venido en el request*/
-        $this->Productos()->where('id','!=',$request->get('prod_id'))->detach();
-
-        /*loop por id de producto que viene en el request*/
-        for ($i=0; $i < $cant_prod; $i++) {
-            if(isset($request->get('prod_id')[$i])){
-                $existe = false;
-                /*Buscamos en cada producto del proyecto*/
-                foreach ($this->productos as $proyectoProducto){
-                    /*Se lo encontramos lo actualizamos*/
-                    if( $request->get('prod_id')[$i] == $proyectoProducto->id){
-
-                        $proyectoProducto->pivot->cantidad = $request->get('prod_cant')[$i];
-                        $proyectoProducto->pivot->item = $request->get('prod_item')[$i];
-                        $proyectoProducto->pivot->work_order = $request->get('prod_work_order')[$i];
-                        $proyectoProducto->pivot->heat_number = $request->get('prod_heat_number')[$i];
-                        $proyectoProducto->pivot->update();
-                        $existe = true;
-                    }
-                }
-                /*Si no lo encontramos lo agregamos y le damos los datos que vienen en el request*/
-                if(!$existe){
-                    $this   ->Productos()
-                            ->attach($request->get('prod_id')[$i],
-                            [   'cantidad' => $request->get('prod_cant')[$i],
-                                'item' => $request->get('prod_item')[$i],
-                                'work_order' => $request->get('prod_work_order')[$i],
-                                'heat_number' => $request->get('prod_heat_number')[$i]]);
-
-                    $this->attachProyectoProductoProceso($user_id,$request->get('prod_id')[$i]);
-                }
-            }
-        }
+    public function attachProyectoProductoProceso($user_id,$producto_id){
+        /**Esta fincion busca el ProyectoProducto por Id Producto y Proyecto */
+        $proyectoProductoAux = $this->getProyectoProductoById($producto_id);
+        $proyectoProceso = $this->getFirstProceso();
+        $proyectoProductoAux->ProyectoProcesoProducto()
+                            ->attach($proyectoProductoAux->id,[   
+                                'proyecto_proceso_id' => $proyectoProceso->id,
+                                'user_id' => $user_id
+                            ]);
+        return $proyectoProductoAux;
     }
+
+    public function getProyectoProductoById($id){
+        return ProyectoProducto::   with('ProyectoProcesoProducto')   
+                                    ->where([
+                                        ['proyecto_id',$this->id],
+                                        ['producto_id',$id]
+                                    ])
+                                    ->first();
+    }
+
+    public function getFirstProceso(){
+        return  ProyectoProceso::   whereHas('Proceso', function ($query) {
+                                        return $query->where('es_primero', '=', 1);
+                                    })
+                                    ->where('proyecto_id',$this->id)
+                                    ->first();
+    }
+
 
     public function loadTotalHrsLabor(){
         $this['totalHrsLabor'] = $this->getTotalHrsLabor();
@@ -235,34 +216,55 @@ class Proyecto extends Model
         
     }
 
-    public function attachProyectoProductoProceso($user_id,$producto_id){
-        $proyectoProductoAux = $this->getProyectoProductoById($producto_id);
-        $proyectoProceso = $this->getFirstProceso();
-        $proyectoProductoAux->ProyectoProcesoProducto()
-                            ->attach($proyectoProductoAux->id,[   
-                                'proyecto_proceso_id' => $proyectoProceso->id,
-                                'user_id' => $user_id
-                            ]);
-    }
+    
 
-    public function getProyectoProductoById($id){
-        return ProyectoProducto::   with('ProyectoProcesoProducto')   
-                                    ->where([
-                                        ['proyecto_id',$this->id],
-                                        ['producto_id',$id]
-                                    ])
-                                    ->first();
-    }
-
-    public function getFirstProceso(){
-        return  ProyectoProceso::   whereHas('Proceso', function ($query) {
-                                        return $query->where('es_primero', '=', 1);
-                                    })
-                                    ->where('proyecto_id',$this->id)
-                                    ->first();
-    }
+    
+    
 
 
+// public function updateProductosByRequest($user_id){
+    //     //cargar Request como collection
+    //     $request = collect(request());
 
+    //     //contamos la cantidad para poder hacer el loop
+    //     $cant_prod = count(collect($request)->get('prod_id'));
+
+    //     /*obtener proceso n1*/        
+    //     $proceso = $this->procesos->where('es_primero',1)->first();
+        
+    //     /*Se eliminan los productos que no hayan venido en el request*/
+    //     $this->Productos()->where('id','!=',$request->get('prod_id'))->detach();
+
+    //     /*loop por id de producto que viene en el request*/
+    //     for ($i=0; $i < $cant_prod; $i++) {
+    //         if(isset($request->get('prod_id')[$i])){
+    //             $existe = false;
+    //             /*Buscamos en cada producto del proyecto*/
+    //             foreach ($this->productos as $proyectoProducto){
+    //                 /*Se lo encontramos lo actualizamos*/
+    //                 if( $request->get('prod_id')[$i] == $proyectoProducto->id){
+
+    //                     $proyectoProducto->pivot->cantidad = $request->get('prod_cant')[$i];
+    //                     $proyectoProducto->pivot->item = $request->get('prod_item')[$i];
+    //                     $proyectoProducto->pivot->work_order = $request->get('prod_work_order')[$i];
+    //                     $proyectoProducto->pivot->heat_number = $request->get('prod_heat_number')[$i];
+    //                     $proyectoProducto->pivot->update();
+    //                     $existe = true;
+    //                 }
+    //             }
+    //             /*Si no lo encontramos lo agregamos y le damos los datos que vienen en el request*/
+    //             if(!$existe){
+    //                 $this   ->Productos()
+    //                         ->attach($request->get('prod_id')[$i],
+    //                         [   'cantidad' => $request->get('prod_cant')[$i],
+    //                             'item' => $request->get('prod_item')[$i],
+    //                             'work_order' => $request->get('prod_work_order')[$i],
+    //                             'heat_number' => $request->get('prod_heat_number')[$i]]);
+
+    //                 $this->attachProyectoProductoProceso($user_id,$request->get('prod_id')[$i]);
+    //             }
+    //         }
+    //     }
+    // }
     
 }

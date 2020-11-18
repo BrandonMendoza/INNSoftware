@@ -9,7 +9,7 @@
             <div class="filter-item">
                 <el-input class="input-with-select" size="small" placeholder="buscar" v-model="presearch" @change="handlePresearchChange()" clearable>
                     <el-select v-model="selectSearch" slot="prepend" size="small" placeholder="Select">
-                        <el-option label="Nom. del Proyecto"  value="numero_parte_cliente"></el-option>
+                        <el-option label="Núm. de Parte (Cliente)"  value="numero_parte_cliente"></el-option>
                         <el-option label="Núm. de Parte (Local)"    value="numero_parte"></el-option>
                         <el-option label="Cliente"                  value="nombre_cliente"></el-option>
                     </el-select>

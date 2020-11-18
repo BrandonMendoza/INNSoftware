@@ -2,7 +2,7 @@
 
     <el-form  :model="form" ref="form" label-position="top" label-width="150px" >
         <el-dialog
-        width="25%"
+        width="30%"
         id="dialogoCodigoBarras"
         :ref="dialogRef"
         :before-close="handleClose"
@@ -49,7 +49,7 @@
                     <el-row>
                         <el-col :span="6">
                             <!--PDF BUTTON -->
-                            <el-button v-waves type="primary" size="small" icon="el-icon-printer" @click="print('barcodeLocal')">Imprimir</el-button>
+                            <el-button v-waves type="primary" size="small" icon="el-icon-printer" @click="print('barcodeCliente')">Imprimir</el-button>
                         </el-col>
                         <el-col :span="6">
                             <!--DOWNLOAD BUTTON -->

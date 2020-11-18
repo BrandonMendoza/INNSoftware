@@ -54,10 +54,10 @@
                         <!-- Tab Materiales -->
                         <el-tab-pane label="Productos" name="first">
                             <div class="filter-container">
-                                <el-button class="filter-item" type="primary" icon="el-icon-plus" @click="dialogoProductos = true;actualizarSelectProductos();">Agregar</el-button>
+                                <el-button size="mini" class="filter-item" type="primary" icon="el-icon-plus" @click="openProductDialog()">Agregar</el-button>
                             </div>
                             <el-table
-                            :data="form.productos"
+                            :data="displayData"
                             border
                             fit
                             highlight-current-row
@@ -75,6 +75,12 @@
                                 <el-table-column
                                 prop="proyecto_producto.cantidad"
                                 label="Cantidad"
+                                align="center"
+                                width="85"/>
+
+                                <el-table-column
+                                prop="proyecto_producto.work_order"
+                                label="Orden de Trabajo"
                                 align="center"
                                 width="85"/>
 
@@ -108,11 +114,7 @@
                                         </template>
                                 </af-table-column> 
 
-                                <el-table-column
-                                prop="proyecto_producto.work_order"
-                                label="Orden de Trabajo"
-                                align="center"
-                                width="85"/>
+                                
 
 
                                 <el-table-column
@@ -125,7 +127,15 @@
                                 </el-table-column>
                             </el-table>
                             <!-- Dialog agregar Material -->
-                            
+                            <el-row type="flex" justify="end">
+                            <el-pagination
+                                background
+                                layout="prev, pager, next"
+                                @current-change="handleCurrentChangePagination"
+                                :page-size="pageSize"
+                                :total="total">
+                            </el-pagination>
+                        </el-row>
                         </el-tab-pane>
                         
                         
@@ -148,12 +158,16 @@
         :visible.sync="dialogoProductos"
         width="25%">
             <el-form-item label="Producto">
-                <el-select v-model="productoAgregar.producto" style="width: 100%;" value-key="id" filterable>
+                <el-select 
+                v-model="productoAgregar.producto" 
+                style="width: 100%;" 
+                value-key="id" 
+                filterable>
                     <el-option 
                         v-for="producto in productosSelect" 
+                        :key="producto.id"
                         :label="producto.numero_parte_cliente" 
                         :value="producto" 
-                        :key="producto.id"
                         :disabled="producto.disabled"/>
                 </el-select>
             </el-form-item>
@@ -246,18 +260,32 @@ import { CommentDropdown } from '../articles/components/Dropdown';
         dialogRef: 'myForm',
         dialogoProductos:false,
         loadingCliente:false,
+        page: 1,
+        pageSize: 10,
+        total: 0,
       };
+    },
+    computed:{
+        searching() {
+            this.total = this.form.productos.length;
+            return this.form.productos;
+        },
+        displayData() {
+            return this.searching.slice(this.pageSize * this.page - this.pageSize, this.pageSize * this.page);
+        },
     },
     methods: {
         open() {
-            
             this.getClientes();
-            this.getProductos();
             this.dialogoAgregar = true;
         },
         close() {
             this.$parent.setCurrent();
             this.dialogoAgregar = false;
+        },
+        openProductDialog(){
+            this.dialogoProductos = true;
+            this.getProductos();
         },
         insert(form){/*Update o Insert Proceso*/
             this.$refs[form].validate((valid) => { //validacion del form
@@ -267,6 +295,8 @@ import { CommentDropdown } from '../articles/components/Dropdown';
                     });
                     let me = this;
                     axios.put('/proyectos/insert',me.form).then(function (response) {
+                        console.log("RESPONSE");
+                        console.log(response);
                         me.$parent.getList();
                         me.clearFields();
                         me.close(); 
@@ -301,21 +331,15 @@ import { CommentDropdown } from '../articles/components/Dropdown';
             })
             .catch(_ => {});
         },
+        handleCurrentChangePagination (val) {
+            this.page = val
+        },
         getProductos(){
             let me =this;
             let url = '/productos';
             axios.get(url).then(function (response) {
                 me.productosSelect = response.data;
-                me.productosSelect.forEach(element => {
-                    me.form.productos.forEach(producto => {
-                        if(element['id'] == producto['id']){
-                            element['disabled'] = true;
-                        }else{
-                            element['disabled'] = false;
-                        }
-                    });
-                });
-                
+                me.actualizarSelectProductos();
             })
             .catch(function (error) {
                 me.$message.error('Hubo un error.');
@@ -366,23 +390,26 @@ import { CommentDropdown } from '../articles/components/Dropdown';
             this.productoAgregar.proyecto_producto.item="";
             this.productoAgregar.proyecto_producto.precio_pesos = 0;
             this.productoAgregar.proyecto_producto.precio_dlls = 0;
+            this.productosSelect = [];
             this.dialogoProductos = false;
         },
         actualizarSelectProductos(){
-            this.productosSelect.forEach(element => {
-                element['disabled'] = false;
-            });
-            this.productosSelect.forEach(element => {
-                this.form.productos.forEach(producto => {
-                    if(element['id'] == producto['id']){
-                        element['disabled'] = true;
-                    }
-                });
-            });
+            this.productosSelect = this.productosSelect.filter(x=> !this.form.productos.some(y=> y.id==x.id ));
         },
         deleteRowProductos(row){
-            let i = this.form.productos.map(producto => producto.id).indexOf(row.id) // find index of your object
-            this.form.productos.splice(i, 1);
+            this.$confirm('Esto eliminara permanentemente el producto. Quieres continuar?', 'Advertencia', {
+                confirmButtonText: 'Eliminar',
+                cancelButtonText: 'Cancelar',
+                type: 'warning',
+            }).then(() => {
+                let i = this.form.productos.map(producto => producto.id).indexOf(row.id);
+                this.form.productos.splice(i, 1);
+            }).catch(() => {
+                this.$message({
+                type: 'info',
+                message: 'Eliminacion cancelada',
+                });
+            });
         },
     },
   };

@@ -200,6 +200,7 @@
                 let me = this;
                 axios.get(me.listUrl).then(function (response) {
                     me.list = response.data;
+                    console.log(me.list);
                     me.loading = false;
                 })
                 .catch(function (error) {

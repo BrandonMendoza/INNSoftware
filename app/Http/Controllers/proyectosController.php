@@ -26,7 +26,8 @@ class proyectosController extends Controller
     /*Funcion para insertar o Actualizar un proyecto*/
     public function insert(){
         
-       return DB::transaction(function () {
+        DB::transaction(function () {
+
             $proyecto = new Proyecto;
             /*Se le da formato a la fecha de entrega con Carbon*/
             request()->merge(['fecha_entrega' => Carbon::parse(request()->fecha_entrega)]);
@@ -41,7 +42,7 @@ class proyectosController extends Controller
                 $proyecto->update();
                 /* insertmaos los productos del proyecto*/
             }
-            return $proyecto->insertProductos(request()->get('productos'),Auth::id());
+            $proyecto->insertProductos(request()->get('productos'),Auth::id());
         });
     }
 

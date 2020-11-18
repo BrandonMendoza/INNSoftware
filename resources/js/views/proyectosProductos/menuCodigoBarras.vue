@@ -1,7 +1,7 @@
 <template>
 
         <el-dialog
-        width="23%"
+        width="30%"
         id="dialogoMenuCodigoBarras"
         :ref="dialogRef"
         :before-close="handleClose"
