@@ -48,7 +48,7 @@ const content = `<p>Last week at<a href="https://vuejs.london/summary" rel="nofo
 <h4>7. IE11build</h4>
 <p>The last task before the final release will be the IE11 compatibility build as mentioned above.</p>
 <h4>8. FinalRelease</h4>
-<p>In all honesty, we don’t know when this will happen yet, but likely in 2019. Again, we care more about shipping something that is solid and stable rather than hitting specific dates. There is a lot of work to be done, but we are excited for what’s coming next!</p>`;
+<p>In all honesty, we don’t know when this will happen'++' yet, but likely in 2019. Again, we care more about shipping something that is solid and stable rather than hitting specific dates. There is a lot of work to be done, but we are excited for what’s coming next!</p>`;
 
 const data = {
   title,

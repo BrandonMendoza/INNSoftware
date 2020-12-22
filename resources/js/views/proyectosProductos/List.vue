@@ -21,20 +21,20 @@
             </div>
 
             <!-- EDIT -->
-            <el-button v-waves type="primary" size="small" class="filter-item" icon="el-icon-edit" :disabled="disableEditar"  @click="loadFieldsUpdate(currentRow)">Editar</el-button>
+            <el-button  v-waves type="primary" size="small" class="filter-item" icon="el-icon-edit" :disabled="disableEditar"  @click="loadFieldsUpdate(currentRow)">Editar</el-button>
             <!-- PROCESO -->
-            <el-button v-waves type="primary" size="small" class="filter-item" title="Cambiar proceso" :disabled="disableEditar" style="margin-left:0px;" @click="cambiarProceso(currentRow);">
+            <el-button v-waves v-permission="['cambiar proceso ordenes abiertas']" type="primary" size="small" class="filter-item" title="Cambiar proceso" :disabled="disableEditar" style="margin-left:0px;" @click="cambiarProceso(currentRow);">
                 <svg-icon icon-class="process"/> Cambiar Proceso
             </el-button>
             <!-- CODIGO DE BARRAS -->
-            <el-button v-waves type="primary" size="small" class="filter-item" icon="el-icon-tickets" title="Cambiar proceso" :disabled="disableEditar" style="margin-left:0px;" @click="codigoBarras(currentRow);">
+            <el-button v-waves v-permission="['codigo barras ordenes abiertas']" type="primary" size="small" class="filter-item" icon="el-icon-tickets" title="Cambiar proceso" :disabled="disableEditar" style="margin-left:0px;" @click="codigoBarras(currentRow);">
                 Codigo de Barras
             </el-button>
             <!-- DELETE -->
-            <el-button v-waves type="danger" size="small" class="filter-item" icon="el-icon-delete" style="margin-left:0px;" :disabled="disableEditar"
+            <el-button v-waves v-permission="['eliminar ordenes abiertas']" type="danger" size="small" class="filter-item" icon="el-icon-delete" style="margin-left:0px;" :disabled="disableEditar"
                         @click="deleteRow(currentRow.id,currentRow.numero_parte,currentRow.numero_parte_cliente);">Eliminar</el-button>
             <!-- IMPORTAR BUTTON -->
-            <router-link class="filter-item"  :to="'/ordenesAbiertas/UploadExcel'">
+            <router-link v-permission="['importar ordenes abiertas']" class="filter-item"  :to="'/ordenesAbiertas/UploadExcel'">
                 <el-button type="primary" size="small" icon="el-icon-edit">
                     Importar    
                 </el-button>
@@ -195,6 +195,7 @@
                 label="Precio (Pesos)"
                 align="center"
                 width="170"
+                v-show="checkPermission(['view finanzas ordenes abiertas'])"
                 show-overflow-tooltip>
                     <template slot-scope="scope">
 
@@ -207,6 +208,7 @@
                 label="Precio (Dlls)"
                 align="center"
                 width="170"
+                v-show="checkPermission(['view finanzas ordenes abiertas'])"
                 show-overflow-tooltip>
                     <template slot-scope="scope">
 
@@ -271,6 +273,9 @@ import moment from 'moment';
 import uniq from 'lodash/uniq';
 import VueNumeric from 'vue-numeric';
 import waves from '@/directive/waves'; // Waves directive
+import permission from '@/directive/permission/index.js';
+import role from '@/directive/role/index.js';
+import checkPermission from '@/utils/permission';
 
 
 
@@ -312,7 +317,7 @@ import waves from '@/directive/waves'; // Waves directive
             menuCodigoBarrasDialog : menuCodigoBarrasDialog,
             Pagination,
         },
-        directives: { waves },
+        directives: { waves, permission, role  },
         computed: {
             searching() {
                 console.log("LISTA SEARCHING: ");
@@ -341,7 +346,7 @@ import waves from '@/directive/waves'; // Waves directive
                    dataReturned = this.list.filter(data => !!data['producto']['numero_parte'].toLowerCase().includes(this.search.toLowerCase()));
                 }
                 else if(this.selectSearch == "codigo_barras"){
-                   dataReturned = this.list.filter(data => !!data['numero_parte'].toLowerCase().includes(this.search.toLowerCase()));
+                   dataReturned = this.list.filter(data => data['numero_parte'].toLowerCase().includes(this.search.toLowerCase()));
                 }
                 else if(this.selectSearch == "codigo_barras_cliente"){
                    dataReturned = this.list.filter(data => !!data['codigo_barras_cliente'].toLowerCase().includes(this.search.toLowerCase()));
@@ -365,6 +370,7 @@ import waves from '@/directive/waves'; // Waves directive
             }
         },
         methods:{
+            checkPermission,
             //funcion para buscar con barcode
             barcodeSearch(barcodeInput){
                     console.log("DATA RETURNED");

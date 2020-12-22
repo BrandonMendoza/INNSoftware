@@ -24,12 +24,12 @@
                             <el-row :gutter="20">
                                 <el-col :span="12">
                                     <el-form-item label="Cantidad">
-                                        <el-input-number :min="1" v-model="form.cantidad"/>
+                                        <el-input-number :min="1" :disabled="!checkPermission(['editar ordenes abiertas'])" v-model="form.cantidad"/>
                                     </el-form-item>
                                 </el-col>
                                 <el-col :span="12">
                                     <el-form-item label="Fecha de Entrega" prop="fecha_entrega">
-                                        <el-date-picker v-model="form.fecha_entrega" type="date" />
+                                        <el-date-picker :disabled="!checkPermission(['editar ordenes abiertas'])" v-model="form.fecha_entrega" type="date" />
                                     </el-form-item>
                                 </el-col>
                             </el-row>
@@ -38,25 +38,25 @@
                             <el-row :gutter="20">
                                 <el-col :span="12">
                                    <el-form-item label="Orden de Trabajo">
-                                        <el-input  v-model="form.work_order"/>
+                                        <el-input :disabled="!checkPermission(['editar ordenes abiertas'])" v-model="form.work_order"/>
                                     </el-form-item>
                                 </el-col>
                                 <el-col :span="12">
                                     <el-form-item label="Item">
-                                        <el-input v-model="form.item"/>
+                                        <el-input :disabled="!checkPermission(['editar ordenes abiertas'])" v-model="form.item"/>
                                     </el-form-item>
                                 </el-col>
                             </el-row>
 
-                            <el-row :gutter="20">
+                            <el-row :gutter="20" v-permission="['view finanzas']">
                                 <el-col :span="12">
                                     <el-form-item label="Precio (pesos)">
-                                        <vue-numeric class="el-input__inner" v-bind:precision="2"  currency="$" separator="," v-model="form.precio_pesos"></vue-numeric>
+                                        <vue-numeric :disabled="!checkPermission(['editar ordenes abiertas'])" class="el-input__inner" v-bind:precision="2"  currency="$" separator="," v-model="form.precio_pesos"></vue-numeric>
                                     </el-form-item>
                                 </el-col>
                                 <el-col :span="12">
                                     <el-form-item label="Precio (dlls)">
-                                        <vue-numeric class="el-input__inner" v-bind:precision="2"  currency="$" separator="," v-model="form.precio_dlls"></vue-numeric>
+                                        <vue-numeric :disabled="!checkPermission(['editar ordenes abiertas'])" class="el-input__inner" v-bind:precision="2"  currency="$" separator="," v-model="form.precio_dlls"></vue-numeric>
                                     </el-form-item>
                                 </el-col>
                             </el-row>
@@ -64,7 +64,7 @@
                             
 
                             <el-form-item label="Heat Number" hidden>
-                                <el-input v-model="form.heat_number" />
+                                <el-input :disabled="!checkPermission(['editar ordenes abiertas'])" v-model="form.heat_number" />
                             </el-form-item>
                         </el-tab-pane>
                         <!-- Tab Notas -->
@@ -101,6 +101,9 @@ import moment from 'moment';
 import VueNumeric from 'vue-numeric';
 import waves from '@/directive/waves'; // Waves directive
 
+import permission from '@/directive/permission/index.js'
+import role from '@/directive/role/index.js'
+import checkPermission from '@/utils/permission';
   export default {
     data() {
       return {
@@ -138,8 +141,9 @@ import waves from '@/directive/waves'; // Waves directive
         loadingCliente:false,
       };
     },
-    directives: { waves },
+    directives: { waves, permission, role  },
     methods: {
+        checkPermission,
         open() {
             this.activeName = 'first';
             this.dialogoAgregar = true;

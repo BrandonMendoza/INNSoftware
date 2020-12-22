@@ -10,9 +10,21 @@ use App\Cliente;
 use App\Proceso;
 use Carbon\Carbon;
 use Auth;
+use App\Http\Resources\ProyectoProductoResource;
+use Illuminate\Support\Arr;
 
 class proyectosProductosController extends Controller
 {
+	/************************************ Nuevos metodos para usar Resource*/
+	public function OrdenesTerminadas(Request $request)
+    {
+		//$params = $request->all();
+		//return $params;
+        return ProyectoProductoResource::collection(ProyectoProducto::loadOrdenesAbiertasTerminadas($params['cliente_id']));
+    }
+
+
+	/************************************ Nuevos metodos para usar Resource*/
 
 	 /** Funcion para obtener todos los materiales */
 	 public function proyectosProductos(){

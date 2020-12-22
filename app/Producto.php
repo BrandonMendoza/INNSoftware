@@ -47,6 +47,14 @@ class Producto extends Model
 		$this->delete();
 	}
 
+	public static function getProductosByCliente($cliente_id = 0){
+		$productos = Producto::orderBy('id','DESC')->get();
+
+		if ($cliente_id != 0) {
+            $productos = $productos->where('cliente_id', $cliente_id);
+		}
+		return $productos;
+	}
 
 	public function insertMateriales($materiales,$producto){
 		$producto->Materiales()->detach();
@@ -94,4 +102,6 @@ class Producto extends Model
 			}
 		}
 	}
+
+	
 }

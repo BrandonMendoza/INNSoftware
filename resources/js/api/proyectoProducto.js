@@ -3,7 +3,21 @@ import Resource from '@/api/resource';
 
 class ProyectoProductoResource extends Resource {
   constructor() {
-    super('proyectoProducto');
+    super('proyectosProductos');
+  }
+
+  OrdenesTerminadasSinEmbarcar(cliente_id = 0) {
+    return request({
+      url: '/' + this.uri + '/'+cliente_id+'/OrdenesTerminadasSinEmbarcar' ,
+      method: 'get',
+    });
+  }
+
+  getOrdenesAbiertasByCliente(cliente_id = 0) {
+    return request({
+      url: '/' + this.uri + '/'+cliente_id+'/getOrdenesAbiertasByCliente' ,
+      method: 'get',
+    });
   }
 }
 

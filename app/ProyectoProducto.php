@@ -33,7 +33,8 @@ class ProyectoProducto extends Pivot
         'precio_pesos',
         'precio_dlls',
         'numero_parte',//Este dato se utiliza para los codigos de barra locales
-        'codigo_barras_cliente'//este dato se utiliza para los codigos de barra de cliente
+        'codigo_barras_cliente',//este dato se utiliza para los codigos de barra de cliente
+        'embarcado'
     ];
     protected $dates = ['fecha_entrega'];
 
@@ -45,18 +46,59 @@ class ProyectoProducto extends Pivot
         'proceso_id' => 'integer',
         'precio_pesos' => 'float',
         'precio_dlls' => 'float',
+        'embarcado' => 'integer'
     ];
 
     public static function loadOrdenesAbiertasWithAll(){
-        
         $ordenesAbiertas = ProyectoProducto::
                                 orderBy('fecha_entrega','DESC')
                                 ->with([ 'Producto','Proyecto','Proyecto.Cliente'])
                                 ->get();
+
         foreach ($ordenesAbiertas as $key => $ordenAbierta) {
             $ordenAbierta->loadProceso();
         }
         return $ordenesAbiertas;
+    }
+
+    public static function getOrdenesTerminadasSinEmbarcar($cliente_id = 0){
+        $ordenes = ProyectoProducto::
+                                where('embarcado',0)
+                                ->orderBy('fecha_entrega','DESC')
+                                ->with([ 'Producto','Proyecto','Proyecto.Cliente'])
+                                ->get();
+                                
+        foreach ($ordenes as $key => $orden) {
+            $orden->loadProceso();
+        }
+        
+        if ($cliente_id != 0) {
+            $ordenes = $ordenes->where('Proyecto.cliente_id', $cliente_id);
+        }
+
+        return $ordenes;
+    }
+
+    public static function getOrdenesAbiertasByCliente($cliente_id = 0){
+        $ordenes = ProyectoProducto::orderBy('numero_parte','ASC')->with([ 'Producto','Proyecto','Proyecto.Cliente'])->get();
+
+                                
+        foreach ($ordenes as $key => $orden) {
+            $orden->loadProceso();
+        }
+        
+        if ($cliente_id != 0) {
+            $ordenes = $ordenes->where('Producto.cliente_id', $cliente_id);
+        }
+
+        $ordenes = $ordenes->where('Proceso.es_ultimo',0);
+        return $ordenes;
+    }
+
+    public function latestProyectoProcesoProducto()
+    {
+        return $this    ->hasOne('App\ProyectoProcesoProducto','id','proyecto_proceso_id')
+                        ->latest();
     }
 
 	public function Producto()
@@ -78,6 +120,8 @@ class ProyectoProducto extends Pivot
                     ->as('ProyectoProcesoProducto')
                     ->withTimestamps();
     }
+
+    
 
     public function loadProceso(){
         $this['Proceso'] = $this->getLastProceso();

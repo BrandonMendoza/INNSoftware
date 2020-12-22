@@ -126,6 +126,12 @@ export const asyncRoutes = [
         meta: { title: 'ordenesAbiertas', icon: 'ordenesAbiertas'},
       },
       {
+        path: 'embarques',
+        component: () => import('@/views/Embarques/List'),
+        name: 'Embarques',
+        meta: { title: 'embarques', icon: 'list' },
+      },
+      {
         path: 'UploadExcel',
         component: () => import('@/views/proyectosProductos/UploadExcel'),
         name: 'importarExcel',
@@ -249,11 +255,12 @@ export const asyncRoutes = [
   //tableRoutes,
   adminRoutes,
   errorRoutes,
-    // {
-  //   path: '/pdf/download',
-  //   component: () => import('@/views/pdf/Download'),
-  //   hidden: true,
-  // },
+  {
+    path: '/embarques/hoja_de_salida_download/:id',
+    name: 'hoja_de_salida_download',
+    component: () => import('@/views/embarques/hoja_de_salida_download'),
+    hidden: true,
+  },
   { path: '*', redirect: '/404', hidden: true },
 ];
 

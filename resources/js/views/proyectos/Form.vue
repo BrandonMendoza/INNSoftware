@@ -16,139 +16,165 @@
 
             <span style="margin-right: 5px;"><b>Núm. de Parte (Local): </b> {{form.numero_parte}}</span>
             <br>
-            <el-row :gutter="20">
-                <el-col :span="6">
-                    
 
-                    <el-form-item label="Cliente" prop="cliente_id">
-                        <el-select 
-                        v-model="form.cliente_nombre" 
-                        value-key="nombre_cliente"
-                        @change="changeCliente()"
-                        filterable>
-                            <el-option 
-                            v-for="cliente in clientes"
-                            :key="cliente.id"
-                            :label="cliente.nombre_cliente" 
-                            :value="cliente.nombre_cliente"/>
-                        </el-select>
-                    </el-form-item>
+             <el-row :gutter="20">
+                        <el-col :span="5">
+                            <el-form-item label="Cliente" prop="cliente_id">
+                                <el-select 
+                                :disabled="!checkPermission(['editar proyectos'])"
+                                v-model="form.cliente_nombre" 
+                                value-key="nombre_cliente"
+                                @change="changeCliente()"
+                                filterable>
+                                    <el-option 
+                                    v-for="cliente in clientes"
+                                    :key="cliente.id"
+                                    :label="cliente.nombre_cliente" 
+                                    :value="cliente.nombre_cliente"/>
+                                </el-select>
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="5">
+                            <el-form-item label="Nombre del Proyecto" prop="numero_parte_cliente">
+                                <el-input :disabled="!checkPermission(['editar proyectos'])" v-model="form.numero_parte_cliente" />
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="5">
+                            <el-form-item label="Fecha de Entrega" prop="fecha_entrega">
+                                <el-date-picker
+                                :disabled="!checkPermission(['editar proyectos'])"
+                                v-model="form.fecha_entrega"
+                                type="date"/>
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="6">
+                            <el-form-item label="Orden de Compra (Cliente)" prop="orden_compra">
+                                <el-input :disabled="!checkPermission(['editar proyectos'])" v-model="form.orden_compra" />
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row :gutter="20">
+                        <el-col :span="5">
+                            
+                        </el-col>
+                        <el-col :span="5">
+                            
+                        </el-col>
+                        <el-col :span="5">
+                            
+                        </el-col>
+                        <el-col :span="6">
+                            
+                        </el-col>
+                    </el-row>
+                    <el-row >
+                       <el-col>
+                             <el-tabs v-model="activeName" @tab-click="handleClick" :stretch="true">
+                                <!-- Tab General -->
 
-                    <el-form-item label="Nombre del Proyecto" prop="numero_parte_cliente">
-                        <el-input v-model="form.numero_parte_cliente" />
-                    </el-form-item>  
+                                <el-tab-pane label="Ordenes Terminadas" name="first" >
+                                    <el-row>
+                                        <div class="filter-container"> 
+                                            <!-- AGREGAR -->
+                                            <el-button  v-waves :disabled="disableAddProducto" :v-show="checkPermission(['agrergar productos proyectos'])" size="mini" class="filter-item" type="primary" icon="el-icon-plus" @click="openProductDialog()">Agregar</el-button>
+                                        </div>
+                                    </el-row>
+                                    <el-row type="flex" justify="space-around" id="embarqueTransfer">
+                                        <el-col>
+                                            <el-table
+                                            :data="displayData"
+                                            border
+                                            fit
+                                            highlight-current-row
+                                            style="width: 100%">
+                                                <el-table-column
+                                                type="index"
+                                                align="center" 
+                                                width="80"/>
 
-                    <el-form-item label="Orden de Compra (Cliente)" prop="orden_compra">
-                        <el-input v-model="form.orden_compra" />
-                    </el-form-item>
+                                                <el-table-column
+                                                prop="numero_parte_cliente"
+                                                label="Producto"
+                                                show-overflow-tooltip/>
 
-                    <el-form-item label="Fecha de Entrega" prop="fecha_entrega">
-                        <el-date-picker
-                        v-model="form.fecha_entrega"
-                        type="date"/>
-                    </el-form-item>
-                    
-                </el-col>
-                <el-col :span="18">
-                    <el-tabs v-model="activeName" @tab-click="handleClick">
-                        <!-- Tab Materiales -->
-                        <el-tab-pane label="Productos" name="first">
-                            <div class="filter-container">
-                                <el-button size="mini" class="filter-item" type="primary" icon="el-icon-plus" @click="openProductDialog()">Agregar</el-button>
-                            </div>
-                            <el-table
-                            :data="displayData"
-                            border
-                            fit
-                            highlight-current-row
-                            style="width: 100%">
-                                <el-table-column
-                                type="index"
-                                align="center" 
-                                width="80"/>
+                                                <el-table-column
+                                                prop="proyecto_producto.cantidad"
+                                                label="Cantidad"
+                                                align="center"
+                                                width="85"/>
 
-                                <el-table-column
-                                prop="numero_parte_cliente"
-                                label="Producto"
-                                show-overflow-tooltip/>
+                                                <el-table-column
+                                                prop="proyecto_producto.work_order"
+                                                label="Orden de Trabajo"
+                                                align="center"
+                                                width="85"/>
 
-                                <el-table-column
-                                prop="proyecto_producto.cantidad"
-                                label="Cantidad"
-                                align="center"
-                                width="85"/>
+                                                <el-table-column
+                                                prop="proyecto_producto.item"
+                                                label="Item"
+                                                align="center"
+                                                width="85"/>
 
-                                <el-table-column
-                                prop="proyecto_producto.work_order"
-                                label="Orden de Trabajo"
-                                align="center"
-                                width="85"/>
+                                                <el-table-column
+                                                    v-if="checkPermission(['view finanzas ordenes abiertas'])"
+                                                    label="Precio (pesos)"
+                                                    align="center"
+                                                    width="85"
+                                                    show-overflow-tooltip>
+                                                        <template slot-scope="scope">
+                                                            <vue-numeric v-if="scope.row.proyecto_producto.precio_pesos" v-bind:precision="2"  currency="$" separator="," v-model="scope.row.proyecto_producto.precio_pesos" :read-only="true">                                                
+                                                            </vue-numeric>
+                                                            <span v-else>$ 0.00 </span>
+                                                        </template>
+                                                </el-table-column> 
 
-                                <el-table-column
-                                prop="proyecto_producto.item"
-                                label="Item"
-                                align="center"
-                                width="85"/>
+                                                <el-table-column
+                                                    v-if="checkPermission(['view finanzas ordenes abiertas'])"
+                                                    label="Precio (dlls)"
+                                                    align="center"
+                                                    width="85"
+                                                    show-overflow-tooltip>
+                                                        <template slot-scope="scope">
+                                                            <vue-numeric v-if="scope.row.proyecto_producto.precio_dlls" v-bind:precision="2"  currency="$" separator="," v-model="scope.row.proyecto_producto.precio_dlls" :read-only="true">                                                
+                                                            </vue-numeric>
+                                                            <span v-else>$ 0.00 </span>
+                                                        </template>
+                                                </el-table-column> 
 
-                                <af-table-column
-                                    label="Precio (pesos)"
-                                    align="center"
-                                    width="85"
-                                    show-overflow-tooltip>
-                                        <template slot-scope="scope">
-                                            <vue-numeric v-if="scope.row.proyecto_producto.precio_pesos" v-bind:precision="2"  currency="$" separator="," v-model="scope.row.proyecto_producto.precio_pesos" :read-only="true">                                                
-                                            </vue-numeric>
-                                            <span v-else>$ 0.00 </span>
-                                        </template>
-                                </af-table-column> 
+                                                <el-table-column
+                                                align="center"
+                                                width="80">
+                                                    <template slot-scope="scope">
+                                                        <!-- <el-button type="primary" size="mini" icon="el-icon-edit" @click="loadFieldsUpdate(scope.row);"/> -->
+                                                        <el-button :disabled="!checkPermission(['eliminar productos proyectos'])" type="danger" size="mini" icon="el-icon-delete" @click="deleteRowProductos(scope.row);"/>
+                                                    </template>
+                                                </el-table-column>
+                                            </el-table>
+                                            <!-- Dialog agregar Material -->
+                                            <el-row type="flex" justify="end">
+                                                <el-pagination
+                                                    background
+                                                    layout="prev, pager, next"
+                                                    @current-change="handleCurrentChangePagination"
+                                                    :page-size="pageSize"
+                                                    :total="total">
+                                                </el-pagination>
+                                            </el-row>
+                                           
+                                        </el-col>
+                                    </el-row>
+                                </el-tab-pane>
+                            </el-tabs>
+                        </el-col>
+                   </el-row>
 
-                                <af-table-column
-                                    label="Precio (dlls)"
-                                    align="center"
-                                    width="85"
-                                    show-overflow-tooltip>
-                                        <template slot-scope="scope">
-                                            <vue-numeric v-if="scope.row.proyecto_producto.precio_dlls" v-bind:precision="2"  currency="$" separator="," v-model="scope.row.proyecto_producto.precio_dlls" :read-only="true">                                                
-                                            </vue-numeric>
-                                            <span v-else>$ 0.00 </span>
-                                        </template>
-                                </af-table-column> 
-
-                                
-
-
-                                <el-table-column
-                                align="center"
-                                width="80">
-                                    <template slot-scope="scope">
-                                        <!-- <el-button type="primary" size="mini" icon="el-icon-edit" @click="loadFieldsUpdate(scope.row);"/> -->
-                                        <el-button type="danger" size="mini" icon="el-icon-delete" @click="deleteRowProductos(scope.row);"/>
-                                    </template>
-                                </el-table-column>
-                            </el-table>
-                            <!-- Dialog agregar Material -->
-                            <el-row type="flex" justify="end">
-                            <el-pagination
-                                background
-                                layout="prev, pager, next"
-                                @current-change="handleCurrentChangePagination"
-                                :page-size="pageSize"
-                                :total="total">
-                            </el-pagination>
-                        </el-row>
-                        </el-tab-pane>
-                        
-                        
-                    </el-tabs>
-                </el-col>
-            </el-row>
 
             <span slot="footer" class="dialog-footer">
-                <el-button @click="clearFields();close();" class="float-left">Cancelar</el-button>
+                <el-button  v-waves  @click="clearFields();close();" class="float-left">Cancelar</el-button>
                 <!-- Botón que añade los datos del formulario, solo se muestra si la variable update es igual a 0-->
-                <el-button type="success" v-if="form.id == 0" @click="insert('form');" icon="el-icon-check">Agregar</el-button>
+                <el-button  v-waves type="success" v-if="form.id == 0" @click="insert('form');" icon="el-icon-check">Agregar</el-button>
                 <!-- Botón que modifica la tarea que anteriormente hemos seleccionado, solo se muestra si la variable update es diferente a 0-->
-                <el-button type="success" v-if="form.id != 0" @click="insert('form');" icon="el-icon-check">Guardar</el-button>
+                <el-button  v-waves type="success" v-if="form.id != 0" @click="insert('form');" icon="el-icon-check">Guardar</el-button>
             </span>
         </el-dialog>
 
@@ -166,7 +192,7 @@
                     <el-option 
                         v-for="producto in productosSelect" 
                         :key="producto.id"
-                        :label="producto.numero_parte_cliente" 
+                        :label="producto.numero_parte+'-'+producto.numero_parte_cliente" 
                         :value="producto" 
                         :disabled="producto.disabled"/>
                 </el-select>
@@ -201,8 +227,8 @@
             </el-form-item>
 
             <span slot="footer" class="dialog-footer">
-                <el-button @click="dialogoProductos = false">Cancelar</el-button>
-                <el-button type="primary" @click="agregarProducto">Confirmar</el-button>
+                <el-button  v-waves @click="dialogoProductos = false">Cancelar</el-button>
+                <el-button  v-waves type="primary" @click="agregarProducto">Confirmar</el-button>
             </span>
         </el-dialog>
     </el-form>
@@ -217,7 +243,15 @@
 
 <script>
 import { CommentDropdown } from '../articles/components/Dropdown';
-  export default {
+import permission from '@/directive/permission/index.js';
+import role from '@/directive/role/index.js';
+import waves from '@/directive/waves'; // Waves directive
+import checkPermission from '@/utils/permission';
+import ProductoResource from '@/api/producto';
+
+const productoResource = new ProductoResource('proyectosProductos');
+
+export default {
     data() {
       return {
         clientes:[],
@@ -273,8 +307,15 @@ import { CommentDropdown } from '../articles/components/Dropdown';
         displayData() {
             return this.searching.slice(this.pageSize * this.page - this.pageSize, this.pageSize * this.page);
         },
+        disableAddProducto(){
+            if(this.form.cliente_id == 0)
+                return true;
+            return false;
+        }
     },
+    directives: { waves, permission, role  },
     methods: {
+        checkPermission,
         open() {
             this.getClientes();
             this.dialogoAgregar = true;
@@ -314,7 +355,7 @@ import { CommentDropdown } from '../articles/components/Dropdown';
         },
         clearFields(){/*Limpia los campos e inicializa la variable update a 0*/
             this.form.id = 0;
-            this.form.cliente_id = "";
+            this.form.cliente_id = 0;
             this.form.cliente_nombre = "";
             this.form.numero_parte_cliente = "";
             this.form.orden_compra = "";
@@ -334,17 +375,12 @@ import { CommentDropdown } from '../articles/components/Dropdown';
         handleCurrentChangePagination (val) {
             this.page = val
         },
-        getProductos(){
-            let me =this;
-            let url = '/productos';
-            axios.get(url).then(function (response) {
-                me.productosSelect = response.data;
-                me.actualizarSelectProductos();
-            })
-            .catch(function (error) {
-                me.$message.error('Hubo un error.');
-                console.log(error);
-            });
+        async getProductos(){
+            const { data, meta } = await productoResource.getProductosByCliente(this.form.cliente_id);
+            console.log("DATA GET PRODUCTOS");
+            console.log(data);
+            this.productosSelect = data;
+            this.actualizarSelectProductos();
         },
         getClientes(){
             let me =this;
@@ -361,11 +397,15 @@ import { CommentDropdown } from '../articles/components/Dropdown';
             });
         },
         changeCliente(){
-            this.clientes.forEach(cliente => {
-                if(cliente['nombre_cliente'] == this.form.cliente_nombre){
-                    this.form.cliente_id = cliente['id'];
-                }
-            });
+            if(this.form.cliente_nombre != ""){
+                this.clientes.forEach(cliente => {
+                    if(cliente['nombre_cliente'] == this.form.cliente_nombre){
+                        this.form.cliente_id = cliente['id'];
+                    }
+                });
+            }else{
+                this.current.cliente_id = 0;
+            }   
         },
         handleClick(tab, event) {
         },

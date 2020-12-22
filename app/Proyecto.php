@@ -125,11 +125,14 @@ class Proyecto extends Model
                 $this->attachProyectoProductoProceso($user_id,$producto['id']);
             }
         }
+
+        $proyectosProductos = ProyectoProducto::where('proyecto_id',$this->id)->get();
         /**Si no tiene numero parte de actualiza */
         foreach ($proyectosProductos as $proyectoProducto){
-            if($proyectoProducto->numero_parte == null)
-                $proyectoProducto->numero_parte = $proyectoProducto->id.''.Str::random(8);
-            $proyectoProducto->update();
+            if($proyectoProducto->numero_parte == null){
+                $proyectoProducto->numero_parte = 'OR-'.$proyectoProducto->id;
+                $proyectoProducto->update();
+            }
         }
     }
 

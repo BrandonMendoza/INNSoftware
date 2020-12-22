@@ -20,6 +20,11 @@ Route::get('/', function () {
 Route::group(['middleware' => 'web'], function () {
     Route::get(env('LARAVUE_PATH'), 'LaravueController@index')->where('any', '.*')->name('laravue');
     
+    //Embarques'/embarques/documentos/store'
+        //Embarques -> Documentos
+        Route::post('/embarques/documentos/store','embarquesController@storeDocumento');
+        Route::post('/embarques/documentos/delete','embarquesController@deleteDocumento');
+        Route::get('/embarques/downloadDocumento/{documento_id}','embarquesController@downloadDocumento');
     //UploadExcel
     Route::get('uploadExcel/getData','uploadExcelController@getData');
     Route::put('/uploadExcel/insertOrdenesAbiertas','uploadExcelController@insertOrdenesAbiertas');

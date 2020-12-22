@@ -16,12 +16,14 @@
                     <el-button slot="append" v-waves size="small" type="primary" icon="el-icon-search" @click="handleSearch"></el-button>
                 </el-input>
             </div>
-
-            <el-button class="filter-item" type="primary" size="small" icon="el-icon-plus" @click="$refs.myForm.clearFields();$refs.myForm.open()">Agregar</el-button>
-             <!-- SELECT ROW -->
+            <!-- Agregar -->
+            <el-button v-waves v-permission="['agregar proyectos']" class="filter-item" type="primary" size="small" icon="el-icon-plus" @click="$refs.myForm.clearFields();$refs.myForm.open()">Agregar</el-button>
+             <!-- Editar -->
             <el-button v-waves type="primary" size="small" class="filter-item" icon="el-icon-edit" style="margin-left:0px;" :disabled="disableEditar" @click="loadFieldsUpdate(currentRow)">Editar</el-button>
-            <el-button v-waves type="primary" size="small" class="filter-item" icon="el-icon-document" style="margin-left:0px;" :disabled="disableEditar" @click="loadDocumentos(currentRow)">Documentos</el-button>
-            <el-button  v-waves type="danger" size="small" class="filter-item" icon="el-icon-delete" style="margin-left:0px;" :disabled="disableEditar"
+            <!-- Documentos -->
+            <el-button v-waves v-permission="['ver documentos proyectos']" type="primary" size="small" class="filter-item" icon="el-icon-document" style="margin-left:0px;" :disabled="disableEditar" @click="loadDocumentos(currentRow)">Documentos</el-button>
+            <!-- Eliminar -->
+            <el-button v-waves v-permission="['eliminar proyectos']" type="danger" size="small" class="filter-item" icon="el-icon-delete" style="margin-left:0px;" :disabled="disableEditar"
                         @click="deleteRow(currentRow.id,currentRow.numero_parte,currentRow.numero_parte_cliente);">Eliminar</el-button>
 
         </div>
@@ -130,6 +132,8 @@
     import documentosDialog from './documentos';
     import Pagination from '@/components/Pagination';
     import waves from '@/directive/waves'; // Waves directive
+    import permission from '@/directive/permission/index.js'
+    import role from '@/directive/role/index.js'
 
     export default {
         data(){
@@ -171,7 +175,7 @@
                 return false;
             }
         },
-        directives: { waves },
+        directives: { waves, permission, role },
         components: { 
             formDialog : formDialog,
             documentosDialog : documentosDialog,
