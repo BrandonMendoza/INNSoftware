@@ -129,7 +129,7 @@ export const asyncRoutes = [
         path: 'embarques',
         component: () => import('@/views/Embarques/List'),
         name: 'Embarques',
-        meta: { title: 'embarques', icon: 'list' },
+        meta: { title: 'Embarques', icon: 'list' },
       },
       {
         path: 'UploadExcel',

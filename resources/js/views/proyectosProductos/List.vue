@@ -191,24 +191,24 @@
                     </template>
                 </af-table-column> 
 
-                <af-table-column
+                <el-table-column
                 label="Precio (Pesos)"
                 align="center"
                 width="170"
-                v-show="checkPermission(['view finanzas ordenes abiertas'])"
+                v-if="checkPermission(['view finanzas ordenes abiertas'])"
                 show-overflow-tooltip>
                     <template slot-scope="scope">
 
                         <vue-numeric v-if="scope.row.precio_pesos" v-bind:precision="2"  currency="$" separator="," v-model="scope.row.precio_pesos" :read-only="true"></vue-numeric>
                         <span v-else>$ 0.00 </span>
                     </template>
-                </af-table-column> 
+                </el-table-column> 
 
                 <af-table-column
                 label="Precio (Dlls)"
                 align="center"
                 width="170"
-                v-show="checkPermission(['view finanzas ordenes abiertas'])"
+                v-if="checkPermission(['view finanzas ordenes abiertas'])"
                 show-overflow-tooltip>
                     <template slot-scope="scope">
 

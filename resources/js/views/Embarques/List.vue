@@ -544,11 +544,20 @@ const proyectoProductoResource = new ProyectoProductoResource('proyectosProducto
                     cancelButtonText: 'Cancelar',
                     type: 'warning',
                 }).then(() => {
+                    /*Se agrega a la lista general el embaruqe*/
+                    this.ordenesAbiertasSeleccionadas.forEach(ordenAbierta => {
+                        if(row.id == ordenAbierta.id ){
+                            this.ordenesAbiertasList.push({
+                                key: ordenAbierta.id,
+                                label: 'Orden: '+ordenAbierta.numero_parte+' - '+ordenAbierta.producto.numero_parte_cliente,
+                                disabled: false,
+                            });
+                        }
+                    });
+
+                    // se borra de las seleccionadas
                     let i = this.ordenesAbiertasSeleccionadas.map(orden => orden.id).indexOf(row.id);
                     this.ordenesAbiertasSeleccionadas.splice(i, 1);
-
-                    let x = this.ordenesAbiertasNuevas.indexOf(row.id);
-                    this.ordenesAbiertasNuevas.splice(x, 1);
                 }).catch(() => {
                     this.$message({
                     type: 'info',
@@ -572,16 +581,24 @@ const proyectoProductoResource = new ProyectoProductoResource('proyectosProducto
 
                 console.log("OA Todas");
                 console.log(this.OrdenesTodasList);
+                var idAgregado = 0;
+                
                 this.ordenesAbiertasNuevas.forEach(nuevaOrden => {
                     this.OrdenesTodasList.forEach(ordenAbierta => {
                         if(ordenAbierta.id == nuevaOrden){
-                            console.log('ESTA SERA AGREGADA '+ordenAbierta.id+' '+nuevaOrden.id);
+                            /*Se agrega a la lista de Seleccionadas de el embarque*/
                             this.ordenesAbiertasSeleccionadas.push(ordenAbierta);
+                            /* Se borra del listado general del embarque*/
+                            let i = this.ordenesAbiertasList.map(orden => orden.key).indexOf(ordenAbierta.id);
+                            this.ordenesAbiertasList.splice(i, 1);
                         }
                     });
                 });
 
-                this.ordeordenesAbiertasNuevas = [];
+                
+                
+
+                this.ordenesAbiertasNuevas = [];
                 this.agregarOrdenesVisible = false;
                 this.updateOrdenesAbiertasList();
             },
