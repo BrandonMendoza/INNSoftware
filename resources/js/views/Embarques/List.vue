@@ -6,26 +6,35 @@
             <!-- BUSCAR INPUT -->
             <div class="filter-item">
                 <el-input class="input-with-select" size="small" placeholder="buscar" v-model="query.keyword"  @keyup.enter.native="handleFilter" clearable> 
-                    <el-button slot="append" size="small" v-waves type="primary" icon="el-icon-search" @click="handleFilter"></el-button>    
+                    <el-button slot="append" size="small" v-waves type="primary" icon="el-icon-search" 
+                        @click="handleFilter"></el-button>    
                 </el-input>
             </div>
             <!-- AGREGAR -->
-            <el-button class="filter-item" type="primary" size="small" icon="el-icon-plus"  style="margin-left:0px;"  @click="handleCreateForm()">
-                {{ $t('table.add') }}
-            </el-button>
+            <el-button class="filter-item" type="primary" size="small" icon="el-icon-plus"  style="margin-left:0px;"  
+                @click="handleCreateForm()"> {{ $t('table.add') }} </el-button>
             <!-- EDIT -->
-            <el-button v-waves type="primary" size="small" class="filter-item" icon="el-icon-edit"  style="margin-left:0px;"  :disabled="disableEditar"  @click="handleEditForm()">Editar</el-button>
+            <el-button v-waves type="primary" size="small" class="filter-item" icon="el-icon-edit"  style="margin-left:0px;"  :disabled="disableEditar"  
+                @click="handleEditForm()">Editar</el-button>
+
+            <!-- DOCUMENTOS -->
+            <el-button v-waves type="primary" size="small" class="filter-item" icon="el-icon-document" style="margin-left:0px;" :disabled="disableEditar" 
+                @click="handleDocumentos()">Documentos</el-button>
            
             <!-- DELETE -->
             <el-button v-waves type="danger" size="small" class="filter-item" icon="el-icon-delete" style="margin-left:0px;" :disabled="true"
-                        @click="deleteRow(current);">Eliminar</el-button>
+                @click="deleteRow(current);">Eliminar</el-button>
 
-            <!-- pdf example button -->
+            <!-- GENERAR HOJA DE SALIDA -->
+            <el-button v-waves type="primary" size="small" class="filter-item" style="margin-left:0px;"  :disabled="disableEditar"  
+                @click="handlePrePrintForm()">Generar Hoja de Salida</el-button>
+
+            <!-- pdf example button
             <router-link target="_blank" :to="{ name: 'hoja_de_salida_download', params: { id: current.id } }">
                 <el-button type="primary" size="small" class="filter-item"  style="margin-left:0px;"  :disabled="disableEditar">
                     Generar Hoja de Salida
                 </el-button>
-            </router-link>
+            </router-link> -->
         </div>
         <el-row >
             <el-table
@@ -198,49 +207,6 @@
                                         </el-col>
                                     </el-row>
                                 </el-tab-pane>
-
-                                <el-tab-pane label="Documentos" v-if="current.id != 0">
-                                    <div class="filter-container">
-                                        <el-button class="filter-item" type="primary" size="small" icon="el-icon-plus" @click="dialogoDocumentosAgregarVisible = true;">Agregar</el-button>
-                                    </div>
-                                    <el-table
-                                    :data="current.documentos"
-                                    border
-                                    fit
-                                    highlight-current-row
-                                    style="width: 100%">
-                                        <el-table-column
-                                        type="index"
-                                        align="center" 
-                                        width="80"/>
-
-                                        <el-table-column
-                                        prop="nombre_real"
-                                        label="Documento"
-                                        show-overflow-tooltip/>
-
-                                        <el-table-column
-                                        prop="created_at"
-                                        label="Fecha de carga"
-                                        align="center" 
-                                        show-overflow-tooltip>
-                                            <template slot-scope="scope">
-                                                {{scope.row.created_at | moment("YYYY-MMM-DD")}}
-                                            </template>
-                                        </el-table-column>
-
-                                        <el-table-column
-                                        align="center"
-                                        width="180">
-                                            <template slot-scope="scope">
-                                                <a type="button" title="descargar" :href="'/proyectos/downloadDocumento/'+scope.row.id" class="el-button el-button--primary el-button--mini" >
-                                                    <i class="el-icon-download"></i>
-                                                </a>
-                                                <el-button type="danger" title="eliminar" size="mini" icon="el-icon-delete" @click="deleteDocumento(scope.row);"/>
-                                            </template>
-                                        </el-table-column>
-                                    </el-table>
-                                </el-tab-pane>
                             </el-tabs>
                         </el-col>
                    </el-row>
@@ -253,7 +219,7 @@
         </el-dialog>
 
 
-        <!-- CREATE DIALOG -->
+        <!-- DIALOGO AGREGAR ORDENES -->
         <el-dialog title="Agregar Ordenes" :visible.sync="agregarOrdenesVisible" width="60%">
             <div class="form-container">
                 <el-transfer
@@ -273,6 +239,103 @@
             </span>
         </el-dialog>
 
+        <!-- Dialogo PRE PRINT -->
+        <el-dialog
+        id="dialogoPrePrint"
+        title="Generar Hoja de Salida"
+        :visible.sync="dialogoPrePrint"
+        :before-close="handleClose"
+        width="23%">
+            
+            <el-row :gutter="20">
+                <el-col :span="5">
+                        Perfil de Empresa:
+                        <el-select 
+                        v-model="perfil_empresa_id" 
+                        value-key="id">
+                            <el-option 
+                            v-for="perfil_empresa in perfil_empresa_list"
+                            :key="perfil_empresa.id"
+                            :label="perfil_empresa.nombre_corto" 
+                            :value="perfil_empresa.id"/>
+                        </el-select>
+                </el-col>
+            </el-row>
+            
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="dialogoPrePrint = false;fileList = [];" class="float-left">Cancelar</el-button>
+                <!-- pdf example button -->
+                <router-link target="_blank" :to="{ name: 'hoja_de_salida_download', params: { id: current.id, perfil_empresa: perfil_empresa_id } }">
+                    <el-button type="primary" size="small" class="filter-item"  style="margin-left:0px;"  :disabled="disableEditar">
+                        Generar Hoja de Salida
+                    </el-button>
+                </router-link>
+            </span>
+        </el-dialog>
+
+
+        <!-- DIALOGO DOCUMENTOS -->
+        <el-dialog
+        width="50%"
+        id="dialogoListDocumento"
+        :visible.sync="dialogoDocumentos">
+            <span slot="title">
+                <i class="el-icon-document"></i> Documentos
+            </span>
+
+            <div class="filter-container">
+                <el-button class="filter-item" type="primary" size="small" icon="el-icon-plus" @click="handleAgregarDocumento">Agregar</el-button>
+            </div>
+            <el-table :data="current.documentos" border fit highlight-current-row style="width: 100%">
+                <el-table-column
+                type="index"
+                align="center" 
+                width="80"/>
+
+                <el-table-column
+                prop="nombre_real"
+                label="Documento"
+                show-overflow-tooltip/>
+
+                <el-table-column
+                prop="documento_tipo.nombre"
+                label="Tipo de Documento"
+                show-overflow-tooltip/>
+
+                <el-table-column
+                prop="usuario.name"
+                label="Cargado Por"
+                show-overflow-tooltip/>
+
+                <el-table-column
+                prop="created_at"
+                label="Fecha de carga"
+                align="center" 
+                show-overflow-tooltip>
+                    <template slot-scope="scope">
+                        {{scope.row.created_at | moment("YYYY-MMM-DD, h:mm a")}}
+                    </template>
+                </el-table-column>
+
+                
+
+                <el-table-column
+                align="center"
+                width="180">
+                    <template slot-scope="scope">
+                        <a type="button" title="descargar" :href="'/embarques/downloadDocumento/'+scope.row.id" class="el-button el-button--primary el-button--mini" >
+                            <i class="el-icon-download"></i>
+                        </a>
+                        <el-button type="danger" title="eliminar" size="mini" icon="el-icon-delete" @click="deleteDocumento(scope.row);"/>
+                    </template>
+                </el-table-column>
+            </el-table>
+
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="dialogoDocumentos = false" class="float-left">Cerrar</el-button>
+            </span>
+        </el-dialog>
+
         <!-- Dialogo Agregar Doc -->
         <el-dialog
         id="dialogoAgregarDocumento"
@@ -280,22 +343,48 @@
         :visible.sync="dialogoDocumentosAgregarVisible"
         :before-close="handleClose"
         width="23%">
-            
-            <div class="filter-container">
-                <el-upload
-                class="upload-demo"
-                action=""
-                :file-list="fileList"
-                ref="upload"
-                :auto-upload="false"
-                :on-change="handleUploadChange"
-                :on-progress="handleProgress"
-                :on-success="handleSuccess"
-                drag>
-                    <i class="el-icon-upload"></i>
-                    <div class="el-upload__text">Arrastra un archivo aqui o <em>click para subir</em></div>
-                </el-upload>
-            </div>
+            <el-row :gutter="20" style="margin-bottom: 20px;">
+                <el-col :span="24">
+                    Tipo de Documento
+                </el-col>
+            </el-row>
+
+            <el-row :gutter="20" style="margin-bottom: 20px;">
+                <el-col :span="24">
+                    
+                        <el-select 
+                        v-loading="loadingTipoDocumentos"
+                        v-model="documento_tipo_id" 
+                        value-key="id">
+                            <el-option 
+                            v-for="documentoTipo in documentosTiposSelect"
+                            :key="documentoTipo.id"
+                            :label="documentoTipo.nombre" 
+                            :value="documentoTipo.id"/>
+                        </el-select>
+                    
+                </el-col>
+            </el-row>
+
+            <el-row :gutter="20" style="margin-bottom: 20px;">
+                <el-col :span="24">
+                    <div class="filter-container">
+                        <el-upload
+                        class="upload-demo"
+                        action=""
+                        :file-list="fileList"
+                        ref="upload"
+                        :auto-upload="false"
+                        :on-change="handleUploadChange"
+                        :on-progress="handleProgress"
+                        :on-success="handleSuccess"
+                        drag>
+                            <i class="el-icon-upload"></i>
+                            <div class="el-upload__text">Arrastra un archivo aqui o <em>click para subir</em></div>
+                        </el-upload>
+                    </div>
+                </el-col>
+            </el-row>
             
             <span slot="footer" class="dialog-footer">
                 <el-button @click="dialogoDocumentosAgregarVisible = false;fileList = [];" class="float-left">Cancelar</el-button>
@@ -303,6 +392,8 @@
             </span>
         </el-dialog>
     </div>
+
+    
 
 
     
@@ -338,6 +429,8 @@ import waves from '@/directive/waves'; // Waves directive
 import ProyectoProductoResource from '@/api/proyectoProducto';
 import Resource from '@/api/resource';
 
+const documentoTipoResource = new Resource('documentoTipo');
+const perfilEmpresaResource = new Resource('perfilEmpresa');
 const embarqueResource = new Resource('embarques');
 const proyectoProductoResource = new ProyectoProductoResource('proyectosProductos');
 
@@ -346,6 +439,7 @@ const proyectoProductoResource = new ProyectoProductoResource('proyectosProducto
         name: 'EmbarqueList',
         created () {
             this.getList();
+            
         },
         destroyed () {
             
@@ -408,10 +502,23 @@ const proyectoProductoResource = new ProyectoProductoResource('proyectosProducto
                 /**Sub dialog */
                 agregarOrdenesVisible:false,
                 /** Documentos */
-                dialogoDocumentosVisible:false,
+                dialogoDocumentos:false,
                 dialogoDocumentosAgregarVisible:false,
                 fileList: [],
-                
+                loadingTipoDocumentos:false,
+                documentosTiposSelect: [{
+                    id: 4,
+                    nombre: 'Foto'
+                }, 
+                {
+                    id: 5,
+                    nombre: 'Otro'
+                }],
+                documento_tipo_id:"",
+                /* PRE PRINT */
+                perfil_empresa_list:[],
+                dialogoPrePrint: false,
+                perfil_empresa_id:"",
             }
         },
         components: { 
@@ -428,12 +535,20 @@ const proyectoProductoResource = new ProyectoProductoResource('proyectosProducto
         },
         methods:{
             /* Documentos*/
+            async getDocumentoTipos(){
+                const { data, meta } = await documentoTipoResource.list();
+                this.documentosTiposSelect = data;
+            },
             handleClose(done) {
                 this.$confirm('Está seguro que deseas salir?')
                 .then(_ => {
                     this.dialogoDocumentosAgregarVisible = false;
                 })
                 .catch(_ => {});
+            },
+            handleAgregarDocumento(){
+                this.dialogoDocumentosAgregarVisible = true;
+                //this.getDocumentoTipos();
             },
             submitUpload() {
                 let me =this;
@@ -448,13 +563,14 @@ const proyectoProductoResource = new ProyectoProductoResource('proyectosProducto
                 
                 formData.append('file', me.fileList[0].raw);
                 formData.append('embarque_id', me.current.id);
+                formData.append('documento_tipo_id', me.documento_tipo_id);
                 axios.post('/embarques/documentos/store', formData,{headers: {'Content-Type': 'multipart/form-data'}})
                 .then(function (response){
                     me.$message.success('Guardado correctamente.');
                     me.current.documentos = response.data.documentos;
                     me.fileList = [];
                     loadingInstance.close();
-                    me.dialogoDocumentos = false;
+                    me.dialogoDocumentosAgregarVisible = false;
                 })
                 .catch(function (error) {
                     me.$message.error('Hubo un error.');
@@ -509,6 +625,10 @@ const proyectoProductoResource = new ProyectoProductoResource('proyectosProducto
                     });
                 }
             },
+            async getPerfilesEmpresa(){
+                const { data, meta } = await perfilEmpresaResource.list();
+                this.perfil_empresa_list = data;
+            },
             getClientes(){
                 let me =this;
                 axios.get( '/clientes').then(function (response) {
@@ -521,8 +641,6 @@ const proyectoProductoResource = new ProyectoProductoResource('proyectosProducto
                 });
             },
             changeCliente(){
-                console.log("CLIENTE NOMBRE");
-                console.log(this.current.cliente_nombre);
                 if(this.current.cliente_nombre != ""){
                     this.clientes.forEach(cliente => {
                         if(cliente['nombre_cliente'] == this.current.cliente_nombre){
@@ -570,19 +688,7 @@ const proyectoProductoResource = new ProyectoProductoResource('proyectosProducto
                 this.agregarOrdenesVisible = true;
             },
             handleConfirmOrdenes(){
-                console.log("OA LIST");
-                console.log(this.ordenesAbiertasList);
-
-                console.log("OA Seleccionadas");
-                console.log(this.ordenesAbiertasSeleccionadas);
-
-                console.log("OA Nuevas");
-                console.log(this.ordenesAbiertasNuevas);
-
-                console.log("OA Todas");
-                console.log(this.OrdenesTodasList);
                 var idAgregado = 0;
-                
                 this.ordenesAbiertasNuevas.forEach(nuevaOrden => {
                     this.OrdenesTodasList.forEach(ordenAbierta => {
                         if(ordenAbierta.id == nuevaOrden){
@@ -594,9 +700,6 @@ const proyectoProductoResource = new ProyectoProductoResource('proyectosProducto
                         }
                     });
                 });
-
-                
-                
 
                 this.ordenesAbiertasNuevas = [];
                 this.agregarOrdenesVisible = false;
@@ -619,8 +722,6 @@ const proyectoProductoResource = new ProyectoProductoResource('proyectosProducto
                 return item.initial.toLowerCase().indexOf(query.toLowerCase()) > -1;
             },
             handleChangeTransfer(){
-                //console.log(value, direction, movedKeys);
-                console.log("CHANGE TRANSFEER");
                 console.log(this.ordenesAbiertasSeleccionadas);
             },
             /* Tab */
@@ -639,7 +740,9 @@ const proyectoProductoResource = new ProyectoProductoResource('proyectosProducto
                 this.getProyectosProductosList();
                 this.formVisible = true;
             },
-            //SELECTROW
+            handleDocumentos(){
+                this.dialogoDocumentos = true;
+            },
             setCurrent(row) {
                 this.$refs.tableList.setCurrentRow(row);
             },
@@ -756,6 +859,18 @@ const proyectoProductoResource = new ProyectoProductoResource('proyectosProducto
                     nombre_chofer:'',
                     placas_transporte:'',
                 };
+            },
+            /* PRE PRINT */
+            handlePrePrintForm(){
+                this.dialogoPrePrint = true;
+                this.getPerfilesEmpresa();
+            },
+            handleClosePrePrint(done) {
+                this.$confirm('Está seguro que deseas salir?')
+                .then(_ => {
+                    this.dialogoPrePrint = false;
+                })
+                .catch(_ => {});
             },
         },
     }

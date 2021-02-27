@@ -16,7 +16,7 @@
             <br>
             <br>
             <div class="filter-container">
-                <el-button class="filter-item" type="primary" icon="el-icon-plus" @click="dialogoDocumentos = true;">Agregar</el-button>
+                <el-button class="filter-item" size="small" type="primary" icon="el-icon-plus" @click="handleOpen">Agregar</el-button>
             </div>
                 <el-table
                 :data="form.documentos"
@@ -45,6 +45,12 @@
                     </el-table-column>
 
                     <el-table-column
+                    prop="documento_tipo.nombre"
+                    label="Tipo de Documento"
+                    show-overflow-tooltip>
+                    </el-table-column>
+
+                    <el-table-column
                     align="center"
                     width="180">
                         <template slot-scope="scope">
@@ -68,22 +74,46 @@
         :visible.sync="dialogoDocumentos"
         :before-close="handleClose"
         width="23%">
+
+
+            <el-row :gutter="20">
+                <el-col :span="24">
+                    <el-form-item label="Tipo de Documento" prop="cliente_id" >
+                        <el-select 
+                        v-loading="loadingTipoDocumentos"
+                        v-model="documento_tipo_id" 
+                        value-key="id">
+                            <el-option 
+                            v-for="documentoTipo in documentosTiposSelect"
+                            :key="documentoTipo.id"
+                            :label="documentoTipo.nombre" 
+                            :value="documentoTipo.id"/>
+                        </el-select>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+
+            <el-row :gutter="20">
+                <el-col :span="24">
+                    <div class="filter-container">
+                        <el-upload
+                        class="upload-demo"
+                        action=""
+                        :file-list="fileList"
+                        ref="upload"
+                        :auto-upload="false"
+                        :on-change="handleUploadChange"
+                        :on-progress="handleProgress"
+                        :on-success="handleSuccess"
+                        drag>
+                            <i class="el-icon-upload"></i>
+                            <div class="el-upload__text">Arrastra un archivo aqui o <em>click para subir</em></div>
+                        </el-upload>
+                    </div>
+                </el-col>
+            </el-row>
             
-            <div class="filter-container">
-                <el-upload
-                class="upload-demo"
-                action=""
-                :file-list="fileList"
-                ref="upload"
-                :auto-upload="false"
-                :on-change="handleUploadChange"
-                :on-progress="handleProgress"
-                :on-success="handleSuccess"
-                drag>
-                    <i class="el-icon-upload"></i>
-                    <div class="el-upload__text">Arrastra un archivo aqui o <em>click para subir</em></div>
-                </el-upload>
-            </div>
+            
             
             <span slot="footer" class="dialog-footer">
                 <el-button @click="dialogoDocumentos = false;fileList = [];" class="float-left">Cancelar</el-button>
@@ -96,7 +126,12 @@
 </template>
 
 <script>
+import permission from '@/directive/permission/index.js';
+import checkPermission from '@/utils/permission';
 import { CommentDropdown } from '../articles/components/Dropdown';
+import Resource from '@/api/resource';
+const documentoTipoResource = new Resource('documentoTipo');
+
   export default {
     props: {
         csrf: {
@@ -121,11 +156,19 @@ import { CommentDropdown } from '../articles/components/Dropdown';
         dialogoDocumentos:false,
         loadingImage: false,
         imageFile: null,
+        documentosTiposSelect:[],
+        loadingTipoDocumentos:false,
+        documento_tipo_id:"",
       };
     },
     methods: {
+        checkPermission,
         open() {
             this.dialogoAgregar = true;
+            /*Verificatr si el usuario puede ver finanzas entonces se muestran las OC, si no se quitan las ordenes de compra*/
+            if(!checkPermission(['ver finanzas proyectos'])){
+                this.form.documentos = this.form.documentos.filter(data => data['documento_tipo_id'] != 2);
+            }
         },
         close() {
             this.dialogoAgregar = false;
@@ -134,12 +177,22 @@ import { CommentDropdown } from '../articles/components/Dropdown';
             this.form.id = 0;
             this.form.documentos = [];
         },
+        handleOpen(){
+            this.dialogoDocumentos = true;
+            this.getDocumentoTipos();
+        },
         handleClose(done) {
             this.$confirm('Está seguro que deseas salir?')
             .then(_ => {
                 this.dialogoDocumentos = false;
             })
             .catch(_ => {});
+        },
+        async getDocumentoTipos(){
+            const { data, meta } = await documentoTipoResource.list();
+            console.log("DATA GET DOCUMENTO TIPO");
+            console.log(data);
+            this.documentosTiposSelect = data;
         },
         deleteDocumento(row){
             let me = this;
@@ -171,6 +224,7 @@ import { CommentDropdown } from '../articles/components/Dropdown';
             
             formData.append('file', me.fileList[0].raw);
             formData.append('proyecto_id', me.form.id);
+            formData.append('documento_tipo_id', me.documento_tipo_id);
             axios.post('/proyectos/documentos/store', formData,{headers: {'Content-Type': 'multipart/form-data'}})
             .then(function (response){
                 me.$message.success('Guardado correctamente.');

@@ -7,9 +7,12 @@ use Illuminate\Http\Request;
 use App\ProyectoProducto;
 use App\ProyectoProceso;
 use App\ProyectoProcesoProducto;
+use App\Proyecto;
 use App\Cliente;
 use App\Proceso;
 use Carbon\Carbon;
+use Auth;
+use DB;
 
 
 use Illuminate\Http\Resources\Json\ResourceCollection;
@@ -17,6 +20,9 @@ use Illuminate\Support\Arr;
 
 class proyectosProductosController extends BaseController
 {
+
+	const ITEM_PER_PAGE = 15;
+
 	/************************************ Nuevos metodos para usar Resource*/
 	public function OrdenesTerminadasSinEmbarcar($cliente_id)
     {
@@ -28,8 +34,105 @@ class proyectosProductosController extends BaseController
         return ProyectoProductoResource::collection(ProyectoProducto::getOrdenesAbiertasByCliente($cliente_id));
     }
 
+	public function getDocumentosFromOrden(Request $request){
+		$searchParams = $request->all();
+        $proyecto_producto_id = Arr::get($searchParams, 'proyecto_producto_id', 0);
+		return ProyectoProductoResource::collection(ProyectoProducto::getDocumentosFromOrden($proyecto_producto_id));
+	}
 
-	/************************************ Nuevos metodos para usar Resource*/
+	public function getOrdenesAbiertasList(Request $request)
+    {		
+        $searchParams = $request->all();
+        $limit = Arr::get($searchParams, 'limit', static::ITEM_PER_PAGE);
+		$mostrarTerminados = Arr::get($searchParams, 'mostrarTerminados', 0);
+		$keyword = Arr::get($searchParams, 'keyword', '');
+		$selectSearch = Arr::get($searchParams, 'selectSearch', '');
+
+        return ProyectoProductoResource::collection(ProyectoProducto::getOrdenesAbiertasList());
+	}
+
+	public function storeProyectoProceso(Request $request){
+        $proyectoProducto = new ProyectoProducto;
+		request()->merge(['fecha_entrega' => Carbon::parse(request()->fecha_entrega)]);
+        request()->merge(['fecha_promesa' => Carbon::parse(request()->fecha_promesa)]);
+		 /*Aqui se actualiza/crea con la informacion que enviamos al request*/
+		if(request()->get('numero_parte') == ""){
+			/**Conseguir primero proceso */
+			$proyecto = Proyecto::find( request()->get('proyecto_id'));
+			$primerProceso = $proyecto->getFirstProceso();
+			$user_id = Auth::id();
+
+
+
+			if(request()->get('agrupar')== 0){
+				/** Si agrupar es igual a false creamos ordenes de acuerdo a la cantidad que se pidio */
+				$cantidad = request()->get('cantidad');
+				request()->merge(['cantidad' => 1]);
+
+				for ($x = 0; $x < $cantidad; $x++) {
+					$proyectoProducto = $proyectoProducto ->fill(request()->all())
+												->updateOrCreate(['id' => request()->get('id')],$proyectoProducto->toArray());
+	
+					$proyectoProducto->numero_parte = 'OR-'.$proyectoProducto->id;
+					$proyectoProducto->save();
+					
+					
+					$proyectoProductoProceso = new ProyectoProcesoProducto;
+					$proyectoProductoProceso->proyecto_producto_id = $proyectoProducto->id;
+					$proyectoProductoProceso->proyecto_proceso_id = $primerProceso->id;
+					$proyectoProductoProceso->user_id =$user_id;
+					$proyectoProductoProceso->save();	
+				}
+			}else{
+				/* si agrupor es igual a True se agrega la orden con la cantidad que pidio el usuario */
+
+				$proyectoProducto = $proyectoProducto ->fill(request()->all())
+												->updateOrCreate(['id' => request()->get('id')],$proyectoProducto->toArray());
+	
+				$proyectoProducto->numero_parte = 'OR-'.$proyectoProducto->id;
+				$proyectoProducto->save();
+				
+				
+				$proyectoProductoProceso = new ProyectoProcesoProducto;
+				$proyectoProductoProceso->proyecto_producto_id = $proyectoProducto->id;
+				$proyectoProductoProceso->proyecto_proceso_id = $primerProceso->id;
+				$proyectoProductoProceso->user_id =$user_id;
+				$proyectoProductoProceso->save();
+			}
+		}else{
+			$proyectoProducto = $proyectoProducto ->fill(request()->all())
+                                            ->updateOrCreate(['id' => request()->get('id')],$proyectoProducto->toArray());
+		}
+
+		return Proyecto::where('id',request()->get('proyecto_id'))->with(['Productos'])->get();
+	}
+
+	public function deleteFromProject(Request $request){
+		ProyectoProducto::find(request()->get('id'))->delete();
+		return Proyecto::where('id',request()->get('proyecto_id'))->with(['Productos'])->get();
+	}
+
+	public function deleteMultipleFromProject(Request $request){
+		$proyecto_producto_ids = array_map(function($producto){return $producto['proyecto_producto']['id'];}, request()->get('multipleSelection'));
+		ProyectoProducto::whereIn('id', $proyecto_producto_ids)->delete();
+		return Proyecto::where('id',request()->get('proyecto_id'))->with(['Productos'])->get();
+	}
+
+	public function updateMultiplePlanCorte(Request $request){
+		/**Se obtienen los ids de los productos para mandarlos a actualizar */
+		$proyecto_producto_ids = array_map(function($producto){return $producto['proyecto_producto']['id'];}, request()->get('multipleSelection'));
+		/**Se actualiza */
+		ProyectoProducto::whereIn('id', $proyecto_producto_ids)->update(['plan_corte' => request()->get('nuevoPlanCorte')]);
+
+		return Proyecto::where('id',request()->get('proyecto_id'))->with(['Productos'])->get();
+	}
+
+	function getID($producto){
+		return $producto->proyecto_producto->id;
+	 }
+	 
+	
+	/********* */
 
 	 /** Funcion para obtener todos los materiales */
 	 public function proyectosProductos(){
@@ -41,6 +144,10 @@ class proyectosProductosController extends BaseController
 		//return request();
         $proyectoProducto = new ProyectoProducto;
         /*Aqui se actualiza/crea con la informacion que enviamos al request*/
+
+		request()->merge(['fecha_entrega' => Carbon::parse(request()->fecha_entrega)]);
+        request()->merge(['fecha_promesa' => Carbon::parse(request()->fecha_promesa)]);
+		
         $proyectoProducto = $proyectoProducto ->fill(request()->all())
                                             ->updateOrCreate(['id' => request()->get('id')],$proyectoProducto->toArray());
     }

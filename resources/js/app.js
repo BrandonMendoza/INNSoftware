@@ -17,8 +17,9 @@ import VueBarcodeScanner from 'vue-barcode-scanner';
 //import PerfectScrollbar from 'perfect-scrollbar';
 //import "perfect-scrollbar/css/perfect-scrollbar.css";
 
-
-
+//MOMENT CONFIG
+const moment = require('moment')
+require('moment/locale/es')
 
 
 import * as filters from './filters'; // global filters
@@ -45,10 +46,14 @@ let options = {
 //Nuevas librerias
 Vue.use(VueTheMask);
 Vue.use(VueNumeric)
-Vue.use(require('vue-moment'));
+//Vue.use(require('vue-moment'));
+Vue.use(require('vue-moment'), {
+  moment
+})
 Vue.use(AFTableColumn)
 Vue.use(VueBarcodeScanner, options);
 
+moment.locale('es');
 
 Vue.config.productionTip = false;
 

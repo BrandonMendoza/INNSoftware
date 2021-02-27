@@ -30,4 +30,22 @@ class Permission extends \Spatie\Permission\Models\Permission
     {
         return $query->where('name', '!=', Acl::PERMISSION_PERMISSION_MANAGE);
     }
+
+    // public function children()
+    // {
+    //     return $this->hasMany(self::class, 'padre_id');    
+    // }
+
+    public function childs() {
+        return $this->hasMany('App\Laravue\Models\Permission','padre_id','id') ;
+    }
+    // public function parent()
+    // {
+    //     return $this->belongsTo('App\Laravue\Models\Permission','parent_id')->where('parent_id',0)->with('parent');
+    // }
+
+    // public function children()
+    // {
+    //     return $this->hasMany('App\Laravue\Models\Permission','parent_id')->with('children');
+    // }
 }

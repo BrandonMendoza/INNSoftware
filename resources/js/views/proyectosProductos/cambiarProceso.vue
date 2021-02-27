@@ -228,11 +228,13 @@ import Pagination from '@/components/Pagination';
             var loadingInstance = this.$loading({ target: '#dialogoCambiarProceso > .el-dialog' });
             let url = '/proyectosProductos/getProcesosByProducto';
             axios.put(url,me.form).then(function (response) {
+                console.log("RESPUESTA: ");
+                console.log(response);
                 //creamos un array y guardamos el contenido que nos devuelve el response
                 //procesos
                 me.procesos = response.data.procesos;
                 //proceso actual
-                me.procesoActual = response.data.lastProceso.proyecto_proceso.proceso;
+                me.procesoActual = response.data.lastProceso.proyecto_proceso;
                 me.form.proceso_actual = response.data.lastProceso.proyecto_proceso.id;
                 me.form.proceso_nuevo = response.data.lastProceso.proyecto_proceso.id;
                 //primer proceso
@@ -249,8 +251,11 @@ import Pagination from '@/components/Pagination';
                 } else if(me.procesoActual.es_ultimo == 1){
                     me.orden = (me.ordenMax + 1);
                 }else{
+                    console.log("PROCESO ACTUAL");
+                    console.log(me.procesoActual);
                     me.orden = me.procesoActual.orden
                 }
+
 
                 //cargar barra de porcentaje
                 me.calcularPorcentaje();
@@ -281,10 +286,14 @@ import Pagination from '@/components/Pagination';
                 this.form.proceso_nuevo = this.procesoUltimo.id;
                 return false;
             }
+            console.log("FOR PROCESOS: ----");
             for (var proceso of this.procesos) {
                 if(parseInt(proceso.porcentaje) != 0){
                     this.percentage += parseInt(proceso.porcentaje);
                 }
+                console.log("---------------------");
+                console.log(proceso);
+                console.log(this.orden);
                 if(this.orden == proceso.orden){
                     //cuando encuentras el proceso lo guardas en el proceso actual
                     this.procesoActual = proceso.proceso;

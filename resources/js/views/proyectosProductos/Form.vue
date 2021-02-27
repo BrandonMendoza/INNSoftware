@@ -2,7 +2,7 @@
 
     <el-form  :model="form" :rules="rules" ref="form" label-position="top"  label-width="150px" >
         <el-dialog
-        width="40%"
+        width="30%"
         :ref="dialogRef"
         :before-close="handleClose"
         :visible.sync="dialogoAgregar">
@@ -12,24 +12,34 @@
             
             <!-- Id del proceso que se esta editando ("0" si es agregar) -->
             <input v-model="form.id" hidden/>    
+            <span style="margin-right: 5px;"><b>Orden: </b> {{form.numero_parte}}</span>
             <span style="margin-right: 5px;"><b>Proyecto: </b> {{form.proyecto}}</span>
-            <span                           ><b>Producto: </b> {{form.producto}}/{{form.producto_local}}</span>    
             <br>
                     <el-tabs v-model="activeName" @tab-click="handleClick">
                         <!-- Tab General -->
                         <el-tab-pane label="General" name="first">
-
-                            
-
                             <el-row :gutter="20">
                                 <el-col :span="12">
-                                    <el-form-item label="Cantidad">
-                                        <el-input-number :min="1" :disabled="!checkPermission(['editar ordenes abiertas'])" v-model="form.cantidad"/>
+                                    <el-form-item label="Producto">
+                                        {{form.producto_local}}/{{form.producto}}
                                     </el-form-item>
                                 </el-col>
                                 <el-col :span="12">
+                                    <el-form-item label="Cantidad">
+                                        <el-input-number :min="1" v-model="form.cantidad" />
+                                    </el-form-item>
+                                </el-col>
+                            </el-row>
+
+                            <el-row :gutter="20">
+                                <el-col :span="12" v-if="checkPermission(['ver fecha entrega proyectos'])">
                                     <el-form-item label="Fecha de Entrega" prop="fecha_entrega">
                                         <el-date-picker :disabled="!checkPermission(['editar ordenes abiertas'])" v-model="form.fecha_entrega" type="date" />
+                                    </el-form-item>
+                                </el-col>
+                                <el-col :span="12">
+                                    <el-form-item label="Fecha Promesa" prop="fecha_promesa">
+                                        <el-date-picker :disabled="!checkPermission(['editar ordenes abiertas'])" v-model="form.fecha_promesa" type="date" />
                                     </el-form-item>
                                 </el-col>
                             </el-row>
@@ -61,6 +71,17 @@
                                 </el-col>
                             </el-row>
 
+                            <el-row :gutter="20" >
+                                <el-col :span="12">
+                                    <el-form-item label="Plan de Corte">
+                                        <el-input :disabled="!checkPermission(['editar ordenes abiertas'])" v-model="form.plan_corte"/>
+                                    </el-form-item>
+                                </el-col>
+                                <el-col :span="12">
+                                    
+                                </el-col>
+                            </el-row>
+
                             
 
                             <el-form-item label="Heat Number" hidden>
@@ -85,6 +106,7 @@
             </span>
         </el-dialog>
 
+        
     </el-form>
 
     
@@ -112,8 +134,10 @@ import checkPermission from '@/utils/permission';
         activeName: 'first',
         form:{
             id:0,
+            numero_parte:"",
             cantidad:"",
             fecha_entrega:"",
+            fecha_promesa:"",
             item:"",
             work_order:"",
             heat_number:"",
@@ -122,7 +146,10 @@ import checkPermission from '@/utils/permission';
             producto_local:"",
             notas:"",
             precio_pesos:"",
-            precio_dlls:""
+            precio_dlls:"",
+            plan_corte:"",
+            documentos:[],
+
         },
         rules: {
             // numero_parte_cliente: [
@@ -139,6 +166,9 @@ import checkPermission from '@/utils/permission';
         dialogRef: 'myForm',
         dialogoProductos:false,
         loadingCliente:false,
+        /*Documentos*/
+        dialogoDocumentos:false,
+        fileList: [],
       };
     },
     directives: { waves, permission, role  },
@@ -179,6 +209,7 @@ import checkPermission from '@/utils/permission';
         },
         clearFields(){/*Limpia los campos e inicializa la variable update a 0*/
             this.form.id = 0;
+            this.form.numero_parte = "";
             this.form.cantidad = "";
             this.form.item = "";
             this.form.work_order = "";
@@ -188,8 +219,10 @@ import checkPermission from '@/utils/permission';
             this.form.producto = "";
             this.form.producto_local = "";
             this.form.fecha_entrega = moment();
+            this.form.fecha_promesa = moment();
             this.form.precio_pesos = 0;
             this.form.precio_dlls = 0;
+            this.form.plan_corte = "";
         },
         handleClose(done) {
             this.$confirm('Está seguro que deseas salir?')

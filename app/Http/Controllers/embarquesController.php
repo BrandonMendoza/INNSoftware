@@ -39,7 +39,7 @@ class embarquesController extends Controller
 
         
 
-        return EmbarqueResource::collection($embarqueQuery->with('ProyectosProductos.Producto','Cliente','Documentos')->paginate($limit));
+        return EmbarqueResource::collection($embarqueQuery->with('ProyectosProductos.Producto','Cliente','Documentos.Documento_tipo','Documentos.Usuario')->paginate($limit));
         //return EmbarqueResource::collection(Embarque::all());
     }
 
@@ -81,10 +81,10 @@ class embarquesController extends Controller
 		DB::transaction(function () use ($request){
 			if(request()->file('file')){
 				$embarque = Embarque::find(request()->get('embarque_id'));
-				$embarque->Documentos()->attach(Documento::store(request()->file('file'),'uploads/embarques/'.$embarque->id.'/documentos'));
+				$embarque->Documentos()->attach(Documento::store(request()->file('file'),'uploads/embarques/'.$embarque->id.'/documentos',request()->get('documento_tipo_id')));
 			}
 		});
-		return (Embarque::where('id',request()->get('embarque_id'))->with(['Documentos'])->first());
+		return (Embarque::where('id',request()->get('embarque_id'))->with(['Documentos.Documento_tipo','Documentos.Usuario'])->first());
     }
 
     /** Funcion para eliminar archivos */

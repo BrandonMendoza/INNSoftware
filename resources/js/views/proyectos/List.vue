@@ -6,7 +6,7 @@
         </el-row>
         <div class="filter-container">
             <!-- BUSCAR INPUT -->
-            <div class="filter-item">
+            <div class="filter-item" id="barra_busqueda">
                 <el-input class="input-with-select" size="small" placeholder="buscar" v-model="presearch" @change="handlePresearchChange()" clearable>
                     <el-select v-model="selectSearch" slot="prepend" size="small" placeholder="Select">
                         <el-option label="Nom. del Proyecto"  value="numero_parte_cliente"></el-option>
@@ -51,17 +51,13 @@
                 sortable/>  
 
                  <el-table-column
-                prop="numero_parte_cliente"
-                label="Nombre del Proyecto"/> 
+                prop="orden_compra"
+                label="Orden de Compra"
+                show-overflow-tooltip/>
 
                 <el-table-column
                 prop="cliente.nombre_cliente"
                 label="Cliente"
-                show-overflow-tooltip/>
-
-                <el-table-column
-                prop="orden_compra"
-                label="Orden de Compra"
                 show-overflow-tooltip/>
 
                 <el-table-column
@@ -75,12 +71,25 @@
 
                 <el-table-column
                 label="Fecha de Entrega"
+                v-if="checkPermission(['ver fecha entrega proyectos'])"
                 show-overflow-tooltip
                 sortable
                 align="center"> 
                     <template slot-scope="scope">
                         <el-tag>
                             {{scope.row.fecha_entrega | moment("YYYY-MMM-DD")}}
+                        </el-tag>
+                    </template>
+                </el-table-column>
+
+                <el-table-column
+                label="Fecha Promesa"
+                show-overflow-tooltip
+                sortable
+                align="center"> 
+                    <template slot-scope="scope">
+                        <el-tag>
+                            {{scope.row.fecha_promesa | moment("YYYY-MMM-DD")}}
                         </el-tag>
                     </template>
                 </el-table-column>
@@ -114,7 +123,7 @@
     </div>
 </template>
 <style>
-    .el-select .el-input {
+    #barra_busqueda > .el-select .el-input {
         width: 180px;
     }
 
@@ -134,7 +143,7 @@
     import waves from '@/directive/waves'; // Waves directive
     import permission from '@/directive/permission/index.js'
     import role from '@/directive/role/index.js'
-
+    import checkPermission from '@/utils/permission';
     export default {
         data(){
             
@@ -182,6 +191,7 @@
             Pagination
         },
         methods:{
+            checkPermission,
             setCurrent(row) {
                 this.$refs.tableList.setCurrentRow(row);
             },
@@ -202,6 +212,7 @@
             },
             async getList(){
                 let me = this;
+                me.loading = true;
                 axios.get(me.listUrl).then(function (response) {
                     me.list = response.data;
                     console.log(me.list);
@@ -221,6 +232,7 @@
                 this.$refs.myForm.form.orden_compra = data.orden_compra;
                 this.$refs.myForm.form.plan_corte = data.plan_corte;
                 this.$refs.myForm.form.fecha_entrega = data.fecha_entrega;
+                this.$refs.myForm.form.fecha_promesa = data.fecha_promesa;
 
                 this.$refs.myForm.form.productos = JSON.parse(JSON.stringify(data.productos));
 

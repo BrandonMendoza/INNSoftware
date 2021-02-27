@@ -10,7 +10,36 @@ class Proyecto extends Model
 {
     protected $table = 'proyectos'; 
 
-    protected $fillable = ['id','cliente_id','peso_lbs','item','cantidad','status','cotizado','dias_habiles','pagado_status','descripcion','notas','titulo','work_order','plan_corte','heat_number','orden_compra','numero_factura','tipo_cambio','validez','deleted_at','created_at','updated_at','fecha_entrega','numero_parte','numero_parte_cliente','pintura_id','hrs_labor'];
+    protected $fillable = 
+        [
+            'id',
+            'cliente_id',
+            'peso_lbs',
+            'item',
+            'cantidad',
+            'status',
+            'cotizado',
+            'dias_habiles',
+            'pagado_status',
+            'descripcion',
+            'notas',
+            'titulo',
+            'work_order',
+            'plan_corte',
+            'heat_number',
+            'orden_compra',
+            'numero_factura',
+            'tipo_cambio',
+            'validez',
+            'deleted_at',
+            'created_at',
+            'updated_at',
+            'fecha_entrega',
+            'numero_parte',
+            'numero_parte_cliente',
+            'pintura_id',
+            'hrs_labor',
+            'fecha_promesa',];
 
 
     public function Cliente()
@@ -20,7 +49,7 @@ class Proyecto extends Model
 
     public function Productos(){
         return $this->belongsToMany('App\Producto', 'proyecto_producto','proyecto_id', 'producto_id')
-                    ->withPivot('id','cantidad','numero_parte_cliente','work_order','item','cantidad','heat_number','notas','hrs_labor','pintura_id','proceso_id','fecha_entrega','precio_pesos','precio_dlls','numero_parte','codigo_barras_cliente')
+                    ->withPivot('id','cantidad','numero_parte_cliente','work_order','item','cantidad','heat_number','notas','hrs_labor','pintura_id','proceso_id','fecha_entrega','fecha_promesa','precio_pesos','precio_dlls','numero_parte','codigo_barras_cliente','plan_corte')
                     ->using('App\ProyectoProducto')
                     ->as('ProyectoProducto')
                     ->withTimestamps();
@@ -88,8 +117,13 @@ class Proyecto extends Model
 
         /*obtener proceso numero 1*/        
         $proceso = $this->procesos->where('es_primero',1)->first();
+
+        /*Obtenmos las ordenes viejas del Proyecto */
         $proyectosProductos = ProyectoProducto::where('proyecto_id',$this->id)->get();
         
+        /**Comparamos los productos que vienen en el request con los que ya se tenian
+         * Si existe lo actualizamos y si no existe lo agregamos
+         */
         foreach ($productos as $producto) {
             
             /**Bandera para saber si exste un proyectoProducto */
@@ -111,18 +145,31 @@ class Proyecto extends Model
                 }
             }else{
                 /*Si no lo encontramos lo agregamos y le damos los datos que vienen en el request*/
-                $this   ->Productos()
-                        ->attach($producto['id'],
-                        [   'cantidad' => $producto['proyecto_producto']['cantidad'],
-                            'item' => $producto['proyecto_producto']['item'],
-                            'work_order' => $producto['proyecto_producto']['work_order'],
-                            'heat_number' => $producto['proyecto_producto']['heat_number'],
-                            'precio_pesos' => $producto['proyecto_producto']['precio_pesos'],
-                            'precio_dlls' => $producto['proyecto_producto']['precio_dlls'],
-                            'fecha_entrega' => request()->fecha_entrega,
-                        ]);
+                $proyectoProductoAux = new ProyectoProducto();
+                $proyectoProductoAux->proyecto_id = $this->id;
+                $proyectoProductoAux->producto_id = $producto['id'];
+                $proyectoProductoAux->cantidad = $producto['proyecto_producto']['cantidad'];
+                $proyectoProductoAux->item = $producto['proyecto_producto']['item'];
+                $proyectoProductoAux->work_order = $producto['proyecto_producto']['work_order'];
+                $proyectoProductoAux->heat_number = $producto['proyecto_producto']['heat_number'];
+                $proyectoProductoAux->precio_pesos = $producto['proyecto_producto']['precio_pesos'];
+                $proyectoProductoAux->precio_dlls = $producto['proyecto_producto']['precio_dlls'];
+                $proyectoProductoAux->fecha_entrega = request()->fecha_entrega;
+                $proyectoProductoAux->fecha_promesa = request()->fecha_promesa;
 
-                $this->attachProyectoProductoProceso($user_id,$producto['id']);
+                $proyectoProductoAux->save();
+                $saveProyectoProducto = ProyectoProducto::with('ProyectoProcesoProductoBelongs')
+                    ->where([['proyecto_id',$this->id],['producto_id',$proyectoProductoAux->producto_id]])
+                    ->orderBy('id','DESC')
+                    ->first();
+
+                $proyectoProceso = $this->getFirstProceso();
+                $proyectoProductoProceso = new ProyectoProcesoProducto;
+                $proyectoProductoProceso->proyecto_producto_id = $saveProyectoProducto->id;
+                $proyectoProductoProceso->proyecto_proceso_id = $proyectoProceso->id;
+                $proyectoProductoProceso->user_id = $user_id;
+                $proyectoProductoProceso->save();
+                //$this->attachProyectoProductoProceso($user_id,$saveProyectoProducto->id);
             }
         }
 
@@ -136,24 +183,26 @@ class Proyecto extends Model
         }
     }
 
-    public function attachProyectoProductoProceso($user_id,$producto_id){
+    public function attachProyectoProductoProceso($user_id,$proyecto_producto_id){
         /**Esta fincion busca el ProyectoProducto por Id Producto y Proyecto */
-        $proyectoProductoAux = $this->getProyectoProductoById($producto_id);
         $proyectoProceso = $this->getFirstProceso();
-        $proyectoProductoAux->ProyectoProcesoProducto()
-                            ->attach($proyectoProductoAux->id,[   
-                                'proyecto_proceso_id' => $proyectoProceso->id,
-                                'user_id' => $user_id
-                            ]);
-        return $proyectoProductoAux;
+        $proyectoProductoProceso = new ProyectoProcesoProducto;
+        $proyectoProductoProceso->proyecto_producto_id = $proyecto_producto_id;
+        $proyectoProductoProceso->proyecto_proceso_id = $proyectoProceso->id;
+        $proyectoProductoProceso->user_id = $user_id;
+        $proyectoProductoProceso->save();
     }
 
     public function getProyectoProductoById($id){
-        return ProyectoProducto::   with('ProyectoProcesoProducto')   
+        /**El error esta en que estamos buscando el mismo id de producto y el producto se esta repitiendo asi que nos trae el mismo 
+         * y agrega el primer proceso 4 veces porque son las veces que el producto se agrega
+        */
+        return ProyectoProducto::   with('ProyectoProcesoProductoBelongs')   
                                     ->where([
                                         ['proyecto_id',$this->id],
                                         ['producto_id',$id]
                                     ])
+                                    ->orderBy('created_at','DESC')
                                     ->first();
     }
 

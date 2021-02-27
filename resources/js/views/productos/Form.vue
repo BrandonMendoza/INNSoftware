@@ -18,6 +18,7 @@
                 <el-col :span="6">
                     <el-form-item label="Cliente" prop="cliente_id">
                         <el-select 
+                        :disabled="!checkPermission(['editar productos'])"
                         v-model="form.cliente_nombre" 
                         value-key="nombre_cliente"
                         @change="changeCliente()"
@@ -32,7 +33,7 @@
 
 
                     <el-form-item label="Número de Parte (Cliente)" prop="numero_parte_cliente">
-                        <el-input v-model="form.numero_parte_cliente" />
+                        <el-input v-model="form.numero_parte_cliente" :disabled="!checkPermission(['editar productos'])"/>
                     </el-form-item>  
 
                     <el-form-item label="Pintura" prop="pintura_id">
@@ -40,6 +41,7 @@
                         v-model="form.pintura_nombre" 
                         value-key="nombre"
                         @change="changePintura()"
+                        :disabled="!checkPermission(['editar productos'])"
                         filterable>
                             <el-option 
                             v-for="pintura in pinturas"
@@ -50,11 +52,11 @@
                     </el-form-item>
 
                     <el-form-item label="Peso (kg)" prop="peso_kg">
-                        <vue-numeric class="el-input__inner" v-bind:precision="2" separator="," v-model="form.peso_kg" @blur="calcularKgsToLbs()"></vue-numeric>
+                        <vue-numeric :disabled="!checkPermission(['editar productos'])" class="el-input__inner" v-bind:precision="2" separator="," v-model="form.peso_kg" @blur="calcularKgsToLbs()"></vue-numeric>
                     </el-form-item> 
 
                     <el-form-item label="Peso (lbs)" prop="peso_lbs">
-                        <vue-numeric class="el-input__inner" v-bind:precision="2" separator="," v-model="form.peso_lbs" @blur="calcularLbsToKgs()"></vue-numeric>
+                        <vue-numeric :disabled="!checkPermission(['editar productos'])" class="el-input__inner" v-bind:precision="2" separator="," v-model="form.peso_lbs" @blur="calcularLbsToKgs()"></vue-numeric>
                     </el-form-item> 
                 </el-col>
                 <el-col :span="18">
@@ -68,7 +70,7 @@
                         <!-- Tab Materiales -->
                         <el-tab-pane label="Materiales" name="second">
                             <div class="filter-container">
-                                <el-button class="filter-item" type="primary" icon="el-icon-plus" @click="dialogoMateriales = true;actualizarSelectMateriales();">Agregar</el-button>
+                                <el-button :disabled="!checkPermission(['editar productos'])" size="small" class="filter-item" type="primary" icon="el-icon-plus" @click="dialogoMateriales = true;actualizarSelectMateriales();">Agregar</el-button>
                             </div>
                             <el-table
                             :data="form.materiales"
@@ -97,7 +99,7 @@
                                 width="80">
                                     <template slot-scope="scope">
                                         <!-- <el-button type="primary" size="mini" icon="el-icon-edit" @click="loadFieldsUpdate(scope.row);"/> -->
-                                        <el-button type="danger" size="mini" icon="el-icon-delete" @click="deleteRowMateriales(scope.row);"/>
+                                        <el-button :disabled="!checkPermission(['editar productos'])" type="danger" size="mini" icon="el-icon-delete" @click="deleteRowMateriales(scope.row);"/>
                                     </template>
                                 </el-table-column>
                             </el-table>
@@ -107,7 +109,7 @@
                         <!-- Tab Accesorios -->
                         <el-tab-pane label="Accesorios" name="third">
                             <div class="filter-container">
-                                <el-button class="filter-item" type="primary" icon="el-icon-plus" @click="dialogoAccesorios = true;actualizarSelectAccesorios()">Agregar</el-button>
+                                <el-button :disabled="!checkPermission(['editar productos'])" size="small" class="filter-item" type="primary" icon="el-icon-plus" @click="dialogoAccesorios = true;actualizarSelectAccesorios()">Agregar</el-button>
                             </div>
                             <el-table
                             :data="form.accesorios"
@@ -138,7 +140,7 @@
                                 width="80">
                                     <template slot-scope="scope">
                                         <!-- <el-button type="primary" size="mini" icon="el-icon-edit" @click="loadFieldsUpdate(scope.row);"/> -->
-                                        <el-button type="danger" size="mini" icon="el-icon-delete" @click="deleteRowAccesorios(scope.row);"/>
+                                        <el-button type="danger" :disabled="!checkPermission(['editar productos'])"  size="mini" icon="el-icon-delete" @click="deleteRowAccesorios(scope.row);"/>
                                     </template>
                                 </el-table-column>
                             </el-table>
@@ -233,6 +235,10 @@
 </style>
 <script>
 import VueNumeric from 'vue-numeric';
+import waves from '@/directive/waves'; // Waves directive
+import permission from '@/directive/permission/index.js';
+import role from '@/directive/role/index.js';
+import checkPermission from '@/utils/permission';
 
   export default {
     data() {
@@ -285,7 +291,9 @@ import VueNumeric from 'vue-numeric';
         loadingPinturas:false,
       };
     },
+    directives: { waves, permission, role  },
     methods: {
+        checkPermission,
         open() {
             this.activeName = 'first';
             this.getPinturas();

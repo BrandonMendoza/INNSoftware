@@ -19,6 +19,12 @@ Route::get('/', function () {
 
 Route::group(['middleware' => 'web'], function () {
     Route::get(env('LARAVUE_PATH'), 'LaravueController@index')->where('any', '.*')->name('laravue');
+
+    //PerfilEmpresa'/PerfilEmpresa/documentos/store'
+        //PerfilEmpresa -> Documentos
+        Route::post('/perfilEmpresa/documentos/store','perfilEmpresaController@storeDocumento');
+        Route::post('/perfilEmpresa/documentos/delete','perfilEmpresaController@deleteDocumento');
+        Route::get('/perfilEmpresa/downloadDocumento/{documento_id}','perfilEmpresaController@downloadDocumento');
     
     //Embarques'/embarques/documentos/store'
         //Embarques -> Documentos
@@ -39,6 +45,12 @@ Route::group(['middleware' => 'web'], function () {
     Route::get('/proyectosProductos','proyectosProductosController@proyectosProductos');
     Route::put('/proyectosProductos/insert','proyectosProductosController@insert');
     Route::post('/proyectosProductos/delete','proyectosProductosController@delete');
+        //ProyectoProductos -> Documentos
+        Route::post('/proyectosProductos/documentos/store','proyectosProductosController@storeDocumento');
+        Route::post('/proyectosProductos/documentos/delete','proyectosProductosController@deleteDocumento');
+        Route::get('/proyectosProductos/downloadDocumento/{documento_id}','proyectosProductosController@downloadDocumento');
+
+        
         //->Cambiar Proceso 
         Route::put('/proyectosProductos/getProcesosByProducto','proyectosProductosController@getProcesosByProducto');
         Route::put('/proyectosProductos/saveProceso','proyectosProductosController@saveProceso');

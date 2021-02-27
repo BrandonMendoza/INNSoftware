@@ -77,6 +77,15 @@
               </el-form-item>
             </el-form>
           </div>
+
+          <div class="block">
+            <el-form :model="currentUser" label-width="80px" label-position="top">
+              <el-form-item label="Permissions">
+                
+              </el-form-item>
+            </el-form>
+          </div>
+
           <div class="clear-left" />
         </div>
         <div style="text-align:right;">
@@ -266,6 +275,8 @@ export default {
     async getPermissions() {
       const { data } = await permissionResource.list({});
       const { all, menu, other } = this.classifyPermissions(data);
+      console.log("PERMISOS:");
+      console.log(all);
       this.permissions = all;
       this.menuPermissions = menu;
       this.otherPermissions = other;

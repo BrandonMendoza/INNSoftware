@@ -8,23 +8,55 @@ use App\ProyectoProceso;
 use App\ProyectoProcesoProducto;
 use App\Cliente;
 use App\Proceso;
+use App\Documento;
 use Carbon\Carbon;
 use Auth;
+use DB;
 use App\Http\Resources\ProyectoProductoResource;
 use Illuminate\Support\Arr;
 
 class proyectosProductosController extends Controller
 {
 	/************************************ Nuevos metodos para usar Resource*/
+	/** Este metodo se utiliza para traer las ordenes que estan en estatus terminado
+	 * Utilizado en: Embarques
+	 * 
+	 */
 	public function OrdenesTerminadas(Request $request)
     {
 		//$params = $request->all();
 		//return $params;
         return ProyectoProductoResource::collection(ProyectoProducto::loadOrdenesAbiertasTerminadas($params['cliente_id']));
+	}
+
+	/** Funcion para guardar archivos */
+	public function storeDocumento(Request $request)
+    {
+		DB::transaction(function () use ($request){
+			if(request()->file('file')){
+				$proyectoProducto = ProyectoProducto::find(request()->get('proyecto_producto_id'));
+				$proyectoProducto->Documentos()->attach(Documento::store(request()->file('file'),'uploads/proyectos/'.$proyectoProducto->numero_parte.'/documentos'));
+			}
+		});
+		return (ProyectoProducto::where('id',request()->get('proyecto_producto_id'))->with(['Documentos'])->first());
     }
 
+    /** Funcion para eliminar archivos */
+	public function deleteDocumento(){
+		DB::transaction(function () {
+			(ProyectoProducto::find(request()->get('proyecto_producto_id')))->Documentos()->detach(request()->get('documento_id'));
+			(Documento::find(request()->get('documento_id')))->deleteStorage();
+		});
 
-	/************************************ Nuevos metodos para usar Resource*/
+		return (ProyectoProducto::where('id',request()->get('proyecto_producto_id'))->with(['Documentos'])->first());
+	}
+    
+	/** Funcion para guardar archivos */
+	public function downloadDocumento($documento_id){
+		return (Documento::find($documento_id))->download();
+	}
+
+	
 
 	 /** Funcion para obtener todos los materiales */
 	 public function proyectosProductos(){
@@ -33,6 +65,8 @@ class proyectosProductosController extends Controller
 
 	/*Funcion para insertar o Actualizar un proyecto*/
 	public function insert(){
+		request()->merge(['fecha_entrega' => Carbon::parse(request()->fecha_entrega)]);
+        request()->merge(['fecha_promesa' => Carbon::parse(request()->fecha_promesa)]);
 		//return request();
         $proyectoProducto = new ProyectoProducto;
         /*Aqui se actualiza/crea con la informacion que enviamos al request*/

@@ -15,12 +15,12 @@
                 <el-switch v-model="form.activo" active-text="Activo" :active-value="1" :inactive-value="0"></el-switch>    
             </el-form-item>
 
-            <el-form-item label="Nombre del Proceso" prop="nombre">
-                <el-input v-model="form.nombre" />
+            <el-form-item label="Nombre del Proceso" prop="nombre" >
+                <el-input v-model="form.nombre" :disabled="disableEditar"/>
             </el-form-item>
 
             <el-form-item label="Simbolo" prop="simbolo">
-                <el-input v-model="form.simbolo" />
+                <el-input v-model="form.simbolo" :disabled="disableEditar"/>
             </el-form-item>
 
             <el-form-item required>
@@ -109,6 +109,14 @@
           '#c7158577'
         ]
       };
+    },
+    computed:{
+        disableEditar() {
+            if(this.form.id != 0){
+                return true;
+            }
+            return false;
+        }
     },
     methods: {
         open() {

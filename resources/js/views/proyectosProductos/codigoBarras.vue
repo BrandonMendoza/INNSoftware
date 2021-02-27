@@ -20,11 +20,11 @@
                     <el-row>
                         <el-col :span="6">
                             <!--PDF BUTTON -->
-                            <el-button v-waves type="primary" size="small" icon="el-icon-printer" @click="print('barcodeLocal')">Imprimir</el-button>
+                            <el-button v-waves type="primary" size="small" icon="el-icon-printer" @click="print('barcodeLocalPrint')">Imprimir</el-button>
                         </el-col>
                         <el-col :span="6">
                             <!--DOWNLOAD BUTTON -->
-                            <el-button v-waves type="primary" size="small" icon="el-icon-download" @click="download('barcodeLocal')">Descargar</el-button>
+                            <el-button v-waves type="primary" size="small" icon="el-icon-download" @click="download('barcodeLocalPrint')">Descargar</el-button>
                         </el-col>
                         <el-col :span="18">
                             <!--INPIUT -->
@@ -37,8 +37,10 @@
 
                      <div style="display: flex; justify-content: center;">
                         <!-- BARCODE -->
-                        <div style="width:min-content; margin: 0 auto;" >
+                        <div id="barcodeLocalPrint" style="width:min-content; margin: 0 auto;text-align:center; color:black;" >
+                            <p style="text-align:center; color:black;"> NPP: {{form.numero_parte_producto}}</p>
                             <img id="barcodeLocal" class="img-thumbnail" style="margin: 0 auto;" />
+                            
                         </div>
                     </div>
                 </el-tab-pane>
@@ -49,11 +51,11 @@
                     <el-row>
                         <el-col :span="6">
                             <!--PDF BUTTON -->
-                            <el-button v-waves type="primary" size="small" icon="el-icon-printer" @click="print('barcodeCliente')">Imprimir</el-button>
+                            <el-button v-waves type="primary" size="small" icon="el-icon-printer" @click="print('barcodeClientePrint')">Imprimir</el-button>
                         </el-col>
                         <el-col :span="6">
                             <!--DOWNLOAD BUTTON -->
-                            <el-button v-waves type="primary" size="small" icon="el-icon-download" @click="download('barcodeCliente')">Descargar</el-button>
+                            <el-button v-waves type="primary" size="small" icon="el-icon-download" @click="download('barcodeClientePrint')">Descargar</el-button>
                         </el-col>
                         <el-col :span="12">
                             <!--INPIUT -->
@@ -63,7 +65,8 @@
                     
                     <div style="display: flex; justify-content: center;">
                         <!-- BARCODE -->
-                        <div style="width:min-content; margin: 0 auto;" >
+                        <div id="barcodeClientePrint" style="width:min-content; margin: 0 auto;" >
+                            <p style="text-align:center; color:black;"> NPP: {{form.numero_parte_producto}}</p>
                             <img id="barcodeCliente" class="img-thumbnail" style="margin: 0 auto;" />
                         </div>
                     </div>
@@ -95,6 +98,7 @@ import waves from '@/directive/waves'; // Waves directive
             id:0,
             numero_parte:"",
             codigo_barras_cliente:"",
+            numero_parte_producto:"",
         },
         dialogoAgregar: false,
         dialogRef: 'codigoBarrasDialog',

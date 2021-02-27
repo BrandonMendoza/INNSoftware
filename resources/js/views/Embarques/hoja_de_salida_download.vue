@@ -21,9 +21,9 @@
           <div id="address">
             <br>
             <p style="font-size: 14px;"> <b>Hoja de Salida/ Packing List</b> </p>
-            <p>Brandon Mendoza Tovar </p>
-            <p>METB940228K52</p>
-            <p> eduardo.mendoza.imm@gmail.com</p>
+            <p>{{perfil_empresa.nombre_representante}} </p>
+            <p>{{perfil_empresa.rfc}}</p>
+            <p>{{perfil_empresa.email}}</p>
             <textarea>
             </textarea>
           </div>
@@ -143,8 +143,11 @@
 <script>
 
 import Resource from '@/api/resource';
+
+const perfilEmpresaResource = new Resource('perfilEmpresa');
 const embarqueResource = new Resource('embarques');
 const logoEmpresa = require('@/assets/empresa/logo-dsi.jpeg').default;
+
 
 export default {
   data() {
@@ -154,6 +157,7 @@ export default {
       
       fullscreenLoading: true,
       id: 0,
+      perfil_empresa_id:0,
       query: {
         page: 1,
         limit: 15,
@@ -164,20 +168,23 @@ export default {
       embarques:[],
       embarque:{
         cliente:{nombre_cliente:''}
-      }
+      },
+      perfil_empresa:[],
     }
   },
   created() {
     this.id = this.$route.params.id;
-    
+    this.perfil_empresa_id = this.$route.params.perfil_empresa_id;
   },
   mounted() {
     this.fetchData();
   },
   methods: {
-    fetchData() {
+    
+    async fetchData() {
+      this.getPerfilEmpresa();
       this.query.id = this.id;
-      embarqueResource.list(this.query).then(data => {
+      await embarqueResource.list(this.query).then(data => {
         this.embarques = data.data;
         this.embarque = data.data[0];
         setTimeout(() => {
@@ -188,6 +195,15 @@ export default {
         }, 3000);
       });
     },
+
+    async getPerfilEmpresa(){
+      this.query.perfil_empresa_id = this.perfil_empresa_id;
+      const { data, meta } = await perfilEmpresaResource.list(this.query);
+      console.log("PERFIL EMPRESA");
+      console.log(data);
+      this.perfil_empresa = data[0];
+    },
+
   },
 };
 

@@ -140,6 +140,36 @@ export const asyncRoutes = [
       },
     ],
   },
+  /**ADMINISTRACION */
+  {
+    path: '/administracion',
+    component: Layout,
+    redirect: '/Administracion',
+    name: 'Administracion',
+    meta: { 
+      title: 'Administracion', icon: 'list', permissions: ['view menu ordenes abiertas']
+    },
+    children: [
+      {
+        path: 'perfilEmpresa',
+        component: () => import('@/views/PerfilEmpresa/List'),
+        name: 'perfilEmpresa',
+        meta: { title: 'Perfil de Empresa',icon: 'form' , permissions: ['view menu perfil empresa']  },
+      },
+      {
+        path: '/empleados',
+        component: () => import('@/views/Empleados/List'),
+        name: 'Empleados',
+        meta: { title: 'Empleados', icon: 'list' },
+      },
+      {
+        path: '/departamentos',
+        component: () => import('@/views/Departamentos/List'),
+        name: 'Departamentos y puestos',
+        meta: { title: 'Departamentos y puestos', icon: 'list' },
+      },
+    ],
+  },
   /**INVENTARIOS */
   {
     path: '/inventarios',

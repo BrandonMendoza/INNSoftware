@@ -28,8 +28,9 @@ class ProyectoProceso extends Model
     }
 
     
-    /*
-    public function ProyectosProcesosProductos(){
-    	return $this->hasOne('App\ProyectoProcesoProducto','id','proyecto_id');	
-    }*/
+    
+    // public function ProyectosProcesosProductos(){
+        
+    //     return $this->belongsTo('App\ProyectoProcesoProducto', 'id', 'proyecto_id');
+    // }
 }

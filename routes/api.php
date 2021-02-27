@@ -49,13 +49,30 @@ Route::namespace('Api')->group(function() {
 
         
     });
+
+    
+    
     /*Proyectos Productos */
     Route::get('proyectosProductos/{cliente}/OrdenesTerminadasSinEmbarcar', 'proyectosProductosController@OrdenesTerminadasSinEmbarcar');
     Route::get('proyectosProductos/{cliente}/getOrdenesAbiertasByCliente', 'proyectosProductosController@getOrdenesAbiertasByCliente');
+    Route::get('proyectosProductos/getOrdenesAbiertasList', 'proyectosProductosController@getOrdenesAbiertasList');
+    Route::get('proyectosProductos/getDocumentosFromOrden', 'proyectosProductosController@getDocumentosFromOrden');
+    Route::post('proyectosProductos/store', 'proyectosProductosController@storeProyectoProceso');
+    Route::post('/proyectosProductos/deleteFromProject', 'proyectosProductosController@deleteFromProject');
+    Route::post('/proyectosProductos/updateMultiplePlanCorte', 'proyectosProductosController@updateMultiplePlanCorte');
+    Route::post('/proyectosProductos/deleteMultipleFromProject', 'proyectosProductosController@deleteMultipleFromProject');
 
     /* Productos */
     Route::get('productos/{cliente}/getProductosByCliente', 'productosController@getProductosByCliente');
 });
 
+Route::get('perfilEmpresa/getImgUrl', 'perfilEmpresaController@getImgUrl');
+
 Route::apiResource('embarques', 'embarquesController');
 Route::apiResource('proyectosProductos', 'proyectosProductosController');
+Route::apiResource('empleados', 'empleadosController');
+Route::apiResource('departamentos', 'departamentosController');
+Route::apiResource('puestos', 'puestosController');
+Route::apiResource('estados', 'estadosController');
+Route::apiResource('documentoTipo', 'documentoTipoController');
+Route::apiResource('perfilEmpresa', 'perfilEmpresaController');

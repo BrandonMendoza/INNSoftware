@@ -20,17 +20,18 @@ class proyectosController extends Controller
 {
     /** Funcion para obtener todos los materiales */
     public function proyectos(){
-        return ((Proyecto::orderBy('id','DESC')->with(['Cliente','Productos','Documentos'])->get())->each->loadTotalHrsLabor())->each->loadProgreso();
+        return ((Proyecto::orderBy('id','DESC')->with(['Cliente','Productos','Documentos.Documento_tipo'])->get())->each->loadTotalHrsLabor())->each->loadProgreso();
 	}
 
     /*Funcion para insertar o Actualizar un proyecto*/
     public function insert(){
         
-        DB::transaction(function () {
-
+        return DB::transaction(function () {
+            //return request()->all();
             $proyecto = new Proyecto;
             /*Se le da formato a la fecha de entrega con Carbon*/
             request()->merge(['fecha_entrega' => Carbon::parse(request()->fecha_entrega)]);
+            request()->merge(['fecha_promesa' => Carbon::parse(request()->fecha_promesa)]);
             
             /*Aqui se actualiza/crea con la informacion que enviamos al request*/
             $proyecto = $proyecto ->fill(request()->all())
@@ -40,9 +41,9 @@ class proyectosController extends Controller
                 $proyecto->numero_parte = 'PY-'.$proyecto->id;
                 $proyecto->crearProcesos();
                 $proyecto->update();
-                /* insertmaos los productos del proyecto*/
             }
-            $proyecto->insertProductos(request()->get('productos'),Auth::id());
+            //Proyecto editado
+            return Proyecto::where('id',$proyecto->id)->with(['Cliente','Productos'])->get();
         });
     }
 
@@ -59,10 +60,12 @@ class proyectosController extends Controller
 		DB::transaction(function () use ($request){
 			if(request()->file('file')){
 				$proyecto = Proyecto::find(request()->get('proyecto_id'));
-				$proyecto->Documentos()->attach(Documento::store(request()->file('file'),'uploads/proyectos/'.$proyecto->numero_parte.'/documentos'));
+				$proyecto->Documentos()->attach(Documento::store(request()->file('file'),
+                                                'uploads/proyectos/'.$proyecto->numero_parte.'/documentos',
+                                                request()->get("documento_tipo_id")));
 			}
 		});
-		return (Proyecto::where('id',request()->get('proyecto_id'))->with(['Documentos'])->first());
+		return (Proyecto::where('id',request()->get('proyecto_id'))->with(['Documentos.Documento_tipo'])->first());
     }
 
     /** Funcion para eliminar archivos */
@@ -90,5 +93,4 @@ class proyectosController extends Controller
         $data['lastProceso'] = $proyectoProducto->getLastProceso();
         return response()->json($data);
     }
-
 }
