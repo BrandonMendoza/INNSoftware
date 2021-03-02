@@ -13,7 +13,8 @@ class ProyectoProcesoProducto extends Pivot
     protected $casts = [
         'id' => 'integer',
         'proyecto_proceso_id' => 'integer',
-        'proyecto_producto_id' => 'integer'
+        'proyecto_producto_id' => 'integer',
+        'es_ultimo' => 'integer',
     ];
 
     public function ProyectoProceso()

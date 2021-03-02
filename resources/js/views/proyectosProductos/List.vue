@@ -184,7 +184,7 @@
                 show-overflow-tooltip> 
                     <template slot-scope="scope">
                         
-                        <el-tag v-if="scope.row.proyecto_proceso_producto[0].es_ultimo == 1" type="success">
+                        <el-tag v-if="scope.row.proyecto_proceso_producto[0].proyecto_proceso.es_ultimo == 1" type="success">
                             {{scope.row.fecha_promesa | moment("YYYY-MMM-DD")}}
                         </el-tag>
 
@@ -203,7 +203,7 @@
                 show-overflow-tooltip> 
                     <template slot-scope="scope">
                         
-                        <el-tag v-if="scope.row.proyecto_proceso_producto[0].es_ultimo == 1" type="success">
+                        <el-tag v-if="scope.row.proyecto_proceso_producto[0].proyecto_proceso.es_ultimo == 1" type="success">
                             {{scope.row.fecha_entrega | moment("YYYY-MMM-DD")}}
                         </el-tag>
 
@@ -218,9 +218,10 @@
                 align="center"
                 width="84"
                 sortable
+                v-if="checkPermission(['ver fecha entrega proyectos'])"
                 label="Semana de Entrega"> 
                     <template slot-scope="scope">
-                        <el-tag v-if="scope.row.proyecto_proceso_producto[0].es_ultimo == 1" type="success">
+                        <el-tag v-if="scope.row.proyecto_proceso_producto[0].proyecto_proceso.es_ultimo == 1" type="success">
                             {{ calculateWeeks(scope.row.fecha_entrega) }}
                         </el-tag>
 
