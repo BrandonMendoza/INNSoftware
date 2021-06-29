@@ -6,6 +6,13 @@ class ProyectoProductoResource extends Resource {
     super('proyectosProductos');
   }
 
+  arreglarListado(){
+    return request({
+      url: '/proyectosProductos/arreglarListado' ,
+      method: 'post',
+    });
+  }
+
   store(resource){
     return request({
       url: '/proyectosProductos/store' ,

@@ -244,11 +244,10 @@
         id="dialogoPrePrint"
         title="Generar Hoja de Salida"
         :visible.sync="dialogoPrePrint"
-        :before-close="handleClose"
         width="23%">
             
-            <el-row :gutter="20">
-                <el-col :span="5">
+            <el-row>
+                <el-col>
                         Perfil de Empresa:
                         <el-select 
                         v-model="perfil_empresa_id" 
@@ -263,10 +262,10 @@
             </el-row>
             
             <span slot="footer" class="dialog-footer">
-                <el-button @click="dialogoPrePrint = false;fileList = [];" class="float-left">Cancelar</el-button>
+                <el-button @click="dialogoPrePrint = false;fileList = [];" size="small" class="float-left">Cancelar</el-button>
                 <!-- pdf example button -->
                 <router-link target="_blank" :to="{ name: 'hoja_de_salida_download', params: { id: current.id, perfil_empresa: perfil_empresa_id } }">
-                    <el-button type="primary" size="small" class="filter-item"  style="margin-left:0px;"  :disabled="disableEditar">
+                    <el-button type="primary" size="small" class="filter-item"  style="margin-left:0px;"  :disabled="disablePrint">
                         Generar Hoja de Salida
                     </el-button>
                 </router-link>
@@ -528,6 +527,12 @@ const proyectoProductoResource = new ProyectoProductoResource('proyectosProducto
         computed: {
             disableEditar() {
                 if(this.current.id == 0){
+                    return true;
+                }
+                return false;
+            },
+            disablePrint() {
+                if(this.perfil_empresa_id == ""){
                     return true;
                 }
                 return false;

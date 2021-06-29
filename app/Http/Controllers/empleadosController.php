@@ -22,11 +22,13 @@ class empleadosController extends Controller
      */
     public function index(Request $request)
     {
+
         $searchParams = $request->all();
         $empleadoQuery = Empleado::query();
         $limit = Arr::get($searchParams, 'limit', static::ITEM_PER_PAGE);
         $keyword = Arr::get($searchParams, 'keyword', '');
         $id = Arr::get($searchParams, 'id', '');
+        $bajas = Arr::get($searchParams, 'bajas', 0);
 
         /*Si viene con ID se filtra */
         if (!empty($id) && $id != 0 ) {
@@ -36,6 +38,10 @@ class empleadosController extends Controller
         if (!empty($keyword)) {
             //$empleadoQuery->where('numero_tarimas', 'LIKE', '%' . $keyword . '%');
             //$empleadoQuery->where('precio_total', 'LIKE', '%' . $keyword . '%');
+        }
+        /*Si viene con ID se filtra */
+        if ($bajas == 1) {
+            return EmpleadoResource::collection($empleadoQuery->onlyTrashed()->with('Estado','Puesto.Departamento')->paginate($limit));
         }
         return EmpleadoResource::collection($empleadoQuery->with('Estado','Puesto.Departamento')->paginate($limit));
     }
@@ -109,7 +115,32 @@ class empleadosController extends Controller
      */
     public function update(Request $request, Empleado $empleado)
     {
-        //
+        DB::transaction(function () {
+            $empleado = new Empleado;
+            $currentEmpleado = request()->get('current');
+            $currentEmpleado['fecha_nacimiento'] = Carbon::parse($currentEmpleado['fecha_nacimiento']);
+            $currentEmpleado['fecha_entrada'] = Carbon::parse($currentEmpleado['fecha_entrada']);
+
+            $empleado = $empleado->fill($currentEmpleado);
+            $empleado->update();
+
+            return new EmpleadoResource($empleado);
+        });
+    }
+
+    public function updateDeleted(Request $request, Empleado $empleado)
+    {
+        DB::transaction(function () {
+            $empleado = new Empleado;
+            $currentEmpleado = request()->get('current');
+            $currentEmpleado['fecha_nacimiento'] = Carbon::parse($currentEmpleado['fecha_nacimiento']);
+            $currentEmpleado['fecha_entrada'] = Carbon::parse($currentEmpleado['fecha_entrada']);
+
+            $empleado = $empleado->fill($currentEmpleado);
+            $empleado->update();
+
+            return new EmpleadoResource($empleado);
+        });
     }
 
     /**
@@ -120,6 +151,9 @@ class empleadosController extends Controller
      */
     public function destroy(Empleado $empleado)
     {
-        //
+        return DB::transaction(function () use ($empleado) {
+            Empleado::find($empleado->id)->delete();
+            return  [ 'message' => 'Empleado dado de baja correctamente.',  'type' => 'success'];
+		});
     }
 }

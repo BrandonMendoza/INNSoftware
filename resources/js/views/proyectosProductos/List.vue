@@ -1,7 +1,5 @@
 <template>
-    <div class="app-container">
-
-        
+    <div class="app-container" id="app-container">
         <div class="filter-container">
             <!-- BUSCAR INPUT -->
             <div class="filter-item">
@@ -19,6 +17,48 @@
                     <el-button  slot="append" size="small" v-waves type="primary" icon="el-icon-search"  @click="handleSearch" ></el-button>
                 </el-input>
             </div>
+            <!-- DRAWER PARA COMENTARIOS POR PROCESO -->
+            <el-drawer
+            title="Comentarios"
+            :visible.sync="drawer">
+                <div class="filter-container"> 
+
+                        <el-row :gutter="20" >
+                            <el-col>
+                                <el-input type="textarea" 
+                                    resize="none"
+                                    v-model="currentComentario.comentario"
+                                    :autosize="{ minRows: 3, maxRows: 16}"/>
+                            </el-col>
+                        </el-row>
+                        <el-row :gutter="20" justify="end" style="margin-top:15px;">
+                            <el-col style="float:right;"> 
+                                <el-button @click="submitComentario()" :disabled="disableEnviarComentario" class="filter-item" type="success" size="small" icon="el-icon-check" style="float:right;">
+                                    Agregar Comentario
+                                </el-button>
+                            </el-col>
+                        </el-row>
+
+                </div>
+                <el-row>    
+                    <el-timeline :reverse="reverse">
+
+                        <el-timeline-item 
+                        v-for="(proyecto_producto_comentario, index) in proyecto_producto_comentarios_list"
+                        :timestamp="proyecto_producto_comentario.proyecto_proceso.proceso.nombre"
+                        :color="proyecto_producto_comentario.proyecto_proceso.proceso.color"
+                        placement="top">
+                            <el-card>
+                                <h4>{{proyecto_producto_comentario.comentario  }}</h4>
+                                <p>{{  proyecto_producto_comentario.usuario.name }} {{formatMoment(proyecto_producto_comentario.created_at)}}</p>
+                            </el-card>
+                        </el-timeline-item>
+
+                    </el-timeline>
+                </el-row>
+
+            </el-drawer>
+
 
             <!-- EDIT -->
             <el-button  v-waves type="primary" size="small" class="filter-item" icon="el-icon-edit" :disabled="disableEditar"  @click="loadFieldsUpdate(currentRow)">Editar</el-button>
@@ -35,12 +75,19 @@
             <!-- DELETE -->
             <el-button v-waves v-permission="['eliminar ordenes abiertas']" type="danger" size="small" class="filter-item" icon="el-icon-delete" style="margin-left:0px;" :disabled="disableEditar"
                         @click="deleteRow(currentRow.id,currentRow.numero_parte,currentRow.numero_parte_cliente);">Eliminar</el-button>
-            <!-- IMPORTAR BUTTON -->
+            <!-- IMPORTAR BUTTON 
             <router-link v-permission="['importar ordenes abiertas']" class="filter-item"  :to="'/ordenesAbiertas/UploadExcel'">
                 <el-button type="primary" size="small" icon="el-icon-edit">
                     Importar    
                 </el-button>
-            </router-link>
+            </router-link>-->
+            <!-- EXPORTAR -->
+            <el-button v-waves :loading="downloading" size="small" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload"  style="margin-left:0px;">
+                {{ $t('table.export') }}
+            </el-button>
+            <!-- ACTUALIZAR -->
+            <el-button v-waves type="primary" size="small" class="filter-item" icon="el-icon-refresh" slot="reference" @click="getList()" style="margin-left:0px;"></el-button>
+            
             <!-- COLUMNAS BUTTON -->
             <el-popover placement="left-start" size="small" width="400"  trigger="click" class="filter-item">
                 <!-- <el-checkbox v-model="showProyecto" class="filter-item" style="margin-left:15px;">Ver Nombre del Proyecto (local)</el-checkbox>     -->
@@ -68,235 +115,248 @@
                     v-model="showProducto"  
                     :active-value="true" 
                     :inactive-value="false"></el-switch>
+                    <br>
+                    <br>
+                    <!-- ACTUALIZAR -->
+                    <el-button v-waves type="primary" size="small" class="filter-item" icon="el-icon-refresh" @click="arreglarListado()">Arreglar Listado</el-button>
                 
                 <el-button type="primary" size="small" icon="el-icon-setting" slot="reference"></el-button>
             </el-popover>
             
-            
             <!-- <el-button class="filter-item" type="primary" icon="el-icon-plus" @click="$refs.myForm.clearFields();$refs.myForm.open()" hidden>Agregar</el-button> -->
         </div>
-        <el-row >
-            <el-table
-            :data="displayData"
-            ref="tableList" 
-            highlight-current-row
-            @current-change="handleCurrentChangeTable"
+
+    <el-row>
+        <div id="fixed">
+        
+        <el-table
+       
+        :data="displayData"
+        ref="tableList" 
+        height="1000"
+        @row-dblclick="dbSelected"
+        highlight-current-row
+        @current-change="handleCurrentChangeTable"
+        sortable
+        border
+        tooltip-effect="light"
+        fit
+        v-loading="loading"
+        style="width: 100%; word-wrap: break-word;">
+            <!-- <af-table-column
+            type="index"
+            align="center"
             sortable
-            border
-            tooltip-effect="light"
-            fit
-            v-loading="loading"
-            style="width: 100%; word-wrap: break-word;">
-                <!-- <af-table-column
-                type="index"
-                align="center"
-                sortable
-                fixed/> -->
+            fixed/> -->
 
-                <af-table-column
-                label="Proceso"
-                :filters="procesosFiltroList"
-                :filter-method="filterProcesoHandler"
-                sortable
-                fixed>
-                    <template slot-scope="scope">
-                        <el-tag :style="'font-weight: bold;background-color:'+scope.row.proyecto_proceso_producto[0].proyecto_proceso.proceso.color+';color:'+scope.row.proyecto_proceso_producto[0].proyecto_proceso.proceso.texto_color+';'">
-                            <svg-icon icon-class="process" :style="'background-color:'+scope.row.proyecto_proceso_producto[0].proyecto_proceso.proceso.color+';color:'+scope.row.proyecto_proceso_producto[0].proyecto_proceso.proceso.texto_color+';'"/>
-                            {{scope.row.proyecto_proceso_producto[0].proyecto_proceso.proceso.nombre}}
-                        </el-tag>
-                    </template>
-                </af-table-column> 
+            
 
-                <af-table-column
-                prop="numero_parte"
-                label="Orden"
-                show-overflow-tooltip
-                width="110"
-                fixed/> 
+            <af-table-column
+            label="Proceso"
+            :filters="procesosFiltroList"
+            :filter-method="filterProcesoHandler"
+            fixed>
+                <template slot-scope="scope">
+                <el-badge  class="item" :value="scope.row.proyecto_producto_comentario.length">
+                    <el-tag  v-if="scope.row.proyecto_proceso_producto.length > 0" :style="'font-weight: bold;background-color:'+scope.row.proyecto_proceso_producto[0].proyecto_proceso.proceso.color+';color:'+scope.row.proyecto_proceso_producto[0].proyecto_proceso.proceso.texto_color+';'">
+                        <svg-icon icon-class="process" :style="'background-color:'+scope.row.proyecto_proceso_producto[0].proyecto_proceso.proceso.color+';color:'+scope.row.proyecto_proceso_producto[0].proyecto_proceso.proceso.texto_color+';'"/>
+                        {{scope.row.proyecto_proceso_producto[0].proyecto_proceso.proceso.nombre}}
+                    </el-tag>
 
-                <af-table-column
-                prop="producto.numero_parte"
-                label="Producto (local)"
-                show-overflow-tooltip
-                width="110"
-                v-if="showProducto"
-                fixed/>
+                    <el-tag v-else="scope.row.proyecto_proceso_producto.length < 1" type="danger">
+                        Error de Proceso
+                    </el-tag>
 
-                <af-table-column
-                prop="proyecto.orden_compra"
-                label="Orden de Compra"
-                width="100"
-                show-overflow-tooltip/>
+                </el-badge>
+                </template>
 
-                <af-table-column
-                prop="producto.numero_parte_cliente"
-                label="Producto (cliente)"
-                show-overflow-tooltip
-                width="110"
-                fixed/>
+            </af-table-column> 
 
-                <af-table-column
-                v-if="showProyecto"
-                prop="proyecto.numero_parte"
-                label="Núm. de Parte del Proyecto (local)"
-                show-overflow-tooltip
-                width="110"/>
+            <af-table-column
+            prop="numero_parte"
+            label="Orden"
+            show-overflow-tooltip
+            width="110"
+            fixed/> 
 
-                <af-table-column
-                prop="proyecto.cliente.nombre_cliente"
-                :filters="clientesFiltroList"
-                :filter-method="filterClienteHandler"
-                label="Cliente"/> 
+            <af-table-column
+            prop="producto.numero_parte" 
+            label="Producto (local)"
+            show-overflow-tooltip
+            width="110"
+            v-if="showProducto"
+            fixed/>
 
-                <af-table-column
-                prop="cantidad"
-                label="Cantidad"
-                show-overflow-tooltip
-                width="85"
-                align="center"  />
+            <af-table-column
+            prop="proyecto.orden_compra" 
+            label="Orden de Compra"
+            width="100"
+            show-overflow-tooltip/>
 
-                <af-table-column
-                prop="plan_corte"
-                label="Plan de Corte"
-                align="center"
-                width="100"
-                show-overflow-tooltip/>
-                
-                <af-table-column
-                prop="work_order"
-                label="Orden de Trabajo"
-                align="center"
-                width="100"
-                show-overflow-tooltip/>
+            <af-table-column
+            prop="producto.numero_parte_cliente" 
+            label="Producto (cliente)"
+            show-overflow-tooltip
+            width="110"
+            fixed/>
 
-                <af-table-column
-                prop="item"
-                label="Item"
-                align="center"
-                width="80"
-                show-overflow-tooltip/>
+            <af-table-column
+            v-if="showProyecto"
+            prop="proyecto.numero_parte" 
+            label="Núm. de Parte del Proyecto (local)"
+            show-overflow-tooltip
+            width="110"/>
 
-                <af-table-column
-                prop="fecha_promesa"
-                label="Fecha Promesa"
-                width="110"
-                sortable
-                show-overflow-tooltip> 
-                    <template slot-scope="scope">
-                        
-                        <el-tag v-if="scope.row.proyecto_proceso_producto[0].proyecto_proceso.es_ultimo == 1" type="success">
-                            {{scope.row.fecha_promesa | moment("YYYY-MMM-DD")}}
-                        </el-tag>
+            <af-table-column
+            prop="proyecto.cliente.nombre_cliente" 
+            :filters="clientesFiltroList"
+            :filter-method="filterClienteHandler"
+            label="Cliente"/> 
 
-                        <el-tag v-else :type="compareDates(scope.row.fecha_promesa)">
-                            {{scope.row.fecha_promesa | moment("YYYY-MMM-DD")}}
-                        </el-tag>
-                    </template>
-                </af-table-column>
+            <af-table-column
+            prop="cantidad" 
+            label="Cantidad"
+            show-overflow-tooltip
+            width="85"
+            align="center"  />
 
-                <af-table-column
-                prop="fecha_entrega"
-                label="Fecha de Entrega"
-                width="110"
-                sortable
-                v-if="checkPermission(['ver fecha entrega proyectos'])"
-                show-overflow-tooltip> 
-                    <template slot-scope="scope">
-                        
-                        <el-tag v-if="scope.row.proyecto_proceso_producto[0].proyecto_proceso.es_ultimo == 1" type="success">
-                            {{scope.row.fecha_entrega | moment("YYYY-MMM-DD")}}
-                        </el-tag>
+            <af-table-column
+            prop="plan_corte" 
+            label="Plan de Corte"
+            align="center"
+            width="100"
+            show-overflow-tooltip/>
+            
+            <af-table-column
+            prop="work_order" 
+            label="Orden de Trabajo"
+            align="center"
+            width="100"
+            show-overflow-tooltip/>
 
-                        <el-tag v-else :type="compareDates(scope.row.fecha_entrega)">
-                            {{scope.row.fecha_entrega | moment("YYYY-MMM-DD")}}
-                        </el-tag>
-                    </template>
-                </af-table-column>
-                
+            <af-table-column
+            prop="item" 
+            label="Item"
+            align="center"
+            width="80"
+            show-overflow-tooltip/>
 
-                <el-table-column
-                align="center"
-                width="84"
-                sortable
-                v-if="checkPermission(['ver fecha entrega proyectos'])"
-                label="Semana de Entrega"> 
-                    <template slot-scope="scope">
-                        <el-tag v-if="scope.row.proyecto_proceso_producto[0].proyecto_proceso.es_ultimo == 1" type="success">
-                            {{ calculateWeeks(scope.row.fecha_entrega) }}
-                        </el-tag>
+            <af-table-column
+            prop="fecha_promesa" 
+            label="Fecha Promesa"
+            width="110"
+            sortable
+            show-overflow-tooltip> 
+                <template slot-scope="scope">
+                    
+                    <el-tag v-if="scope.row.proyecto_proceso_producto[0].proyecto_proceso.es_ultimo == 1" type="success">
+                        {{scope.row.fecha_promesa | moment("YYYY-MMM-DD")}}
+                    </el-tag>
 
-                        <el-tag v-else :type="compareDates(scope.row.fecha_entrega)">
-                            {{ calculateWeeks(scope.row.fecha_entrega) }}
-                        </el-tag>
-                    </template>
-                </el-table-column>
+                    <el-tag v-else :type="compareDates(scope.row.fecha_promesa)">
+                        {{scope.row.fecha_promesa | moment("YYYY-MMM-DD")}}
+                    </el-tag>
+                </template>
+            </af-table-column>
 
-                <af-table-column
-                label="Peso (kgs)"
-                align="center"
-                width="170"
-                show-overflow-tooltip>
-                    <template slot-scope="scope">
-                        <vue-numeric v-bind:precision="2" separator="," v-model="scope.row.producto.peso_kg" :read-only="true"></vue-numeric> Kgs
-                    </template>
-                </af-table-column> 
+            <af-table-column
+            prop="fecha_entrega" 
+            label="Fecha de Entrega"
+            width="110"
+            sortable
+            v-if="checkPermission(['ver fecha entrega proyectos'])"
+            show-overflow-tooltip> 
+                <template slot-scope="scope">
+                    
+                    <el-tag v-if="scope.row.proyecto_proceso_producto[0].proyecto_proceso.es_ultimo == 1" type="success">
+                        {{scope.row.fecha_entrega | moment("YYYY-MMM-DD")}}
+                    </el-tag>
 
-                <af-table-column
-                label="Peso (lbs)"
-                align="center"
-                width="170"
-                show-overflow-tooltip>
-                    <template slot-scope="scope">
-                        <vue-numeric v-bind:precision="2" separator="," v-model="scope.row.producto.peso_lbs" :read-only="true"></vue-numeric> lbs
-                    </template>
-                </af-table-column> 
+                    <el-tag v-else :type="compareDates(scope.row.fecha_entrega)">
+                        {{scope.row.fecha_entrega | moment("YYYY-MMM-DD")}}
+                    </el-tag>
+                </template>
+            </af-table-column>
+            
 
-                <el-table-column
-                label="Precio (Pesos)"
-                align="center"
-                width="170"
-                v-if="checkPermission(['view finanzas ordenes abiertas'])"
-                show-overflow-tooltip>
-                    <template slot-scope="scope">
+            <el-table-column
+            align="center"
+            width="84"
+            sortable
+            v-if="checkPermission(['ver fecha entrega proyectos'])"
+            label="Semana de Entrega"> 
+                <template slot-scope="scope">
+                    <el-tag v-if="scope.row.proyecto_proceso_producto[0].proyecto_proceso.es_ultimo == 1" type="success">
+                        {{ calculateWeeks(scope.row.fecha_entrega) }} 
+                    </el-tag>
+                    <el-tag v-else :type="compareDates(scope.row.fecha_entrega)">
+                        {{ calculateWeeks(scope.row.fecha_entrega) }}
+                    </el-tag>
+                </template>
+            </el-table-column>
 
-                        <vue-numeric v-if="scope.row.precio_pesos" v-bind:precision="2"  currency="$" separator="," v-model="scope.row.precio_pesos" :read-only="true"></vue-numeric>
-                        <span v-else>$ 0.00 </span>
-                    </template>
-                </el-table-column> 
+            <af-table-column
+            label="Peso (kgs)"
+            align="center"
+            width="170"
+            show-overflow-tooltip>
+                <template slot-scope="scope">
+                    <vue-numeric v-bind:precision="2" separator="," v-model="scope.row.producto.peso_kg" :read-only="true"></vue-numeric> Kgs 
+                </template>
+            </af-table-column> 
 
-                <af-table-column
-                label="Precio (Dlls)"
-                align="center"
-                width="170"
-                v-if="checkPermission(['view finanzas ordenes abiertas'])"
-                show-overflow-tooltip>
-                    <template slot-scope="scope">
+            <af-table-column
+            label="Peso (lbs)"
+            align="center"
+            width="170"
+            show-overflow-tooltip>
+                <template slot-scope="scope">
+                    <vue-numeric v-bind:precision="2" separator="," v-model="scope.row.producto.peso_lbs" :read-only="true"></vue-numeric> lbs 
+                </template>
+            </af-table-column> 
 
-                        <vue-numeric v-if="scope.row.precio_dlls" v-bind:precision="2"  currency="$" separator="," v-model="scope.row.precio_dlls" :read-only="true"></vue-numeric>
-                        <span v-else>$ 0.00 </span>
-                    </template>
-                </af-table-column> 
+            <el-table-column
+            label="Precio (Pesos)"
+            align="center"
+            width="170"
+            v-if="checkPermission(['view finanzas ordenes abiertas'])"
+            show-overflow-tooltip>
+                <template slot-scope="scope">
 
-                <af-table-column
-                label="Notas">
-                    <template slot-scope="scope">
-                        <span class="pre-formateado">{{ scope.row.notas }}</span>
-                    </template>
-                </af-table-column>
-            </el-table>
-        </el-row>    
-         
-        <el-row type="flex" justify="end">
-            <el-pagination
-                background
-                layout="total, sizes, prev, pager, next"
-                @current-change="handleCurrentChangePagination"
-                :page-size="pageSize"
-                :page-sizes="[100, 200, 300, 400]"
-                :total="total">
-            </el-pagination>
-        </el-row>
-         <el-backtop ></el-backtop>
+                    <vue-numeric v-if="scope.row.precio_pesos" v-bind:precision="2"  currency="$" separator="," v-model="scope.row.precio_pesos" :read-only="true"></vue-numeric>
+                    <span v-else>$ 0.00 </span>
+                </template>
+            </el-table-column> 
+
+            <af-table-column
+            label="Precio (Dlls)"
+            align="center"
+            width="170"
+            
+            v-if="checkPermission(['view finanzas ordenes abiertas'])"
+            show-overflow-tooltip>
+                <template slot-scope="scope">
+
+                    <vue-numeric v-if="scope.row.precio_dlls" v-bind:precision="2"  currency="$" separator="," v-model="scope.row.precio_dlls" :read-only="true"></vue-numeric>
+                    <span v-else>$ 0.00 </span>
+                </template>
+            </af-table-column> 
+        </el-table>
+        </div>
+    </el-row>    
+    
+    <el-row type="flex" justify="end">
+        <el-pagination
+            background
+            layout="total, sizes, prev, pager, next"
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChangePagination"
+            :page-size="pageSize"
+            :page-sizes="pagesSizeOptions"
+            :total="total">
+        </el-pagination>
+    </el-row>
+    <el-backtop ></el-backtop>
          <!--
         <el-row type="flex" justify="end">
             <pagination layout="prev, pager, next" v-show="total>0" :total="total" :page.sync="query.page" :limit.sync="query.limit" @pagination="getList" />
@@ -327,6 +387,22 @@
     }
     .el-table .cell {
         word-break: break-word;
+        overflow: visible;
+    }
+
+    .card-action {
+        height: 50px;
+
+    }
+
+    .el-drawer__body {
+		height: 100%;
+		box-sizing: border-box;
+		overflow-y: auto;
+	}
+
+    .el-drawer__body > .filter-container{
+        padding:20px;
     }
     
 </style>
@@ -346,8 +422,10 @@ import permission from '@/directive/permission/index.js';
 import role from '@/directive/role/index.js';
 import checkPermission from '@/utils/permission';
 import ProyectoProductoResource from '@/api/proyectoProducto';
+import ProyectoProductoComentarioResource from '@/api/proyectoProductoComentario';
 
 const proyectoProductoResource = new ProyectoProductoResource('proyectosProductos');
+const proyectoProductoComentarioResource = new ProyectoProductoComentarioResource('proyectosProductosComentarios');
 
 
 
@@ -363,9 +441,29 @@ const proyectoProductoResource = new ProyectoProductoResource('proyectosProducto
         },
         data(){
             return{
+                /*EXPORTAR*/
+                downloading:false,
+                /*TIME LINE*/
+                currentComentario:{
+                    id:0,
+                    comentario:'',
+                    user_id:'',
+                    proyecto_producto_id:'',
+                    proyecto_proceso_id:'',
+                },
+                proyecto_producto_comentarios_list:[],
+                reverse: false,
+                pagesSizeOptions: [
+                    100,
+                    300,
+                    600,
+                    1000,
+                ],
+                /*TIME LINE*/
                 listUrl:'/proyectosProductos',
                 deleteUrl:'/proyectosProductos/delete',
                 loading : true,
+                drawer: false,
                 list:[],
                 mostrarTerminados:0,
                 showProyecto:false,
@@ -395,6 +493,7 @@ const proyectoProductoResource = new ProyectoProductoResource('proyectosProducto
         },
         directives: { waves, permission, role  },
         computed: {
+            
             searching() {
                 this.loading = true;
                 if (!this.search) {
@@ -438,6 +537,9 @@ const proyectoProductoResource = new ProyectoProductoResource('proyectosProducto
             },
             displayData() {
                 this.total = this.searching.length;
+                console.log("FUNCTION DISPLAY DATA");
+                console.log(this.pageSize);
+                console.log(this.page);
                 return this.searching.slice(this.pageSize * this.page - this.pageSize, this.pageSize * this.page);
             },
             disableEditar() {
@@ -445,7 +547,13 @@ const proyectoProductoResource = new ProyectoProductoResource('proyectosProducto
                     return true;
                 }
                 return false;
-            }
+            },
+            disableEnviarComentario(){
+                if(this.currentComentario.comentario == ""){
+                    return true;
+                }
+                return false;
+            },
         },
         methods:{
             checkPermission,
@@ -487,7 +595,14 @@ const proyectoProductoResource = new ProyectoProductoResource('proyectosProducto
                     return '—';
                 return moment(date).week();
             },
+            handleSizeChange(val){
+                console.log("CHANGE SIZE");
+                console.log(val);
+                this.pageSize = val;
+            },
             handleCurrentChangePagination (val) {
+                console.log("CHANGE PAGINATION");
+                console.log(val);
                 this.page = val;
             },
             handlePresearchChange(){
@@ -516,6 +631,9 @@ const proyectoProductoResource = new ProyectoProductoResource('proyectosProducto
                 }
                 console.log("LIST");
                 console.log(this.list);
+                this.pagesSizeOptions = [ 100, 300, 600, 1000]
+                this.pagesSizeOptions.push(this.list.length);
+                this.pageSize = this.list.length;
                 
                 this.cargarProcesosFiltro();
                 this.cargarClientesFiltro();
@@ -639,12 +757,149 @@ const proyectoProductoResource = new ProyectoProductoResource('proyectosProducto
             },
             filterProcesoHandler(value, row, column) {
                 const property = column['property'];
-                return row["proyecto_proceso_producto"][0]["proceso"]["nombre"] === value;
+                return row["proyecto_proceso_producto"][0]["proyecto_proceso"]["proceso"]["nombre"] === value;
             },
             filterClienteHandler(value, row, column) {
                 const property = column['property'];
                 return row["proyecto"]["cliente"]["nombre_cliente"] === value;
             },
+            //COMENTARIOS POR PRODUCTO
+            async getProyectoProductoComentarios(){
+                var loadingInstance = this.$loading({ target: '.el-drawer' });
+                const { data, meta } = await proyectoProductoComentarioResource.getProyectoProducoComentarioByProyectoProducto(this.currentRow.id);
+                this.proyecto_producto_comentarios_list = data;
+                loadingInstance.close();
+            },
+            submitComentario(){
+                var loadingInstance = this.$loading({ target: '.el-drawer' });
+                if(this.currentComentario.comentario == ""){
+                    this.$message({ message: 'Escribe un comentario', type: 'danger', duration: 5 * 1000, });
+                    loadingInstance.close();
+                    return false;
+                }
+                console.log("SI AVANZO");
+                proyectoProductoComentarioResource.storeComentario({current: this.currentComentario}).then(response => {
+                    //showing succeful message
+                    console.log("RESPONSE: ");
+                    console.log(response);
+                    this.getProyectoProductoComentarios();
+                    loadingInstance.close();
+                    this.clearCurrentComentario();
+                    this.$message({ message: 'Comentario agregado correctamente.', type: 'success', duration: 5 * 1000, });
+                })
+                .catch(error => {
+                    console.log(error);
+                });
+            },
+            dbSelected(row) {
+                this.drawer = true;
+                this.currentComentario.proyecto_proceso_id = row.proyecto_proceso_producto[0].proyecto_proceso_id;
+                this.currentComentario.proyecto_producto_id = row.proyecto_proceso_producto[0].proyecto_producto_id;
+                this.getProyectoProductoComentarios();
+            },
+            formatMoment(date){
+                return moment(date).format('DD') + ' de ' +moment(date).format('MMMM') + ' del ' + moment(date).format('YYYY HH:MM')
+            },
+            clearCurrentComentario(){
+                this.currentComentario = {
+                    id: 0,
+                    comentario:'',
+                    user_id:'',
+                    proyecto_producto_id:'',
+                    proyecto_proceso_id:'',
+                };
+            },
+            handleDownload() {
+            this.downloading = true;
+                import('@/vendor/Export2Excel').then(excel => {
+                    const tHeader = [
+                        'Proceso', 
+                        'Orden', 
+                        'Producto', 
+                        'Orden de Compra', 
+                        'Cliente',
+                        'Cantidad',
+                        'Plan de corte',
+                        'Orden de Trabajo',
+                        'Item',
+                        'Fecha Promesa',
+                        'Fecha entrega',
+                        'Peso (KGS)',
+                        'Peso (LBS)',
+                        'Precio (DLLS)',
+                        'Precio (Pesos)'];
+
+                    const filterVal = [
+                        //'proyecto_proceso_producto[0].proyecto_proceso.proceso.nombre', 
+                        'excel_proceso', 
+                        'numero_parte', 
+                        'excel_producto_numero_parte', 
+                        'excel_proyecto_orden_compra', 
+                        'excel_proyecto_nombre_cliente',
+                        'cantidad',
+                        'plan_corte',
+                        'work_order',
+                        'item',
+                        'excel_fecha_entrega',
+                        'excel_fecha_promesa',
+                        'excel_producto_peso_lbs',
+                        'excel_producto_peso_kgs',
+                        'precio_dlls',
+                        'precio_pesos'];
+
+                    console.log("EXPORT EXCEL LIST:");
+                    console.log(this.list);
+
+                    this.list.forEach((value, index) => {
+
+                        value.excel_proceso = value.proyecto_proceso_producto[0].proyecto_proceso.proceso.nombre;
+                        value.excel_producto_numero_parte = value.producto.numero_parte;
+                        value.excel_proyecto_orden_compra =value.proyecto.orden_compra;
+                        value.excel_proyecto_nombre_cliente = value.proyecto.cliente.nombre_cliente;
+                        value.excel_fecha_entrega = this.formatMoment(value.fecha_entrega);
+                        value.excel_fecha_promesa = this.formatMoment(value.fecha_promesa);
+                        value.excel_producto_peso_lbs = value.producto.peso_lbs;
+                        value.excel_producto_peso_kgs = value.producto.peso_kg;
+                    });
+                    console.log("EXPORT EXCEL LIST 2:");
+                    console.log(this.list);
+                     
+                     /*
+                    v-model="scope.row.producto.peso_lbs"  
+                    v-model="scope.row.producto.peso_kg" 
+                    prop="fecha_entrega" 
+                    prop="fecha_promesa" 
+                    prop="item" 
+                    prop="work_order" 
+                    prop="plan_corte" 
+                    prop="cantidad" 
+                    prop="proyecto.cliente.nombre_cliente" 
+                    prop="proyecto.numero_parte" 
+                    prop="producto.numero_parte_cliente" 
+                    prop="proyecto.orden_compra" 
+                    prop="producto.numero_parte" 
+                    prop="numero_parte"
+                    
+                    
+                    */
+                    const data = this.formatJson(filterVal, this.list);
+                    
+                    
+                    excel.export_json_to_excel({
+                        header: tHeader,
+                        data,
+                        filename: 'user-list',
+                    });
+                    this.downloading = false;
+                });
+            },
+            formatJson(filterVal, jsonData) {
+                return jsonData.map(v => filterVal.map(j => v[j]));
+            },
+            async arreglarListado(){
+                const { data, meta } = await proyectoProductoResource.arreglarListado();
+                this.getList();
+            }
         },
         mounted() {
            this.getList();

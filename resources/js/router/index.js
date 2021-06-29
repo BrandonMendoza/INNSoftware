@@ -111,12 +111,13 @@ export const constantRoutes = [
 export const asyncRoutes = [
   /**ORDENES ABIERTAS */
   {
-    path: '/ordenesAbiertas',
+
+    path: '/ordenes',
     component: Layout,
-    redirect: '/OrdenesAbiertas',
-    name: 'Ordenes Abiertas',
+    redirect: '/Ordenes',
+    name: 'Ordenes',
     meta: { 
-      title: 'ordenesAbiertas', icon: 'ordenesAbiertas', permissions: ['view menu ordenes abiertas']
+      title: 'Ordenes', icon: 'ordenesAbiertas', permissions: ['view menu ordenes abiertas']
     },
     children: [
       {
@@ -147,8 +148,9 @@ export const asyncRoutes = [
     redirect: '/Administracion',
     name: 'Administracion',
     meta: { 
-      title: 'Administracion', icon: 'list', permissions: ['view menu ordenes abiertas']
+      title: 'Administración', icon: 'list', permissions: ['view menu ordenes abiertas']
     },
+    
     children: [
       {
         path: 'perfilEmpresa',
@@ -156,11 +158,31 @@ export const asyncRoutes = [
         name: 'perfilEmpresa',
         meta: { title: 'Perfil de Empresa',icon: 'form' , permissions: ['view menu perfil empresa']  },
       },
+      
+    ],
+  },
+  /**RECURSOS HUMANOS */
+  {
+    path: '/recursosHumanos',
+    component: Layout,
+    redirect: '/RecursosHumanos',
+    name: 'Recursos Humanos',
+    meta: { 
+      title: 'Recursos Humanos', icon: 'el-icon-user-solid', permissions: ['manage recursos humanos']
+    },
+    
+    children: [
       {
-        path: '/empleados',
+        path: '/empleadosList',
         component: () => import('@/views/Empleados/List'),
-        name: 'Empleados',
-        meta: { title: 'Empleados', icon: 'list' },
+        name: 'Empleados Activos',
+        meta: { title: 'Empleados Activos', icon: 'el-icon-user-solid',permissions: ['view menu empleados activos'] },
+      },
+      {
+        path: '/empleadosBajas',
+        component: () => import('@/views/Empleados/ListBajas'),
+        name: 'Bajas',
+        meta: { title: 'Empleados Bajas', icon: 'el-icon-user-solid',permissions: ['view menu empleados bajas'] },
       },
       {
         path: '/departamentos',
@@ -289,6 +311,24 @@ export const asyncRoutes = [
     path: '/embarques/hoja_de_salida_download/:id',
     name: 'hoja_de_salida_download',
     component: () => import('@/views/embarques/hoja_de_salida_download'),
+    hidden: true,
+  },
+  {
+    path: '/contrato_empleado_download/:fechaContrato/:currentContrato/:currentEmpleado',
+    name: 'contrato_empleado_download',
+    component: () => import('@/views/empleados/components/contrato_empleado_download'),
+    hidden: true,
+  },
+  {
+    path: '/renuncia_empleado_download/:fechaRenuncia/:currentBajaEmpleado/:currentEmpleado',
+    name: 'renuncia_empleado_download',
+    component: () => import('@/views/empleados/components/renuncia_empleado_download'),
+    hidden: true,
+  },
+  {
+    path: '/finiquito_empleado_download/:fechaRenuncia/:currentBajaEmpleado/:currentEmpleado',
+    name: 'finiquito_empleado_download',
+    component: () => import('@/views/empleados/components/finiquito_empleado_download'),
     hidden: true,
   },
   { path: '*', redirect: '/404', hidden: true },

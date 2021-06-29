@@ -68,6 +68,10 @@ class ProyectoProducto extends Pivot
 	    return $this->belongsToMany('App\Documento', 'proyecto_producto_documento','proyecto_producto_id', 'documento_id')->withTimestamps();
     }
 
+    public function ProyectoProductoComentario(){
+	    return $this->hasMany('App\ProyectoProductoComentario','proyecto_producto_id','id');
+    }
+
     public function ProyectoProcesoProducto(){
         return $this->hasMany('App\ProyectoProcesoProducto','proyecto_producto_id','id')
                 //->withPivot('id','proyecto_proceso_id','proyecto_producto_id','user_id')
@@ -120,15 +124,19 @@ class ProyectoProducto extends Pivot
     }
 
     public static function getOrdenesAbiertasList(){
-        return ProyectoProducto::orderBy('fecha_entrega','DESC')
-                                    ->with(['Producto','Proyecto','Proyecto.Cliente','ProyectoProcesoProducto.ProyectoProceso.Proceso'])
+        return ProyectoProducto::orderBy('fecha_promesa','ASC')
+                                    ->with(['Producto',
+                                            'Proyecto',
+                                            'Proyecto.Cliente',
+                                            'ProyectoProcesoProducto.ProyectoProceso.Proceso',
+                                            'ProyectoProductoComentario'])
                                     ->get();
     }
 
     public static function getOrdenesTerminadasSinEmbarcar($cliente_id = 0){
         $ordenes = ProyectoProducto::
                                 where('embarcado',0)
-                                ->orderBy('fecha_entrega','DESC')
+                                ->orderBy('fecha_promesa','ASC')
                                 ->with([ 'Producto','Proyecto','Proyecto.Cliente'])
                                 ->get();
                                 

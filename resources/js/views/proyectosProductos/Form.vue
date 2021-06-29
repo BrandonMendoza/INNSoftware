@@ -88,13 +88,6 @@
                                 <el-input :disabled="!checkPermission(['editar ordenes abiertas'])" v-model="form.heat_number" />
                             </el-form-item>
                         </el-tab-pane>
-                        <!-- Tab Notas -->
-                        <el-tab-pane label="Notas" name="second">
-                            <el-input type="textarea" 
-                            v-model="form.notas"
-                            :autosize="{ minRows: 16, maxRows: 16}"/>
-                            
-                        </el-tab-pane>
                     </el-tabs>
 
             <span slot="footer" class="dialog-footer">

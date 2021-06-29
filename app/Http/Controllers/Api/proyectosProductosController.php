@@ -40,6 +40,7 @@ class proyectosProductosController extends BaseController
 		return ProyectoProductoResource::collection(ProyectoProducto::getDocumentosFromOrden($proyecto_producto_id));
 	}
 
+	/**PRINCIPAL */
 	public function getOrdenesAbiertasList(Request $request)
     {		
         $searchParams = $request->all();
@@ -56,7 +57,9 @@ class proyectosProductosController extends BaseController
 		request()->merge(['fecha_entrega' => Carbon::parse(request()->fecha_entrega)]);
         request()->merge(['fecha_promesa' => Carbon::parse(request()->fecha_promesa)]);
 		 /*Aqui se actualiza/crea con la informacion que enviamos al request*/
-		if(request()->get('numero_parte') == ""){
+		
+		
+		 if(request()->get('numero_parte') == ""){
 			/**Conseguir primero proceso */
 			$proyecto = Proyecto::find( request()->get('proyecto_id'));
 			$primerProceso = $proyecto->getFirstProceso();
@@ -105,6 +108,22 @@ class proyectosProductosController extends BaseController
 		}
 
 		return Proyecto::where('id',request()->get('proyecto_id'))->with(['Productos'])->get();
+	}
+
+	public function arreglarListado(){
+		$proyectoProducto_list = ProyectoProducto::getOrdenesAbiertasList();
+		foreach ($proyectoProducto_list as $key => $proyectoProducto) {
+			if($proyectoProducto->ProyectoProcesoProducto->count() == 0){
+				$user_id = Auth::id();
+				$proyecto = Proyecto::find( $proyectoProducto->proyecto_id);
+				$primerProceso = $proyecto->getFirstProceso();
+				$proyectoProductoProceso = new ProyectoProcesoProducto;
+				$proyectoProductoProceso->proyecto_producto_id = $proyectoProducto->id;
+				$proyectoProductoProceso->proyecto_proceso_id = $primerProceso->id;
+				$proyectoProductoProceso->user_id =$user_id;
+				$proyectoProductoProceso->save();
+			}
+		}
 	}
 
 	public function deleteFromProject(Request $request){

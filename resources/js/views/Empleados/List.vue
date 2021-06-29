@@ -10,15 +10,27 @@
                 </el-input>
             </div>
             <!-- AGREGAR -->
-            <el-button class="filter-item" type="primary" size="small" icon="el-icon-plus"  style="margin-left:0px;"  @click="handleCreateForm()">
+            <el-button class="filter-item" v-permission="['agregar empleados activos']" type="primary" size="small" icon="el-icon-plus"  style="margin-left:0px;"  @click="handleCreateForm()">
                 {{ $t('table.add') }}
             </el-button>
             <!-- EDIT -->
-            <el-button v-waves type="primary" size="small" class="filter-item" icon="el-icon-edit"  style="margin-left:0px;"  :disabled="disableEditar"  @click="handleEditForm()">Editar</el-button>
+            <el-button v-waves type="primary" v-permission="['editar empleados activos']" size="small" class="filter-item" icon="el-icon-edit"  style="margin-left:0px;"  :disabled="disableEditar"  @click="handleEditForm()">Editar</el-button>
+
+            <!-- CONTRATOS -->
+            <el-button v-waves type="primary" v-permission="['contratos empleados activos']" size="small" class="filter-item" icon="el-icon-edit"  style="margin-left:0px;"  :disabled="disableEditar"  @click="handleContratosForm()">Contratos</el-button>
            
-            <!-- DELETE 
-            <el-button v-waves type="danger" size="small" class="filter-item" icon="el-icon-delete" style="margin-left:0px;" :disabled="true"
-                        @click="deleteRow(current);">Eliminar</el-button>-->
+            <!-- DELETE -->
+            <el-button v-waves type="danger" v-permission="['dar baja empleados activos']" size="small" class="filter-item" icon="el-icon-user" style="margin-left:0px;" :disabled="disableEditar"
+                        @click="handleBajasForm()">Dar de Baja</el-button>
+
+            <!-- HISTORIAL ALTA BAJA-->
+            <el-button v-waves type="primary" v-permission="['historial alta baja empleados activos']" size="small" class="filter-item" icon="el-icon-time"  style="margin-left:0px;"  :disabled="disableEditar"  @click="handleHistorialForm()">
+               Historial Alta/baja</el-button>
+
+            <!-- HISTORIAL SUELDOS -->
+            <el-button v-waves type="primary" v-permission="['historial sueldos empleados activos']" size="small" class="filter-item" icon="el-icon-money"  style="margin-left:0px;"  :disabled="disableEditar"  @click="handleHistorialSueldoForm()">
+               Historial Sueldos</el-button>
+
 
             <!-- pdf example button
             <router-link target="_blank" :to="{ name: 'hoja_de_salida_download', params: { id: current.id } }">
@@ -40,13 +52,6 @@
             fit
             v-loading="loading"
             style="width: 100%; word-wrap: break-word;">
-                
-                
-                <af-table-column
-                type="index"
-                align="center"
-                sortable
-                fixed/>
                 
                 <el-table-column type="expand">
                     <template slot-scope="scope">
@@ -89,15 +94,26 @@
                 prop="apellidos"
                 label="Apellidos"
                 show-overflow-tooltip/>
+                
+                <el-table-column
+                prop="tipo_empleado_id"
+                label="Tipo de Empleado"
+                align="center" 
+                show-overflow-tooltip>
+                    <template slot-scope="scope">
+                         <span v-if="scope.row.tipo_empleado_id == 1">Empleado de Planta</span>
+                        <span v-if="scope.row.tipo_empleado_id == 2" > Empleado Eventual</span>
+                    </template>
+                </el-table-column>
 
-                <el-table-column 
+                <af-table-column
                 prop="Puesto.no"
                 label="Puesto (departamento)"
                 show-overflow-tooltip>
                     <template slot-scope="scope">
                         {{scope.row.puesto.nombre }} ({{ scope.row.puesto.departamento.nombre }})
                     </template>
-                </el-table-column>
+                </af-table-column>
 
                 <el-table-column
                 prop="fecha_nacimiento"
@@ -188,7 +204,7 @@
 
                                 <el-col :span="5">
                                     <el-form-item label="CURP" prop="curp">
-                                        <el-input v-model="current.curp" v-mask="'###########'"/>
+                                        <el-input v-model="current.curp" maxlength="13"/>
                                     </el-form-item>
                                 </el-col>
                             </el-row>
@@ -283,6 +299,23 @@
                                             :value="puesto.id"/>
                                         </el-select>
                                     </el-form-item>
+                                </el-col>
+                            </el-row>
+                            <el-row :gutter="20">
+                                <el-col :span="8">
+                                    <el-form-item label="Tipo de Empleado" prop="tipo_empleado_id">
+                                        <el-select 
+                                        v-model="current.tipo_empleado_id" 
+                                        value-key="id">
+                                            <el-option 
+                                            v-for="tipo_empleado in tipos_empleado_list"
+                                            :key="tipo_empleado.id"
+                                            :label="tipo_empleado.nombre" 
+                                            :value="tipo_empleado.id"/>
+                                        </el-select>
+                                    </el-form-item>
+                                </el-col>
+                                <el-col :span="8">
                                 </el-col>
                             </el-row>
                             
@@ -381,7 +414,21 @@
                 <el-button style="margin-left: 10px;" type="success" @click="submitUpload">Guardar</el-button>
             </span>
         </el-dialog>
+
+        <!-- CONTRATOS -->
+        <EmpleadosContratosDialog  ref="EmpleadosContratosDialog" />
+
+        <!-- BAJAS -->
+        <EmpleadosBajasDialog  ref="EmpleadosBajasDialog" />
+
+        <!-- HISTORIAL -->
+        <EmpleadosHistorialDialog  ref="EmpleadosHistorialDialog" />
+
+        <!-- HISTORIAL SUELDOS-->
+        <EmpleadosHistorialSueldoDialog  ref="EmpleadosHistorialSueldoDialog" />
     </div>
+
+
     
 </template>
 <style>
@@ -407,13 +454,19 @@
     
 </style>
 <script>
+import EmpleadosContratosDialog from './components/EmpleadoContratos';
+import EmpleadosBajasDialog from './components/EmpleadoBajas';
+import EmpleadosHistorialDialog from './components/EmpleadoHistorialAltaBaja';
+import EmpleadosHistorialSueldoDialog from './components/EmpleadoHistorialSueldos';
 import Pagination from '@/components/Pagination'; 
 import moment from 'moment';
 import uniq from 'lodash/uniq';
 import VueNumeric from 'vue-numeric';
 import waves from '@/directive/waves'; // Waves directive
 import Resource from '@/api/resource';
+import ContratoEmpleadoResource from '@/api/contratoEmpleado';
 
+const contratoEmpleadoResource = new ContratoEmpleadoResource('contratoEmpleado');
 const empleadoResource = new Resource('empleados');
 const departamentoResource = new Resource('departamentos');
 const puestoResource = new Resource('puestos');
@@ -422,7 +475,13 @@ const estadoResource = new Resource('estados');
 
     export default {
         name: 'EmpleadosList',
-        components: { Pagination, },
+        components: { 
+            Pagination, 
+            EmpleadosContratosDialog : EmpleadosContratosDialog,
+            EmpleadosBajasDialog : EmpleadosBajasDialog,
+            EmpleadosHistorialDialog : EmpleadosHistorialDialog,
+            EmpleadosHistorialSueldoDialog : EmpleadosHistorialSueldoDialog,
+        },
         directives: { waves },
         created () {
             this.getList();
@@ -467,19 +526,31 @@ const estadoResource = new Resource('estados');
                     puesto_id:'',
                     departamento_id:'',
                     documentos:[],
+                    tipo_empleado_id:'',
                 },
                 departamentos_list: [],
                 loadingDepartamentos : false,
                 puestos_list: [],
                 loadingPuestos : false,
                 estados_list: [],
+                contratos:[],
+                tipos_empleado_list:[
+                    {
+                        id: 1,
+                        nombre: 'Empleado de planta'
+                    }, 
+                    {
+                        id: 2,
+                        nombre: 'Empleado eventual'
+                    }, 
+                ],
                 /* Validations */
                 rules: {
                     fecha_entrada: [
-                        { type: 'date', required: true, message: 'Selecciona una Fecha de Entrada', trigger: 'change' }
+                        { required: true, message: 'Selecciona una Fecha de Entrada', trigger: 'blur' }
                     ],
                     fecha_nacimiento: [
-                        { type: 'date', required: true, message: 'Selecciona una Fecha de Nac.', trigger: 'change' }
+                        { required: true, message: 'Selecciona una Fecha de Nac.', trigger: 'blur' }
                     ],
                     nombre: [
                         { required: true, message: 'Ingresa los Nombres', trigger: 'blur' },
@@ -559,6 +630,8 @@ const estadoResource = new Resource('estados');
             },
             /* TABLE */
             handleCurrentChangeTable(val) {
+                console.log("HANDLE CURRENT CHANGE TABLE");
+                console.log(val);
                 if(val != null){
                     this.current = val;
                 }
@@ -584,15 +657,71 @@ const estadoResource = new Resource('estados');
                 this.getEstados();
                 this.formVisible = true;
             },
+             handleBajaEmpleado(){
+                this.$confirm('Esto eliminara permanentemente el Empleado. Quieres continuar?', 'Advertencia', {
+                    confirmButtonText: 'Eliminar',
+                    cancelButtonText: 'Cancelar',
+                    type: 'warning',
+                }).then(() => {
+                    // let me = this;
+                    // me.loading = true;
+                    // axios.post(me.deleteUrl,{'id':id}).then(function (response) {
+                    //     me.getList();   
+                    //     me.$message.success('Eliminado correctamente.');
+                    //     me.loading = false;
+                    // })
+                    // .catch(function (error) {
+                    //     me.$message.error('Hubo un error.');
+                    //     console.log(error);
+                    //     me.loading = false;
+                    // });
+                    empleadoResource.destroy(this.current.id).then(response => {
+                        //showing succeful message
+                        console.log("DESTROY RESPONSE");
+                        console.log(response);
+                        this.$message({ message: response.message, type: response.type, duration: 5 * 1000, });
+                        //hidding form
+                        this.getList();
+                        this.agregarContratoDialog = false;
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    });
+                }).catch(() => {
+                    this.$message({ type: 'info', message: 'Eliminacion cancelada', });
+                });
+            },
+            handleContratosForm(){
+                this.$refs.EmpleadosContratosDialog.open();
+            },
+            async handleBajasForm(){
+                const { data, meta } = await contratoEmpleadoResource.contratosByEmpleado(this.current.id);
+                this.contratos = data;
+                if(this.contratos.length > 0 ){
+                    this.$refs.EmpleadosBajasDialog.open();
+                }else{
+                    this.$message({ type: 'warning', message: 'No puedes dar de baja un empleado sin contrato.', });
+                }
+            },
+            handleHistorialForm() {
+                this.$refs.EmpleadosHistorialDialog.open();
+            },
+
+            handleHistorialSueldoForm() {
+                this.$refs.EmpleadosHistorialSueldoDialog.open();
+            },
             handleFilter() {
                 this.query.page = 1;
                 this.getList();
             },
+
             /** PRINCIPALES ---------
                 1. GET LIST  2. SUBMIT 3. DELETE ROW 4. CLEAR CURRENT
             */
             async getList() {
+                console.log("GET LIST METHOD");
                 const { limit, page } = this.query;
+                this.query.bajas = 0;
                 this.loading = true;
                 const { data, meta } = await empleadoResource.list(this.query);
                 console.log("GET LIST DATA");
@@ -633,28 +762,7 @@ const estadoResource = new Resource('estados');
                     }
                 });
             },
-            deleteRow(id){
-                this.$confirm('Esto eliminara permanentemente la Orden Abierta. Quieres continuar?', 'Advertencia', {
-                    confirmButtonText: 'Eliminar',
-                    cancelButtonText: 'Cancelar',
-                    type: 'warning',
-                }).then(() => {
-                    // let me = this;
-                    // me.loading = true;
-                    // axios.post(me.deleteUrl,{'id':id}).then(function (response) {
-                    //     me.getList();   
-                    //     me.$message.success('Eliminado correctamente.');
-                    //     me.loading = false;
-                    // })
-                    // .catch(function (error) {
-                    //     me.$message.error('Hubo un error.');
-                    //     console.log(error);
-                    //     me.loading = false;
-                    // });
-                }).catch(() => {
-                    this.$message({ type: 'info', message: 'Eliminacion cancelada', });
-                });
-            },
+           
             clearCurrent(){
                 this.setCurrent();
                 this.current = {
@@ -666,6 +774,7 @@ const estadoResource = new Resource('estados');
                     telefono_celular:'',
                     email:'',
                     fecha_nacimiento:'',
+                    fecha_entrada:'',
                     direccion:'',
                     colonia:'',
                     ciudad:'',

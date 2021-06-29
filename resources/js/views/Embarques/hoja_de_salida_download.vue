@@ -27,21 +27,27 @@
             <textarea>
             </textarea>
           </div>
-          <div id="logo">
-            <img id="image" :src="logoEmpresa" alt="logo">
-          </div>
+          <el-image
+          id="logo"
+          v-if="perfil_empresa.logo != null"
+          :src="perfil_empresa.logo.storage_path+'/'+perfil_empresa.logo.nombre_sistema"
+          fit="scale-down">
 
+              <div slot="placeholder" class="image-slot">
+                  Cargando<span class="dot">...</span>
+              </div>
+          </el-image>
         </div>
         <div style="clear:both"></div>
         
+        
         <div id="customer">
-
-           <el-table
+        <el-table
             :data="embarques"
             ref="tableList" 
             border
             fit
-            style="width: 100%; word-wrap: break-word;">
+            style="width: 100%; ">
                 
               
                 <el-table-column 
@@ -49,37 +55,49 @@
                 label="Emb #"
                 align="center"/>
 
-                <el-table-column 
+                <af-table-column
                 prop="fecha_salida"
                 label="Fecha de Salida"
                 align="center">
                    <template slot-scope="scope">
-                            {{scope.row.fecha_salida | moment("YYYY-MMM-DD")}}
+                      {{scope.row.fecha_salida | moment("DD")}} de {{scope.row.fecha_salida | moment("MMMM")}} del {{scope.row.fecha_salida | moment("YYYY HH:MM") }}
                     </template>
-                </el-table-column>
-
-
-
-                <el-table-column 
-                prop="cliente.nombre_cliente"
-                label="Cliente"/>
+                </af-table-column>
 
                 <el-table-column 
                 prop="cantidad_bultos"
                 label="Cant. de Bultos"
                 align="center"/>
+              
+              
+            </el-table>
+
+            <el-table
+            :data="embarques"
+            ref="tableList" 
+            border
+            fit
+            style="width: 100%; ">
+
+                <el-table-column 
+                prop="cliente.nombre_cliente"
+                label="Cliente"
+                align="center"/>
 
                 <el-table-column 
                 prop="compania_transporte"
-                label="Compañia de Transporte"/>
+                label="Compañia de Transporte"
+                align="center"/>
 
                 <el-table-column 
                 prop="nombre_chofer"
-                label="Nombre del Chofer"/>
+                label="Nombre del Chofer"
+                align="center"/>
               
               
             </el-table>
         </div>
+        
         <div id="ordenes">
           <div id="header">ORDENES</div>
           <el-row >
@@ -88,49 +106,44 @@
               ref="tableList" 
               fit
               border
-              style="width: 100%; word-wrap: break-word;">
-                
-                  <el-table-column
-                  type="index"
-                  align="center" 
-                  width="80"/>
+              style="width: 100%; ">
 
                   <el-table-column 
                   prop="numero_parte"
-                  label="Número de Parte (Local)"
+                  label="Orden"
                   align="center"/>
 
                   <el-table-column 
                   prop="producto.numero_parte_cliente"
-                  label="Número de Parte (Cliente)"
+                  label="Producto"
                   align="center"/>
 
                   <el-table-column 
-                  prop="producto.item"
+                  prop="item"
                   label="Item"
                   align="center"/>
 
                   <el-table-column 
-                  prop="producto.work_order"
+                  prop="work_order"
                   label="Work Order"
                   align="center"/>
 
                   <el-table-column 
                   prop="cantidad"
                   label="Cantidad"
-                  align="center">
-                      <template slot-scope="scope">
-                        <textarea>{{scope.row.cantidad}}</textarea>
-                      </template>
-                  </el-table-column>
+                  align="center"/>
                   
 
               </el-table>
           </el-row>   
+
+          
         </div>
         
         
-        <div id="terms" style="float:left; margin-left:32px"> <h5></h5><textarea>Recibió ({{embarque.nombre_chofer}})</textarea></div>
+        <div id="terms" style="text-align:center;float:left; margin-left:32px"> <h5></h5>
+          <textarea>Recibió {{embarque.nombre_chofer}}</textarea>
+        </div>
 
 
 
@@ -185,15 +198,16 @@ export default {
       this.getPerfilEmpresa();
       this.query.id = this.id;
       await embarqueResource.list(this.query).then(data => {
+        console.log("DATA");
+        console.log(data);
         this.embarques = data.data;
         this.embarque = data.data[0];
-        setTimeout(() => {
-          this.fullscreenLoading = false;
-          this.$nextTick(() => {
-            window.print();
-          });
-        }, 3000);
+        
       });
+      this.fullscreenLoading = false;
+      setTimeout(() => {
+          window.print();
+      }, 1000);
     },
 
     async getPerfilEmpresa(){
@@ -230,20 +244,19 @@ export default {
   box-sizing: border-box;
   position: relative;
   vertical-align: middle;
-  padding-left: 10px;
-  padding-right: 10px;
+  padding-left: 0px;
+  padding-right: 0px;
   width: 100%;
 }
+.el-table .cell{padding-left: 0px; word-break: break-word; line-height: 18px;}
 
-.el-table .cell {word-break: break-word;}
 
-.el-table thead{color: #000;}
+.el-table th{background-color:#3c4471; color: #fff; }
 
 #customer .el-table{font-size: 10px;}
-#customer .el-table .cell{ padding:0px; line-height: 12px;}
 //#customer .el-table th{padding: 2px;}
 .el-table--border{
-	border: 1px solid #dfe6ec;	
+	//border: 1px solid #dfe6ec;	
 }
 // CSS MIOS
 .main-article {
@@ -279,8 +292,8 @@ export default {
   @include clearfix;
   font-size: 12px;
   color: #333;
-  letter-spacing: 0.5px;
-  line-height: 28px;
+  //letter-spacing: 0.5px;
+  line-height: 16px;
   margin-bottom: 30px;
   font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif;
 
@@ -301,13 +314,17 @@ body { font: 14px/1.4 ; }
 textarea { border: 0; overflow: hidden; resize: none; }
 textarea:hover, textarea:focus, #items td.total-value textarea:hover, #items td.total-value textarea:focus, .delete:hover { background-color:#EEFF88; }
 #ordenes textarea{text-align: center; vertical-align: middle;}
-table { }
-table td, table th { padding: 5px; }
-#header { height: 30px; width: 100%; margin: 0 0; background: #fff; text-align: center; color: black; font: bold 15px Helvetica, Sans-Serif; text-decoration: uppercase; letter-spacing: 20px; padding: 8px 0px; }
+table {  }
+// #embarque > table, th, td {
+//   border: 1px solid black;
+//   border-collapse: collapse;
+// }
+table td, table th { padding: 0px; }
+#header { height: 30px; width: 100%; margin: 0 0; background: #fff; text-align: center; color: #606266; font: bold 15px Helvetica, Sans-Serif; text-decoration: uppercase; letter-spacing: 20px; padding: 8px 0px; }
 #address { width: 400px; height: 150px; float: right;line-height: 12px;text-align: right; font-size: 8px}
 #address textarea{width: 50%; text-align: right;}
-#customer { margin: 0 0 20px 0; overflow: hidden; }
-// #logo { text-align: right; float: left; position: relative; margin-top: 0px; border: 1px solid #fff; max-width: 540px; max-height: 160px; overflow: hidden; }
+#customer { margin: 0 0 0px 0; overflow: hidden; }
+#logo { text-align: right; float: left; position: relative; margin-top: 0px; border: 1px solid #fff; max-width: 540px; max-height: 160px; overflow: hidden; }
 // // #logo:hover, #logo.edit { border: 1px solid #000; margin-top: 0px; max-height: 125px; }
 // #logoctr { display: none; }
 // // #logo:hover #logoctr, #logo.edit #logoctr { display: block; text-align: right; line-height: 25px; background: #eee; padding: 0 5px; }
@@ -350,3 +367,4 @@ table td, table th { padding: 5px; }
 
 
 </style>
+

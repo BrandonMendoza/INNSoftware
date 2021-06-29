@@ -50,14 +50,36 @@ Route::namespace('Api')->group(function() {
         
     });
 
+    /* PROECTO PRODUCTO COMENTARIOS */
+    Route::post('proyectosProductosComentarios/store', 'proyectosProductosComentariosController@storeProyectoProductoComentario');
+    Route::post('proyectosProductosComentarios/{proyecto_producto_id}/getProyectoProducoComentarioByProyectoProducto', 'proyectosProductosComentariosController@getProyectoProducoComentarioByProyectoProducto');
+
+    /** EMPLEADOS */
+    Route::put('empleado/{id}/updateDeleted', 'EmpleadosController@updateDeleted');
+
+     /* BAJA EMPLEADOS*/
+     Route::get('bajaEmpleado/{empleado_id}/getBajasByEmpleado', 'bajasEmpleadosController@getBajasByEmpleado');
+
+     /* Historial Alta baja empleado */
+    Route::get('historialAltaBajaEmpleado/{empleado_id}/historialByEmpleado', 'historialAltasBajasEmpleadosController@historialByEmpleado');
+
+    /* Historial Sueldos empleado */
+    Route::get('historialSueldoEmpleado/{empleado_id}/historialSueldoByEmpleado', 'historialSueldosEmpleadosController@historialSueldoByEmpleado');
+
+
+    /*Contratos Empleados */
+    //'/' + this.uri + '/'+empleado_id+'/contratosByEmpleado',
+    Route::get('contratoEmpleado/{empleado_id}/contratosByEmpleado', 'ContratosEmpleadosController@contratosByEmpleado');
+    Route::put('contratoEmpleado/{id}/storeAlta', 'ContratosEmpleadosController@storeAlta');
     
-    
+
     /*Proyectos Productos */
     Route::get('proyectosProductos/{cliente}/OrdenesTerminadasSinEmbarcar', 'proyectosProductosController@OrdenesTerminadasSinEmbarcar');
     Route::get('proyectosProductos/{cliente}/getOrdenesAbiertasByCliente', 'proyectosProductosController@getOrdenesAbiertasByCliente');
     Route::get('proyectosProductos/getOrdenesAbiertasList', 'proyectosProductosController@getOrdenesAbiertasList');
     Route::get('proyectosProductos/getDocumentosFromOrden', 'proyectosProductosController@getDocumentosFromOrden');
     Route::post('proyectosProductos/store', 'proyectosProductosController@storeProyectoProceso');
+    Route::post('proyectosProductos/arreglarListado', 'proyectosProductosController@arreglarListado');
     Route::post('/proyectosProductos/deleteFromProject', 'proyectosProductosController@deleteFromProject');
     Route::post('/proyectosProductos/updateMultiplePlanCorte', 'proyectosProductosController@updateMultiplePlanCorte');
     Route::post('/proyectosProductos/deleteMultipleFromProject', 'proyectosProductosController@deleteMultipleFromProject');
@@ -76,3 +98,6 @@ Route::apiResource('puestos', 'puestosController');
 Route::apiResource('estados', 'estadosController');
 Route::apiResource('documentoTipo', 'documentoTipoController');
 Route::apiResource('perfilEmpresa', 'perfilEmpresaController');
+Route::apiResource('contratoEmpleado', 'ContratosEmpleadoController');
+Route::apiResource('bajaEmpleado', 'BajasEmpleadosController');
+Route::apiResource('historialAltasBajasEmpleados', 'HistorialAltasBajasEmpleadosController');

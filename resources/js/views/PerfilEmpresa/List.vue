@@ -198,6 +198,7 @@
                                 </el-col>
                             </el-row>           
                             <el-row :gutter="20" style="margin-top:20px;">
+                            <!-- :src="'storage/uploads/PerfilEmpresa/1/documentos/'+current.logo.nombre_sistema"-->
                                 <div class="block">
                                     <el-image
                                     v-if="current.logo != null"

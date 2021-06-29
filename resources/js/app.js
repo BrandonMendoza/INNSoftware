@@ -14,6 +14,7 @@ import VueTheMask from 'vue-the-mask';
 import VueNumeric from 'vue-numeric';
 import AFTableColumn from 'af-table-column';
 import VueBarcodeScanner from 'vue-barcode-scanner';
+import ElTableFixedHeader from 'el-table-fixed-header';
 //import PerfectScrollbar from 'perfect-scrollbar';
 //import "perfect-scrollbar/css/perfect-scrollbar.css";
 
@@ -52,6 +53,7 @@ Vue.use(require('vue-moment'), {
 })
 Vue.use(AFTableColumn)
 Vue.use(VueBarcodeScanner, options);
+Vue.use(ElTableFixedHeader);
 
 moment.locale('es');
 
