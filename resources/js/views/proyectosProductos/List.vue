@@ -341,6 +341,13 @@
                     <span v-else>$ 0.00 </span>
                 </template>
             </af-table-column> 
+
+            <af-table-column
+            label="Notas">
+                <template slot-scope="scope">
+                    <span class="pre-formateado">{{ scope.row.notas }}</span>
+                </template>
+            </af-table-column>
         </el-table>
         </div>
     </el-row>    
