@@ -308,7 +308,7 @@ export const asyncRoutes = [
   adminRoutes,
   errorRoutes,
   {
-    path: '/embarques/hoja_de_salida_download/:id',
+    path: '/embarques/hoja_de_salida_download/:id/:perfil_empresa',
     name: 'hoja_de_salida_download',
     component: () => import('@/views/embarques/hoja_de_salida_download'),
     hidden: true,

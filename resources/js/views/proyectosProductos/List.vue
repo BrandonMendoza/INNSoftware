@@ -544,9 +544,6 @@ const proyectoProductoComentarioResource = new ProyectoProductoComentarioResourc
             },
             displayData() {
                 this.total = this.searching.length;
-                console.log("FUNCTION DISPLAY DATA");
-                console.log(this.pageSize);
-                console.log(this.page);
                 return this.searching.slice(this.pageSize * this.page - this.pageSize, this.pageSize * this.page);
             },
             disableEditar() {
@@ -566,11 +563,7 @@ const proyectoProductoComentarioResource = new ProyectoProductoComentarioResourc
             checkPermission,
             //funcion para buscar con barcode
             barcodeSearch(barcodeInput){
-                    console.log("DATA RETURNED");
-                    console.log(this.list);
                     let dataReturned = this.list.filter(data => data['numero_parte'].toLowerCase().includes(barcodeInput.toLowerCase()));
-                   
-                    console.log(dataReturned);
                     if(dataReturned.length == 0){
                        this.$message({type: 'info',message: 'No existe orden abierta',});
                     }else{
@@ -603,13 +596,9 @@ const proyectoProductoComentarioResource = new ProyectoProductoComentarioResourc
                 return moment(date).week();
             },
             handleSizeChange(val){
-                console.log("CHANGE SIZE");
-                console.log(val);
                 this.pageSize = val;
             },
             handleCurrentChangePagination (val) {
-                console.log("CHANGE PAGINATION");
-                console.log(val);
                 this.page = val;
             },
             handlePresearchChange(){
@@ -636,8 +625,7 @@ const proyectoProductoComentarioResource = new ProyectoProductoComentarioResourc
                 }else{
                     this.list = data;
                 }
-                console.log("LIST");
-                console.log(this.list);
+                
                 this.pagesSizeOptions = [ 100, 300, 600, 1000]
                 this.pagesSizeOptions.push(this.list.length);
                 this.pageSize = this.list.length;
@@ -784,11 +772,8 @@ const proyectoProductoComentarioResource = new ProyectoProductoComentarioResourc
                     loadingInstance.close();
                     return false;
                 }
-                console.log("SI AVANZO");
+
                 proyectoProductoComentarioResource.storeComentario({current: this.currentComentario}).then(response => {
-                    //showing succeful message
-                    console.log("RESPONSE: ");
-                    console.log(response);
                     this.getProyectoProductoComentarios();
                     loadingInstance.close();
                     this.clearCurrentComentario();
@@ -806,6 +791,12 @@ const proyectoProductoComentarioResource = new ProyectoProductoComentarioResourc
             },
             formatMoment(date){
                 return moment(date).format('DD') + ' de ' +moment(date).format('MMMM') + ' del ' + moment(date).format('YYYY HH:MM')
+            },
+            formatMomentDate(date){
+                if(date == null){
+                    return ""
+                }
+                return moment(date).format('DD') + ' de ' +moment(date).format('MMMM') + ' del ' + moment(date).format('YYYY');
             },
             clearCurrentComentario(){
                 this.currentComentario = {
@@ -854,48 +845,25 @@ const proyectoProductoComentarioResource = new ProyectoProductoComentarioResourc
                         'precio_dlls',
                         'precio_pesos'];
 
-                    console.log("EXPORT EXCEL LIST:");
-                    console.log(this.list);
 
                     this.list.forEach((value, index) => {
 
                         value.excel_proceso = value.proyecto_proceso_producto[0].proyecto_proceso.proceso.nombre;
-                        value.excel_producto_numero_parte = value.producto.numero_parte;
-                        value.excel_proyecto_orden_compra =value.proyecto.orden_compra;
+                        value.excel_producto_numero_parte = value.producto.numero_parte_cliente;
+                        value.excel_proyecto_orden_compra = value.proyecto.orden_compra;
                         value.excel_proyecto_nombre_cliente = value.proyecto.cliente.nombre_cliente;
-                        value.excel_fecha_entrega = this.formatMoment(value.fecha_entrega);
-                        value.excel_fecha_promesa = this.formatMoment(value.fecha_promesa);
+                        value.excel_fecha_entrega = this.formatMomentDate(value.fecha_entrega);
+                        value.excel_fecha_promesa = this.formatMomentDate(value.fecha_promesa);
                         value.excel_producto_peso_lbs = value.producto.peso_lbs;
                         value.excel_producto_peso_kgs = value.producto.peso_kg;
                     });
-                    console.log("EXPORT EXCEL LIST 2:");
-                    console.log(this.list);
-                     
-                     /*
-                    v-model="scope.row.producto.peso_lbs"  
-                    v-model="scope.row.producto.peso_kg" 
-                    prop="fecha_entrega" 
-                    prop="fecha_promesa" 
-                    prop="item" 
-                    prop="work_order" 
-                    prop="plan_corte" 
-                    prop="cantidad" 
-                    prop="proyecto.cliente.nombre_cliente" 
-                    prop="proyecto.numero_parte" 
-                    prop="producto.numero_parte_cliente" 
-                    prop="proyecto.orden_compra" 
-                    prop="producto.numero_parte" 
-                    prop="numero_parte"
-                    
-                    
-                    */
                     const data = this.formatJson(filterVal, this.list);
                     
                     
                     excel.export_json_to_excel({
                         header: tHeader,
                         data,
-                        filename: 'user-list',
+                        filename: 'Ordenes Abiertas'+moment().format(' DD MMMM YYYY HH:MM'),
                     });
                     this.downloading = false;
                 });

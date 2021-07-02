@@ -387,11 +387,12 @@ const contratoResource = new Resource('contratoEmpleado');
           this.$message({ message: 'Contrato agregado correctamente.', type: 'success', duration: 5 * 1000, });
           //hidding form
           this.agregarContratoDialog = false;
+          this.getList();
         })
         .catch(error => {
             console.log(error);
         });
-        this.getList();
+        
       },
       
       /* LISTADO*/

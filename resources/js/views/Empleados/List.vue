@@ -465,6 +465,9 @@ import VueNumeric from 'vue-numeric';
 import waves from '@/directive/waves'; // Waves directive
 import Resource from '@/api/resource';
 import ContratoEmpleadoResource from '@/api/contratoEmpleado';
+import permission from '@/directive/permission/index.js';
+import role from '@/directive/role/index.js';
+import checkPermission from '@/utils/permission';
 
 const contratoEmpleadoResource = new ContratoEmpleadoResource('contratoEmpleado');
 const empleadoResource = new Resource('empleados');
@@ -482,7 +485,7 @@ const estadoResource = new Resource('estados');
             EmpleadosHistorialDialog : EmpleadosHistorialDialog,
             EmpleadosHistorialSueldoDialog : EmpleadosHistorialSueldoDialog,
         },
-        directives: { waves },
+        directives: { waves ,permission,role},
         created () {
             this.getList();
         },

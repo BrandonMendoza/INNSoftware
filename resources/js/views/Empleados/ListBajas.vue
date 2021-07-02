@@ -415,6 +415,9 @@ import Resource from '@/api/resource';
 import ContratoEmpleadoResource from '@/api/contratoEmpleado';
 import EmpleadoResource from '@/api/empleado';
 import BajaEmpleado from '@/api/bajaEmpleado';
+import permission from '@/directive/permission/index.js';
+import role from '@/directive/role/index.js';
+import checkPermission from '@/utils/permission';
 
 const bajaEmpleadoResource = new BajaEmpleado('bajaEmpleado');
 
@@ -435,7 +438,7 @@ const estadoResource = new Resource('estados');
             EmpleadosHistorialDialog : EmpleadosHistorialDialog,
             EmpleadosHistorialSueldoDialog : EmpleadosHistorialSueldoDialog,
         },
-        directives: { waves },
+        directives: { waves,permission,role },
         created () {
             this.getList();
         },

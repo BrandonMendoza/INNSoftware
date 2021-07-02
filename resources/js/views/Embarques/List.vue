@@ -250,21 +250,32 @@
                 <el-col>
                         Perfil de Empresa:
                         <el-select 
-                        v-model="perfil_empresa_id" 
+                        v-model="perfil_empresa" 
                         value-key="id">
                             <el-option 
                             v-for="perfil_empresa in perfil_empresa_list"
                             :key="perfil_empresa.id"
                             :label="perfil_empresa.nombre_corto" 
-                            :value="perfil_empresa.id"/>
+                            :value="perfil_empresa"/>
                         </el-select>
                 </el-col>
             </el-row>
+
+            <!-- 
+                <router-link target="_blank"  
+                :to="{ name: 'renuncia_empleado_download', 
+                    params: {   fechaRenuncia:JSON.stringify(fechaRenuncia), 
+                                currentBajaEmpleado: JSON.stringify(currentBajaEmpleado), 
+                                currentEmpleado: JSON.stringify(currentEmpleado)} }">
+                
+                </router-link>
+            
+            -->
             
             <span slot="footer" class="dialog-footer">
                 <el-button @click="dialogoPrePrint = false;fileList = [];" size="small" class="float-left">Cancelar</el-button>
                 <!-- pdf example button -->
-                <router-link target="_blank" :to="{ name: 'hoja_de_salida_download', params: { id: current.id, perfil_empresa: perfil_empresa_id } }">
+                <router-link target="_blank" :to="{ name: 'hoja_de_salida_download', params: { id: current.id, perfil_empresa: JSON.stringify(perfil_empresa) } }">
                     <el-button type="primary" size="small" class="filter-item"  style="margin-left:0px;"  :disabled="disablePrint">
                         Generar Hoja de Salida
                     </el-button>
@@ -517,7 +528,9 @@ const proyectoProductoResource = new ProyectoProductoResource('proyectosProducto
                 /* PRE PRINT */
                 perfil_empresa_list:[],
                 dialogoPrePrint: false,
-                perfil_empresa_id:"",
+                perfil_empresa:{
+                    id: 0
+                },
             }
         },
         components: { 
@@ -532,7 +545,7 @@ const proyectoProductoResource = new ProyectoProductoResource('proyectosProducto
                 return false;
             },
             disablePrint() {
-                if(this.perfil_empresa_id == ""){
+                if(this.perfil_empresa.id == 0){
                     return true;
                 }
                 return false;

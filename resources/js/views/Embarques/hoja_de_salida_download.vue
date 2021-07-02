@@ -170,7 +170,6 @@ export default {
       
       fullscreenLoading: true,
       id: 0,
-      perfil_empresa_id:0,
       query: {
         page: 1,
         limit: 15,
@@ -187,7 +186,9 @@ export default {
   },
   created() {
     this.id = this.$route.params.id;
-    this.perfil_empresa_id = this.$route.params.perfil_empresa_id;
+    console.log("PERFIL EMPRESA");
+    console.log(JSON.parse(this.$route.params.perfil_empresa));
+    this.perfil_empresa = JSON.parse(this.$route.params.perfil_empresa);
   },
   mounted() {
     this.fetchData();
@@ -195,7 +196,6 @@ export default {
   methods: {
     
     async fetchData() {
-      this.getPerfilEmpresa();
       this.query.id = this.id;
       await embarqueResource.list(this.query).then(data => {
         console.log("DATA");
@@ -210,13 +210,13 @@ export default {
       }, 1000);
     },
 
-    async getPerfilEmpresa(){
-      this.query.perfil_empresa_id = this.perfil_empresa_id;
-      const { data, meta } = await perfilEmpresaResource.list(this.query);
-      console.log("PERFIL EMPRESA");
-      console.log(data);
-      this.perfil_empresa = data[0];
-    },
+    // async getPerfilEmpresa(){
+    //   this.query.perfil_empresa_id = this.perfil_empresa_id;
+    //   const { data, meta } = await perfilEmpresaResource.list(this.query);
+    //   console.log("PERFIL EMPRESA");
+    //   console.log(data);
+    //   this.perfil_empresa = data[0];
+    // },
 
   },
 };
