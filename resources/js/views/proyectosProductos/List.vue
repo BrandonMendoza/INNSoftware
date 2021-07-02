@@ -810,7 +810,7 @@ const proyectoProductoComentarioResource = new ProyectoProductoComentarioResourc
             handleDownload() {
             this.downloading = true;
                 import('@/vendor/Export2Excel').then(excel => {
-                    const tHeader = [
+                    var tHeader = [
                         'Proceso', 
                         'Orden', 
                         'Producto', 
@@ -825,7 +825,7 @@ const proyectoProductoComentarioResource = new ProyectoProductoComentarioResourc
                         'Peso (LBS)',];
 
 
-                    const filterVal = [
+                    var filterVal = [
                         //'proyecto_proceso_producto[0].proyecto_proceso.proceso.nombre', 
                         'excel_proceso', 
                         'numero_parte', 
