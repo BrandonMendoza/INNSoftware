@@ -841,13 +841,13 @@ const proyectoProductoComentarioResource = new ProyectoProductoComentarioResourc
                         'excel_producto_peso_kgs',];
 
                     if(checkPermission(['ver fecha entrega proyectos'])){
-                        tHeader = ['Fecha entrega'];
-                        filterVal = ['excel_fecha_entrega'];
+                        tHeader += ['Fecha entrega'];
+                        filterVal += ['excel_fecha_entrega'];
                     }
                     
                     if(checkPermission(['view finanzas ordenes abiertas'])){
-                        tHeader = [ 'Precio (DLLS)', 'Precio (Pesos)'];
-                        filterVal = [ 'precio_dlls', 'precio_pesos'];
+                        tHeader += [ 'Precio (DLLS)', 'Precio (Pesos)'];
+                        filterVal += [ 'precio_dlls', 'precio_pesos'];
                     }
 
 
