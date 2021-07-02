@@ -821,11 +821,9 @@ const proyectoProductoComentarioResource = new ProyectoProductoComentarioResourc
                         'Orden de Trabajo',
                         'Item',
                         'Fecha Promesa',
-                        'Fecha entrega',
                         'Peso (KGS)',
-                        'Peso (LBS)',
-                        'Precio (DLLS)',
-                        'Precio (Pesos)'];
+                        'Peso (LBS)',];
+
 
                     const filterVal = [
                         //'proyecto_proceso_producto[0].proyecto_proceso.proceso.nombre', 
@@ -838,16 +836,22 @@ const proyectoProductoComentarioResource = new ProyectoProductoComentarioResourc
                         'plan_corte',
                         'work_order',
                         'item',
-                        'excel_fecha_entrega',
                         'excel_fecha_promesa',
                         'excel_producto_peso_lbs',
-                        'excel_producto_peso_kgs',
-                        'precio_dlls',
-                        'precio_pesos'];
+                        'excel_producto_peso_kgs',];
+
+                    if(checkPermission(['ver fecha entrega proyectos'])){
+                        tHeader = ['Fecha entrega'];
+                        filterVal = ['excel_fecha_entrega'];
+                    }
+                    
+                    if(checkPermission(['view finanzas ordenes abiertas'])){
+                        tHeader = [ 'Precio (DLLS)', 'Precio (Pesos)'];
+                        filterVal = [ 'precio_dlls', 'precio_pesos'];
+                    }
 
 
                     this.list.forEach((value, index) => {
-
                         value.excel_proceso = value.proyecto_proceso_producto[0].proyecto_proceso.proceso.nombre;
                         value.excel_producto_numero_parte = value.producto.numero_parte_cliente;
                         value.excel_proyecto_orden_compra = value.proyecto.orden_compra;
