@@ -70,7 +70,7 @@
                                     </el-form-item>
                                 </el-col>
                             </el-row>
-
+                            <!--
                             <el-row :gutter="20" >
                                 <el-col :span="12">
                                     <el-form-item label="Plan de Corte">
@@ -81,6 +81,7 @@
                                     
                                 </el-col>
                             </el-row>
+                            -->
 
                             
 

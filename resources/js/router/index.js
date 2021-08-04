@@ -124,7 +124,13 @@ export const asyncRoutes = [
         path: 'list',
         component: () => import('@/views/proyectosProductos/List'),
         name: 'ordenesAbiertas',
-        meta: { title: 'ordenesAbiertas', icon: 'ordenesAbiertas'},
+        meta: { title: 'ordenesAbiertas', icon: 'ordenesAbiertas', permissions: ['view menu ordenes abiertas']},
+      },
+      {
+        path: 'listClient',
+        component: () => import('@/views/proyectosProductos/ListClient'),
+        name: 'ordenesAbiertasClient',
+        meta: { title: 'ordenes Abiertas Timsa', icon: 'ordenesAbiertas', permissions: ['view menu ordenes abiertas timsa']},
       },
       {
         path: 'embarques',

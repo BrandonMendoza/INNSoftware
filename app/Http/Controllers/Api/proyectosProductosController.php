@@ -52,6 +52,17 @@ class proyectosProductosController extends BaseController
         return ProyectoProductoResource::collection(ProyectoProducto::getOrdenesAbiertasList());
 	}
 
+
+	public function getOrdenesAbiertasListByCliente(Request $request)
+    {		
+        $searchParams = $request->all();
+        $limit = Arr::get($searchParams, 'limit', static::ITEM_PER_PAGE);
+		$mostrarTerminados = Arr::get($searchParams, 'mostrarTerminados', 0);
+		$cliente_id = Arr::get($searchParams, 'cliente_id', 0);
+
+        return ProyectoProductoResource::collection(ProyectoProducto::getOrdenesAbiertasListByCliente($cliente_id));
+	}
+
 	public function storeProyectoProceso(Request $request){
         $proyectoProducto = new ProyectoProducto;
 		request()->merge(['fecha_entrega' => Carbon::parse(request()->fecha_entrega)]);

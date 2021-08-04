@@ -220,12 +220,12 @@
             width="85"
             align="center"  />
 
-            <af-table-column
+            <!-- <af-table-column
             prop="plan_corte" 
             label="Plan de Corte"
             align="center"
             width="100"
-            show-overflow-tooltip/>
+            show-overflow-tooltip/> -->
             
             <af-table-column
             prop="work_order" 
@@ -245,8 +245,7 @@
             prop="fecha_promesa" 
             label="Fecha Promesa"
             width="110"
-            sortable
-            show-overflow-tooltip> 
+            sortable> 
                 <template slot-scope="scope">
                     
                     <el-tag v-if="scope.row.proyecto_proceso_producto[0].proyecto_proceso.es_ultimo == 1" type="success">
@@ -264,8 +263,7 @@
             label="Fecha de Entrega"
             width="110"
             sortable
-            v-if="checkPermission(['ver fecha entrega proyectos'])"
-            show-overflow-tooltip> 
+            v-if="checkPermission(['ver fecha entrega proyectos'])"> 
                 <template slot-scope="scope">
                     
                     <el-tag v-if="scope.row.proyecto_proceso_producto[0].proyecto_proceso.es_ultimo == 1" type="success">
@@ -342,12 +340,6 @@
                 </template>
             </af-table-column> 
 
-            <af-table-column
-            label="Notas">
-                <template slot-scope="scope">
-                    <span class="pre-formateado">{{ scope.row.notas }}</span>
-                </template>
-            </af-table-column>
         </el-table>
         </div>
     </el-row>    

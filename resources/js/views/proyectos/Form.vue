@@ -88,10 +88,10 @@
                                                     size="small" class="filter-item" style="margin-left:0px;"  type="danger" icon="el-icon-delete" @click="deleteRowProductos();">
                                                     Eliminar</el-button>
 
-                                                <!-- Plan de Corte -->
+                                                <!-- Plan de Corte 
                                                 <el-button v-waves :disabled="disableCambiarPlanCorte" :v-show="showCambiarPlanCorte&checkPermission(['editar productos proyectos'])" 
                                                     size="small" class="filter-item" style="margin-left:0px;"  type="primary" @click="handleCambiarPlanCorte();">
-                                                    Cambiar Plan de Corte</el-button>
+                                                    Cambiar Plan de Corte</el-button>-->
 
                                                 <!-- COLUMNAS BUTTON -->
                                                 <el-popover placement="right-start" size="small" width="400" trigger="click" class="filter-item" style="margin-left:0px;" >
@@ -148,10 +148,11 @@
                                                 align="center"
                                                 width="85"/>
 
-                                                <el-table-column
+                                                <!--<el-table-column
                                                 prop="proyecto_producto.plan_corte"
                                                 label="Plan de Corte"
                                                 show-overflow-tooltip/>
+                                                -->
 
                                                 <el-table-column
                                                 prop="proyecto_producto.work_order"
@@ -312,13 +313,13 @@
                 </el-col>
             </el-row>
 
-            <el-row :gutter="20">
+            <!-- <el-row :gutter="20">
                 <el-col :span="12">
                     <el-form-item label="Plan de Corte" >
                          <el-input v-model="currentProyectoProducto.plan_corte" />
                     </el-form-item>
                 </el-col>
-            </el-row>
+            </el-row> -->
             
 
             <el-form-item label="Heat Number" hidden>

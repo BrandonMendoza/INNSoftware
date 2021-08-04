@@ -152,18 +152,17 @@ class ProyectoProducto extends Pivot
     }
 
     public static function getOrdenesAbiertasByCliente($cliente_id = 0){
-        $ordenes = ProyectoProducto::orderBy('numero_parte','ASC')->with([ 'Producto','Proyecto','Proyecto.Cliente'])->get();
-
-                                
-        foreach ($ordenes as $key => $orden) {
-            $orden->loadProceso();
-        }
+        $ordenes = ProyectoProducto::orderBy('fecha_promesa','ASC')
+                                    ->with(['Producto',
+                                            'Proyecto',
+                                            'Proyecto.Cliente',
+                                            'ProyectoProcesoProducto.ProyectoProceso.Proceso',
+                                            'ProyectoProductoComentario'])
+                                    ->get();
         
         if ($cliente_id != 0) {
             $ordenes = $ordenes->where('Producto.cliente_id', $cliente_id);
         }
-
-        $ordenes = $ordenes->where('Proceso.es_ultimo',0);
         return $ordenes;
     }
     

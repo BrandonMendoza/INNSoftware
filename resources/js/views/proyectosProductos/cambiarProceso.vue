@@ -99,7 +99,7 @@
                 align="center" 
                 show-overflow-tooltip>
                     <template slot-scope="scope">
-                        <span>{{scope.row.iniciado_el == null ? '—' :  scope.row.iniciado_el}}</span>
+                        <span>{{scope.row.iniciado_el == null ? '—' :  formatMoment(scope.row.iniciado_el) }}</span>
                     </template>
                 </el-table-column>
 
@@ -132,6 +132,8 @@
 <script>
 import { CommentDropdown } from '../articles/components/Dropdown';
 import Pagination from '@/components/Pagination'; 
+import moment from 'moment';
+
   export default {
     data() {
       return {
@@ -322,7 +324,10 @@ import Pagination from '@/components/Pagination';
                 me.$message.error('Hubo un error.');
                 console.log(error);
             });
-        }
+        },
+        formatMoment(date){
+            return moment(date).format('DD') + ' de ' +moment(date).format('MMMM') + ' del ' + moment(date).format('YYYY HH:MM')
+        },
     },
   };
 </script>
