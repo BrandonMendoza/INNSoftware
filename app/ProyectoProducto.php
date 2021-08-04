@@ -161,7 +161,7 @@ class ProyectoProducto extends Pivot
                                     ->get();
         
         if ($cliente_id != 0) {
-            $ordenes = $ordenes->where('Producto.cliente_id', $cliente_id);
+            $ordenes = $ordenes->where('Proyecto.cliente_id', $cliente_id);
         }
         return $ordenes;
     }
