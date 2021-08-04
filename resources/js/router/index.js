@@ -109,6 +109,25 @@ export const constantRoutes = [
 ];
 
 export const asyncRoutes = [
+  /**ORDENES ABIERTAS TIMSA*/
+  {
+
+    path: '/ordenesTimsa',
+    component: Layout,
+    redirect: '/Ordenes Timsa',
+    name: 'Ordenes Timsa',
+    meta: { 
+      title: 'Ordenes Timsa', icon: 'ordenesAbiertas', permissions: ['view menu ordenes abiertas timsa']
+    },
+    children: [
+      {
+        path: 'listClient',
+        component: () => import('@/views/proyectosProductos/ListClient'),
+        name: 'ordenesAbiertasClient',
+        meta: { title: 'ordenes Abiertas Timsa', icon: 'ordenesAbiertas', permissions: ['view menu ordenes abiertas timsa']},
+      },
+    ],
+  },
   /**ORDENES ABIERTAS */
   {
 
@@ -125,12 +144,6 @@ export const asyncRoutes = [
         component: () => import('@/views/proyectosProductos/List'),
         name: 'ordenesAbiertas',
         meta: { title: 'ordenesAbiertas', icon: 'ordenesAbiertas', permissions: ['view menu ordenes abiertas']},
-      },
-      {
-        path: 'listClient',
-        component: () => import('@/views/proyectosProductos/ListClient'),
-        name: 'ordenesAbiertasClient',
-        meta: { title: 'ordenes Abiertas Timsa', icon: 'ordenesAbiertas', permissions: ['view menu ordenes abiertas timsa']},
       },
       {
         path: 'embarques',
