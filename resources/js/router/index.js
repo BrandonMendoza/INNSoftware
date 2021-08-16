@@ -233,7 +233,7 @@ export const asyncRoutes = [
     path: '/proyectos',
     component: Layout,
     redirect: '/Proyectos',
-    meta: { title: 'productos', icon: 'product' , permissions: ['view menu proyectos'] },
+    meta: { title: 'proyectos', icon: 'proyectos' , permissions: ['view menu proyectos'] },
     children: [
       {
         path: 'list',
@@ -241,6 +241,12 @@ export const asyncRoutes = [
         name: 'Proyectos',
         meta: { title: 'proyectos', icon: 'proyectos' },
       },
+      // {
+      //   path: 'list',
+      //   component: () => import('@/views/proyectosCosteo/List'),
+      //   name: 'Costeos',
+      //   meta: { title: 'Costeos', icon: 'proyectos' },
+      // },
     ],
   },
   /**PRODUCTOS */

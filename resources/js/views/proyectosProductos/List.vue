@@ -157,7 +157,7 @@
             :filter-method="filterProcesoHandler"
             fixed>
                 <template slot-scope="scope">
-                <el-badge  class="item" :value="scope.row.proyecto_producto_comentario.length">
+                <el-badge  class="notificaciones_badge" :value="scope.row.proyecto_producto_comentario.length">
                     <el-tag  v-if="scope.row.proyecto_proceso_producto.length > 0" :style="'font-weight: bold;background-color:'+scope.row.proyecto_proceso_producto[0].proyecto_proceso.proceso.color+';color:'+scope.row.proyecto_proceso_producto[0].proyecto_proceso.proceso.texto_color+';'">
                         <svg-icon icon-class="process" :style="'background-color:'+scope.row.proyecto_proceso_producto[0].proyecto_proceso.proceso.color+';color:'+scope.row.proyecto_proceso_producto[0].proyecto_proceso.proceso.texto_color+';'"/>
                         {{scope.row.proyecto_proceso_producto[0].proyecto_proceso.proceso.nombre}}
@@ -384,9 +384,12 @@
     .pre-formateado {
         white-space: pre;
     }
-    .el-table .cell {
-        word-break: break-word;
-        overflow: visible;
+    .el-badge__content.is-fixed{
+        top:15px;
+
+    }
+    .el-table--border td{
+        overflow:hidden;
     }
 
     .card-action {
@@ -608,15 +611,19 @@ const proyectoProductoComentarioResource = new ProyectoProductoComentarioResourc
             },
             async getList(){
                 //const { data, meta } = await proyectoProductoResource.getOrdenesAbiertasList();
+                console.log("INICIO DE GET LIST");
                 this.loading = true;
                 const { limit, page } = this.query;
+                
                 const { data, meta } = await proyectoProductoResource.getOrdenesAbiertasList(this.query);
+                console.log("FIN DE GET ORDENES ABIERTAS LIST");
                 
                 if(this.mostrarTerminados == 0){
                     this.list = data.filter(data => data['proyecto_proceso_producto'][0]['proyecto_proceso']['es_ultimo'] == 0);
                 }else{
                     this.list = data;
                 }
+                console.log("FIN DE FILTRO DE TERMINADOS");
                 
                 this.pagesSizeOptions = [ 100, 300, 600, 1000]
                 this.pagesSizeOptions.push(this.list.length);
@@ -624,6 +631,7 @@ const proyectoProductoComentarioResource = new ProyectoProductoComentarioResourc
                 
                 this.cargarProcesosFiltro();
                 this.cargarClientesFiltro();
+                console.log("FIN DE CARGAR FILTROS");
                 this.loading = false;
             },
             cargarProcesosFiltro(){
