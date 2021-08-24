@@ -96,7 +96,7 @@
                     active-text="Mostrar Ordenes Terminadas"
                     style="margin-left:15px;" 
                     @change="handleSearch"
-                    v-model="mostrarTerminados"  
+                    v-model="query.mostrarTerminados"  
                     :active-value="1" 
                     :inactive-value="0"></el-switch>
                 
@@ -149,8 +149,6 @@
             sortable
             fixed/> -->
 
-            
-
             <af-table-column
             label="Proceso"
             :filters="procesosFiltroList"
@@ -158,13 +156,9 @@
             fixed>
                 <template slot-scope="scope">
                 <el-badge  class="notificaciones_badge" :value="scope.row.proyecto_producto_comentario.length">
-                    <el-tag  v-if="scope.row.proyecto_proceso_producto.length > 0" :style="'font-weight: bold;background-color:'+scope.row.proyecto_proceso_producto[0].proyecto_proceso.proceso.color+';color:'+scope.row.proyecto_proceso_producto[0].proyecto_proceso.proceso.texto_color+';'">
-                        <svg-icon icon-class="process" :style="'background-color:'+scope.row.proyecto_proceso_producto[0].proyecto_proceso.proceso.color+';color:'+scope.row.proyecto_proceso_producto[0].proyecto_proceso.proceso.texto_color+';'"/>
-                        {{scope.row.proyecto_proceso_producto[0].proyecto_proceso.proceso.nombre}}
-                    </el-tag>
-
-                    <el-tag v-else="scope.row.proyecto_proceso_producto.length < 1" type="danger">
-                        Error de Proceso
+                    <el-tag  :style="'font-weight: bold;background-color:'+scope.row.Proceso.proyecto_proceso.proceso.color+';color:'+scope.row.Proceso.proyecto_proceso.proceso.texto_color+';'">
+                        <svg-icon icon-class="process" :style="'background-color:'+scope.row.Proceso.proyecto_proceso.proceso.color+';color:'+scope.row.Proceso.proyecto_proceso.proceso.texto_color+';'"/>
+                        {{scope.row.Proceso.proyecto_proceso.proceso.nombre}}
                     </el-tag>
 
                 </el-badge>
@@ -248,7 +242,7 @@
             sortable> 
                 <template slot-scope="scope">
                     
-                    <el-tag v-if="scope.row.proyecto_proceso_producto[0].proyecto_proceso.es_ultimo == 1" type="success">
+                    <el-tag v-if="scope.row.Proceso.proyecto_proceso.es_ultimo == 1" type="success">
                         {{scope.row.fecha_promesa | moment("YYYY-MMM-DD")}}
                     </el-tag>
 
@@ -266,7 +260,7 @@
             v-if="checkPermission(['ver fecha entrega proyectos'])"> 
                 <template slot-scope="scope">
                     
-                    <el-tag v-if="scope.row.proyecto_proceso_producto[0].proyecto_proceso.es_ultimo == 1" type="success">
+                    <el-tag v-if="scope.row.Proceso.proyecto_proceso.es_ultimo == 1" type="success">
                         {{scope.row.fecha_entrega | moment("YYYY-MMM-DD")}}
                     </el-tag>
 
@@ -284,7 +278,7 @@
             v-if="checkPermission(['ver fecha entrega proyectos'])"
             label="Semana de Entrega"> 
                 <template slot-scope="scope">
-                    <el-tag v-if="scope.row.proyecto_proceso_producto[0].proyecto_proceso.es_ultimo == 1" type="success">
+                    <el-tag v-if="scope.row.Proceso.proyecto_proceso.es_ultimo == 1" type="success">
                         {{ calculateWeeks(scope.row.fecha_entrega) }} 
                     </el-tag>
                     <el-tag v-else :type="compareDates(scope.row.fecha_entrega)">
@@ -415,7 +409,6 @@ import cambiarProcesoDialog from './cambiarProceso';
 import codigoBarrasDialog from './codigoBarras';
 import menuCodigoBarrasDialog from './menuCodigoBarras';
 import Pagination from '@/components/Pagination'; 
-
 import moment from 'moment';
 import uniq from 'lodash/uniq';
 import VueNumeric from 'vue-numeric';
@@ -482,6 +475,7 @@ const proyectoProductoComentarioResource = new ProyectoProductoComentarioResourc
                 barcodeValue: 'test',
                 query: {
                     role: '',
+                    mostrarTerminados:0,
                 },
             }
         },
@@ -617,12 +611,15 @@ const proyectoProductoComentarioResource = new ProyectoProductoComentarioResourc
                 
                 const { data, meta } = await proyectoProductoResource.getOrdenesAbiertasList(this.query);
                 console.log("FIN DE GET ORDENES ABIERTAS LIST");
+                console.log("DATA");
+                console.log(data);
+                this.list = data;
                 
-                if(this.mostrarTerminados == 0){
-                    this.list = data.filter(data => data['proyecto_proceso_producto'][0]['proyecto_proceso']['es_ultimo'] == 0);
-                }else{
-                    this.list = data;
-                }
+                // if(this.mostrarTerminados == 0){
+                //     this.list = data.filter(data => data['Proceso']['proyecto_proceso']['es_ultimo'] == 0);
+                // }else{
+                //     this.list = data;
+                // }
                 console.log("FIN DE FILTRO DE TERMINADOS");
                 
                 this.pagesSizeOptions = [ 100, 300, 600, 1000]
@@ -638,8 +635,8 @@ const proyectoProductoComentarioResource = new ProyectoProductoComentarioResourc
                 var filtroItem = {};
                 for (var openOrder of this.list) {
                     filtroItem = {
-                        value: openOrder.proyecto_proceso_producto[0].proyecto_proceso.proceso.nombre,
-                        text: openOrder.proyecto_proceso_producto[0].proyecto_proceso.proceso.nombre
+                        value: openOrder.Proceso.proyecto_proceso.proceso.nombre,
+                        text: openOrder.Proceso.proyecto_proceso.proceso.nombre
                     };
                     this.procesosFiltroList.push(filtroItem);
                 }
@@ -752,7 +749,7 @@ const proyectoProductoComentarioResource = new ProyectoProductoComentarioResourc
             },
             filterProcesoHandler(value, row, column) {
                 const property = column['property'];
-                return row["proyecto_proceso_producto"][0]["proyecto_proceso"]["proceso"]["nombre"] === value;
+                return row["Proceso"]["proyecto_proceso"]["proceso"]["nombre"] === value;
             },
             filterClienteHandler(value, row, column) {
                 const property = column['property'];
@@ -785,8 +782,8 @@ const proyectoProductoComentarioResource = new ProyectoProductoComentarioResourc
             },
             dbSelected(row) {
                 this.drawer = true;
-                this.currentComentario.proyecto_proceso_id = row.proyecto_proceso_producto[0].proyecto_proceso_id;
-                this.currentComentario.proyecto_producto_id = row.proyecto_proceso_producto[0].proyecto_producto_id;
+                this.currentComentario.proyecto_proceso_id = row.Proceso.proyecto_proceso_id;
+                this.currentComentario.proyecto_producto_id = row.Proceso.proyecto_producto_id;
                 this.getProyectoProductoComentarios();
             },
             formatMoment(date){
@@ -852,7 +849,7 @@ const proyectoProductoComentarioResource = new ProyectoProductoComentarioResourc
 
 
                     this.list.forEach((value, index) => {
-                        value.excel_proceso = value.proyecto_proceso_producto[0].proyecto_proceso.proceso.nombre;
+                        value.excel_proceso = value.Proceso.proyecto_proceso.proceso.nombre;
                         value.excel_producto_numero_parte = value.producto.numero_parte_cliente;
                         value.excel_proyecto_orden_compra = value.proyecto.orden_compra;
                         value.excel_proyecto_nombre_cliente = value.proyecto.cliente.nombre_cliente;

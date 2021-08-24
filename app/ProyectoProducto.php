@@ -123,16 +123,24 @@ class ProyectoProducto extends Pivot
                                     ->get();
     }
 
-    public static function getOrdenesAbiertasList(){
+    public static function getOrdenesAbiertasList($mostrarTerminados){
+        //$date = Carbon::today()->addYears(2);
         $ordenes = ProyectoProducto::orderBy('fecha_promesa','ASC')
                                     ->with(['Producto',
                                             'Proyecto',
                                             'Proyecto.Cliente',
-                                            'ProyectoProcesoProducto.ProyectoProceso.Proceso',
+                                            //'ProyectoProcesoProducto.ProyectoProceso.Proceso',
                                             'ProyectoProductoComentario'])
+                                    //->whereDate('created_at','<=',$date)
                                     ->get();
 
-            //$ordenes = $ordenes->where('Proyecto.cliente_id', $cliente_id);
+        foreach ($ordenes as $key => $ordenAbierta) {
+            $ordenAbierta->loadProceso();
+        }
+
+        if($mostrarTerminados == 0){
+            $ordenes = $ordenes->where('Proceso.ProyectoProceso.es_ultimo',0);
+        }        
 
         return $ordenes;
 

@@ -49,7 +49,7 @@ class proyectosProductosController extends BaseController
 		$keyword = Arr::get($searchParams, 'keyword', '');
 		$selectSearch = Arr::get($searchParams, 'selectSearch', '');
 
-        return ProyectoProductoResource::collection(ProyectoProducto::getOrdenesAbiertasList());
+        return ProyectoProductoResource::collection(ProyectoProducto::getOrdenesAbiertasList($mostrarTerminados));
 	}
 
 
