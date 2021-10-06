@@ -38,6 +38,7 @@ class ProyectoProducto extends Pivot
         'fecha_promesa',//Dato que solo veran los usuarios que estan relacionados a produccion
         'padre_id',//Dato para agrupar ordenes abiertas
         'plan_corte',
+        'embarcado_el'
 
     ];
     protected $dates = ['fecha_entrega'];
@@ -142,9 +143,29 @@ class ProyectoProducto extends Pivot
             $ordenes = $ordenes->where('Proceso.ProyectoProceso.es_ultimo',0);
         }        
 
-        return $ordenes;
+        return $ordenes;            
+    }
 
-                        
+    public static function getOrdenesTerminadasSinEmbarcarList($mostrarTerminados){
+        //$date = Carbon::today()->addYears(2);
+        $ordenes = ProyectoProducto::orderBy('fecha_promesa','ASC')
+                                    ->with(['Producto',
+                                            'Proyecto',
+                                            'Proyecto.Cliente',
+                                            //'ProyectoProcesoProducto.ProyectoProceso.Proceso',
+                                            'ProyectoProductoComentario'])
+                                    ->where("embarcado",0)
+                                    //->whereDate('created_at','<=',$date)
+                                    ->get();
+
+        foreach ($ordenes as $key => $ordenAbierta) {
+            $ordenAbierta->loadProceso();
+        }
+
+        
+        $ordenes = $ordenes->where('Proceso.ProyectoProceso.es_ultimo',1);
+
+        return $ordenes;            
     }
 
     public static function getOrdenesTerminadasSinEmbarcar($cliente_id = 0){

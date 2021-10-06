@@ -76,6 +76,7 @@ Route::namespace('Api')->group(function() {
     /*Proyectos Productos */
     Route::get('proyectosProductos/{cliente}/OrdenesTerminadasSinEmbarcar', 'proyectosProductosController@OrdenesTerminadasSinEmbarcar');
     Route::get('proyectosProductos/{cliente}/getOrdenesAbiertasByCliente', 'proyectosProductosController@getOrdenesAbiertasByCliente');
+    Route::get('proyectosProductos/getOrdenesTerminadasSinEmbarcarList', 'proyectosProductosController@getOrdenesTerminadasSinEmbarcar');
     Route::get('proyectosProductos/getOrdenesAbiertasList', 'proyectosProductosController@getOrdenesAbiertasList');
     Route::get('proyectosProductos/getDocumentosFromOrden', 'proyectosProductosController@getDocumentosFromOrden');
     Route::post('proyectosProductos/store', 'proyectosProductosController@storeProyectoProceso');

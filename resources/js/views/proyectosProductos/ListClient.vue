@@ -116,14 +116,10 @@
             :filter-method="filterProcesoHandler"
             fixed>
                 <template slot-scope="scope">
-                <el-badge  class="item" :value="scope.row.proyecto_producto_comentario.length">
-                    <el-tag  v-if="scope.row.proyecto_proceso_producto.length > 0" :style="'font-weight: bold;background-color:'+scope.row.proyecto_proceso_producto[0].proyecto_proceso.proceso.color+';color:'+scope.row.proyecto_proceso_producto[0].proyecto_proceso.proceso.texto_color+';'">
-                        <svg-icon icon-class="process" :style="'background-color:'+scope.row.proyecto_proceso_producto[0].proyecto_proceso.proceso.color+';color:'+scope.row.proyecto_proceso_producto[0].proyecto_proceso.proceso.texto_color+';'"/>
-                        {{scope.row.proyecto_proceso_producto[0].proyecto_proceso.proceso.nombre}}
-                    </el-tag>
-
-                    <el-tag v-else="scope.row.proyecto_proceso_producto.length < 1" type="danger">
-                        Error de Proceso
+                <el-badge  class="notificaciones_badge" :value="scope.row.proyecto_producto_comentario.length">
+                    <el-tag  :style="'font-weight: bold;background-color:'+scope.row.Proceso.proyecto_proceso.proceso.color+';color:'+scope.row.Proceso.proyecto_proceso.proceso.texto_color+';'">
+                        <svg-icon icon-class="process" :style="'background-color:'+scope.row.Proceso.proyecto_proceso.proceso.color+';color:'+scope.row.Proceso.proyecto_proceso.proceso.texto_color+';'"/>
+                        {{scope.row.Proceso.proyecto_proceso.proceso.nombre}}
                     </el-tag>
 
                 </el-badge>
@@ -201,7 +197,7 @@
             show-overflow-tooltip> 
                 <template slot-scope="scope">
                     
-                    <el-tag v-if="scope.row.proyecto_proceso_producto[0].proyecto_proceso.es_ultimo == 1" type="success">
+                    <el-tag v-if="scope.row.Proceso.proyecto_proceso.es_ultimo == 1" type="success">
                         {{scope.row.fecha_promesa | moment("YYYY-MMM-DD")}}
                     </el-tag>
 
@@ -220,7 +216,7 @@
             show-overflow-tooltip> 
                 <template slot-scope="scope">
                     
-                    <el-tag v-if="scope.row.proyecto_proceso_producto[0].proyecto_proceso.es_ultimo == 1" type="success">
+                    <el-tag v-if="scope.row.Proceso.proyecto_proceso.es_ultimo == 1" type="success">
                         {{scope.row.fecha_entrega | moment("YYYY-MMM-DD")}}
                     </el-tag>
 
@@ -238,7 +234,7 @@
             v-if="checkPermission(['ver fecha entrega proyectos'])"
             label="Semana de Entrega"> 
                 <template slot-scope="scope">
-                    <el-tag v-if="scope.row.proyecto_proceso_producto[0].proyecto_proceso.es_ultimo == 1" type="success">
+                    <el-tag v-if="scope.row.Proceso.proyecto_proceso.es_ultimo == 1" type="success">
                         {{ calculateWeeks(scope.row.fecha_entrega) }} 
                     </el-tag>
                     <el-tag v-else :type="compareDates(scope.row.fecha_entrega)">
@@ -605,7 +601,7 @@ const proyectoProductoComentarioResource = new ProyectoProductoComentarioResourc
                 console.log(data);
                 
                 if(this.mostrarTerminados == 0){
-                    this.list = data.filter(data => data['proyecto_proceso_producto'][0]['proyecto_proceso']['es_ultimo'] == 0);
+                    this.list = data.filter(data => data['Proceso']['proyecto_proceso']['es_ultimo'] == 0);
                 }else{
                     this.list = data;
                 }
@@ -622,8 +618,8 @@ const proyectoProductoComentarioResource = new ProyectoProductoComentarioResourc
                 var filtroItem = {};
                 for (var openOrder of this.list) {
                     filtroItem = {
-                        value: openOrder.proyecto_proceso_producto[0].proyecto_proceso.proceso.nombre,
-                        text: openOrder.proyecto_proceso_producto[0].proyecto_proceso.proceso.nombre
+                        value: openOrder.Proceso.proyecto_proceso.proceso.nombre,
+                        text: openOrder.Proceso.proyecto_proceso.proceso.nombre
                     };
                     this.procesosFiltroList.push(filtroItem);
                 }
@@ -658,7 +654,7 @@ const proyectoProductoComentarioResource = new ProyectoProductoComentarioResourc
             },
             filterProcesoHandler(value, row, column) {
                 const property = column['property'];
-                return row["proyecto_proceso_producto"][0]["proyecto_proceso"]["proceso"]["nombre"] === value;
+                return row["Proceso"]["proyecto_proceso"]["proceso"]["nombre"] === value;
             },
             filterClienteHandler(value, row, column) {
                 const property = column['property'];
@@ -691,8 +687,8 @@ const proyectoProductoComentarioResource = new ProyectoProductoComentarioResourc
             },
             dbSelected(row) {
                 this.drawer = true;
-                this.currentComentario.proyecto_proceso_id = row.proyecto_proceso_producto[0].proyecto_proceso_id;
-                this.currentComentario.proyecto_producto_id = row.proyecto_proceso_producto[0].proyecto_producto_id;
+                this.currentComentario.proyecto_proceso_id = row.Proceso.proyecto_proceso_id;
+                this.currentComentario.proyecto_producto_id = row.Proceso.proyecto_producto_id;
                 this.getProyectoProductoComentarios();
             },
             formatMoment(date){

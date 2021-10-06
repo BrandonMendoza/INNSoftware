@@ -3,7 +3,7 @@
         <div class="filter-container">
             <!-- BUSCAR INPUT -->
             <div class="filter-item">
-                <el-input class="input-with-select" size="small" placeholder="buscar"  v-model="presearch" @change="handlePresearchChange()" clearable>
+                <el-input class="input-with-select" size="small" placeholder="Buscar"  v-model="presearch" @change="handleSearch()" clearable>
                     <el-select v-model="selectSearch" size="small" slot="prepend" placeholder="Select" >
                         <el-option label="Núm. de Parte (Cliente)"      value="numero_parte_cliente"></el-option>
                         <el-option label="Núm. de Parte (Local)"     value="numero_parte_producto"></el-option>
@@ -14,9 +14,21 @@
                         <!-- <el-option label="Orden de Compra"          value="orden_compra"></el-option> -->
                         <!-- <el-option label="Orden de Trabajo"         value="work_order"></el-option> -->
                     </el-select>
-                    <el-button  slot="append" size="small" v-waves type="primary" icon="el-icon-search"  @click="handleSearch" ></el-button>
+                    <!--<el-button  slot="append" size="small" v-waves type="primary" icon="el-icon-search"  @click="handleSearch" ></el-button> -->
                 </el-input>
             </div>
+
+            <!--
+            <el-autocomplete
+            class="inline-input"
+            v-model="presearch"
+            :fetch-suggestions="searching"
+            placeholder="Please Input"
+            :trigger-on-focus="false"
+            @select="handleSearch"
+            ></el-autocomplete> -->
+            
+        </div>
             <!-- DRAWER PARA COMENTARIOS POR PROCESO -->
             <el-drawer
             title="Comentarios"
@@ -59,6 +71,9 @@
 
             </el-drawer>
 
+        <div class="filter-container">
+
+            
 
             <!-- EDIT -->
             <el-button  v-waves type="primary" size="small" class="filter-item" icon="el-icon-edit" :disabled="disableEditar"  @click="loadFieldsUpdate(currentRow)">Editar</el-button>
@@ -66,28 +81,35 @@
             <el-button v-waves v-permission="['cambiar proceso ordenes abiertas']" type="primary" size="small" class="filter-item" title="Cambiar proceso" :disabled="disableEditar" style="margin-left:0px;" @click="cambiarProceso(currentRow);">
                 <svg-icon icon-class="process"/> Cambiar Proceso
             </el-button>
-            <!-- CODIGO DE BARRAS -->
+            <!-- CODIGO DE BARRAS 
             <el-button v-waves v-permission="['codigo barras ordenes abiertas']" type="primary" size="small" class="filter-item" icon="el-icon-tickets" title="Cambiar proceso" :disabled="disableEditar" style="margin-left:0px;" @click="codigoBarras(currentRow);">
                 Codigo de Barras
-            </el-button>
+            </el-button>-->
             <!-- Documentos -->
             <el-button v-waves v-permission="['ver documentos proyectos']" type="primary" size="small" class="filter-item" icon="el-icon-document" style="margin-left:0px;" :disabled="disableEditar" @click="loadDocumentos(currentRow)">Documentos</el-button>
             <!-- DELETE -->
             <el-button v-waves v-permission="['eliminar ordenes abiertas']" type="danger" size="small" class="filter-item" icon="el-icon-delete" style="margin-left:0px;" :disabled="disableEditar"
                         @click="deleteRow(currentRow.id,currentRow.numero_parte,currentRow.numero_parte_cliente);">Eliminar</el-button>
+
+            <el-button v-waves type="primary" size="small" class="filter-item" icon="el-icon-document" slot="reference" @click="menuReportes()" style="margin-left:0px;">
+                Reportes
+            </el-button>
             <!-- IMPORTAR BUTTON 
             <router-link v-permission="['importar ordenes abiertas']" class="filter-item"  :to="'/ordenesAbiertas/UploadExcel'">
                 <el-button type="primary" size="small" icon="el-icon-edit">
                     Importar    
                 </el-button>
             </router-link>-->
-            <!-- EXPORTAR -->
+            <!-- EXPORTAR 
             <el-button v-waves :loading="downloading" size="small" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload"  style="margin-left:0px;">
                 {{ $t('table.export') }}
-            </el-button>
+            </el-button>-->
             <!-- ACTUALIZAR -->
             <el-button v-waves type="primary" size="small" class="filter-item" icon="el-icon-refresh" slot="reference" @click="getList()" style="margin-left:0px;"></el-button>
-            
+
+            <!-- REPORTES -->
+
+
             <!-- COLUMNAS BUTTON -->
             <el-popover placement="left-start" size="small" width="400"  trigger="click" class="filter-item">
                 <!-- <el-checkbox v-model="showProyecto" class="filter-item" style="margin-left:15px;">Ver Nombre del Proyecto (local)</el-checkbox>     -->
@@ -360,6 +382,7 @@
         <cambiarProcesoDialog  ref="cambiarProcesoDialog" />
         <codigoBarrasDialog  ref="codigoBarrasDialog" />
         <menuCodigoBarrasDialog  ref="menuCodigoBarrasDialog" />
+        <reportesDialog  ref="reportesDialog" />
         <documentosDialog  ref="documentosDialog" />
     </div>
 
@@ -369,6 +392,10 @@
 <style>
     .el-select .el-input {
         width: 180px;
+    }
+
+    .el-table .cell {
+        word-break: break-word;
     }
 
     .input-with-select .el-input-group__prepend {
@@ -408,6 +435,7 @@ import documentosDialog from './documentos';
 import cambiarProcesoDialog from './cambiarProceso';
 import codigoBarrasDialog from './codigoBarras';
 import menuCodigoBarrasDialog from './menuCodigoBarras';
+import reportesDialog from './reportes';
 import Pagination from '@/components/Pagination'; 
 import moment from 'moment';
 import uniq from 'lodash/uniq';
@@ -436,6 +464,7 @@ const proyectoProductoComentarioResource = new ProyectoProductoComentarioResourc
         },
         data(){
             return{
+                rangoFechas:'',
                 /*EXPORTAR*/
                 downloading:false,
                 /*TIME LINE*/
@@ -460,6 +489,7 @@ const proyectoProductoComentarioResource = new ProyectoProductoComentarioResourc
                 loading : true,
                 drawer: false,
                 list:[],
+                terminadasSinEmbarcarlist:[],
                 mostrarTerminados:0,
                 showProyecto:false,
                 showProducto:false,
@@ -485,6 +515,7 @@ const proyectoProductoComentarioResource = new ProyectoProductoComentarioResourc
             cambiarProcesoDialog : cambiarProcesoDialog,
             codigoBarrasDialog : codigoBarrasDialog,
             menuCodigoBarrasDialog : menuCodigoBarrasDialog,
+            reportesDialog : reportesDialog,
             Pagination,
         },
         directives: { waves, permission, role  },
@@ -631,6 +662,26 @@ const proyectoProductoComentarioResource = new ProyectoProductoComentarioResourc
                 console.log("FIN DE CARGAR FILTROS");
                 this.loading = false;
             },
+            async getListTerminadasSinEmbarcar(){
+                //const { data, meta } = await proyectoProductoResource.getOrdenesAbiertasList();
+                console.log("INICIO DE GET LIST");
+                this.loading = true;
+                const { limit, page } = this.query;
+                
+                const { data, meta } = await proyectoProductoResource.getOrdenesTerminadasSinEmbarcarList(this.query);
+                console.log("DATA");
+                console.log(data);
+                this.terminadasSinEmbarcarlist = data;
+                
+                // if(this.mostrarTerminados == 0){
+                //     this.list = data.filter(data => data['Proceso']['proyecto_proceso']['es_ultimo'] == 0);
+                // }else{
+                //     this.list = data;
+                // }
+                
+                
+                this.loading = false;
+            },
             cargarProcesosFiltro(){
                 var filtroItem = {};
                 for (var openOrder of this.list) {
@@ -709,6 +760,9 @@ const proyectoProductoComentarioResource = new ProyectoProductoComentarioResourc
                 this.$refs.documentosDialog.query.proyecto_producto_id = data.id;
                 //this.$refs.documentosDialog.form.documentos = JSON.parse(JSON.stringify(data.documentos));
                 this.$refs.documentosDialog.open()
+            },
+            menuReportes(){
+                this.$refs.reportesDialog.open()
             },
             deleteRow(id){
                 this.$confirm('Esto eliminara permanentemente la Orden Abierta. Quieres continuar?', 'Advertencia', {
@@ -865,6 +919,74 @@ const proyectoProductoComentarioResource = new ProyectoProductoComentarioResourc
                         header: tHeader,
                         data,
                         filename: 'Ordenes Abiertas'+moment().format(' DD MMMM YYYY HH:MM'),
+                    });
+                    this.downloading = false;
+                });
+            },
+            handleSinEmbarcarDownload() {
+
+                this.downloading = true;
+                
+                
+                import('@/vendor/Export2Excel').then(excel => {
+                    var tHeader = [
+                        'Proceso', 
+                        'Orden', 
+                        'Producto', 
+                        'Orden de Compra', 
+                        'Cliente',
+                        'Cantidad',
+                        'Plan de corte',
+                        'Orden de Trabajo',
+                        'Item',
+                        'Fecha Promesa',
+                        'Peso (KGS)',
+                        'Peso (LBS)',];
+
+
+                    var filterVal = [
+                        //'proyecto_proceso_producto[0].proyecto_proceso.proceso.nombre', 
+                        'excel_proceso', 
+                        'numero_parte', 
+                        'excel_producto_numero_parte', 
+                        'excel_proyecto_orden_compra', 
+                        'excel_proyecto_nombre_cliente',
+                        'cantidad',
+                        'plan_corte',
+                        'work_order',
+                        'item',
+                        'excel_fecha_promesa',
+                        'excel_producto_peso_lbs',
+                        'excel_producto_peso_kgs',];
+
+                    if(checkPermission(['ver fecha entrega proyectos'])){
+                        tHeader.push('Fecha entrega');
+                        filterVal.push('excel_fecha_entrega');
+                    }
+                    
+                    if(checkPermission(['view finanzas ordenes abiertas'])){
+                        tHeader.push('Precio (DLLS)', 'Precio (Pesos)');
+                        filterVal.push('precio_dlls', 'precio_pesos');
+                    }
+
+                    
+                    this.terminadasSinEmbarcarlist.forEach((value, index) => {
+                        value.excel_proceso = value.Proceso.proyecto_proceso.proceso.nombre;
+                        value.excel_producto_numero_parte = value.producto.numero_parte_cliente;
+                        value.excel_proyecto_orden_compra = value.proyecto.orden_compra;
+                        value.excel_proyecto_nombre_cliente = value.proyecto.cliente.nombre_cliente;
+                        value.excel_fecha_entrega = this.formatMomentDate(value.fecha_entrega);
+                        value.excel_fecha_promesa = this.formatMomentDate(value.fecha_promesa);
+                        value.excel_producto_peso_lbs = value.producto.peso_lbs;
+                        value.excel_producto_peso_kgs = value.producto.peso_kg;
+                    });
+                    const data = this.formatJson(filterVal, this.terminadasSinEmbarcarlist);
+                    
+                    
+                    excel.export_json_to_excel({
+                        header: tHeader,
+                        data,
+                        filename: 'Ordenes Terminadas Sin Embarcar'+moment().format(' DD MMMM YYYY HH:MM'),
                     });
                     this.downloading = false;
                 });

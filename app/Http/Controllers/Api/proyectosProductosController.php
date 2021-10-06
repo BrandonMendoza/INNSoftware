@@ -53,6 +53,18 @@ class proyectosProductosController extends BaseController
 	}
 
 
+	public function getOrdenesTerminadasSinEmbarcar(Request $request)
+    {		
+        $searchParams = $request->all();
+        $limit = Arr::get($searchParams, 'limit', static::ITEM_PER_PAGE);
+		$mostrarTerminados = Arr::get($searchParams, 'mostrarTerminados', 0);
+		$keyword = Arr::get($searchParams, 'keyword', '');
+		$selectSearch = Arr::get($searchParams, 'selectSearch', '');
+
+        return ProyectoProductoResource::collection(ProyectoProducto::getOrdenesTerminadasSinEmbarcarList($mostrarTerminados));
+	}
+
+
 	public function getOrdenesAbiertasListByCliente(Request $request)
     {		
         $searchParams = $request->all();
@@ -122,7 +134,7 @@ class proyectosProductosController extends BaseController
 	}
 
 	public function arreglarListado(){
-		$proyectoProducto_list = ProyectoProducto::getOrdenesAbiertasList();
+		$proyectoProducto_list = ProyectoProducto::getOrdenesAbiertasList(0);
 		foreach ($proyectoProducto_list as $key => $proyectoProducto) {
 			if($proyectoProducto->ProyectoProcesoProducto->count() == 0){
 				$user_id = Auth::id();

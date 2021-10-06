@@ -54,6 +54,14 @@ class ProyectoProductoResource extends Resource {
     });
   }
 
+  getOrdenesTerminadasSinEmbarcarList(query) {
+    return request({
+      url: '/proyectosProductos/getOrdenesTerminadasSinEmbarcarList' ,
+      method: 'get',
+      params: query,
+    });
+  }
+
   getDocumentosFromOrden(query) {
     return request({
       url: '/proyectosProductos/getDocumentosFromOrden' ,

@@ -56,6 +56,16 @@
                     <el-button icon="el-icon-d-arrow-right" @click="increaseDecrease(1)"></el-button>
                 </el-col>
             </el-row>
+            <!--
+            <el-row type="flex"  justify="space-around" style="margin-top: 20px;">
+                <el-col :span="3"></el-col>
+                <el-col :span="8" class="text-center">
+                    <el-button icon="el-icon-plus" circle></el-button>    
+                </el-col>
+                <el-col :span="3"></el-col>
+            </el-row>
+            -->
+            
                 
             
             <span slot="footer" class="dialog-footer">

@@ -1,6 +1,7 @@
 <?php
 
 namespace App;
+use Carbon\Carbon;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -53,7 +54,8 @@ class Embarque extends Model
             }
         }
         //marcamos como embarcados las ordenes agregadas
-        ProyectoProducto::whereIn('id', $proyectosProductosNews)->update(['embarcado' => 1]);
+        ProyectoProducto::whereIn('id', $proyectosProductosNews)->update(['embarcado' => 1,
+                                                                            'embarcado_el'=> Carbon::now()->toDateTimeString()]);
 
         $this->ProyectosProductos()->sync($proyectosProductosNews);
     }
