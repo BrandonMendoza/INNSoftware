@@ -28,18 +28,17 @@ class embarquesController extends Controller
         $keyword = Arr::get($searchParams, 'keyword', '');
         $id = Arr::get($searchParams, 'id', '');
 
-        if (!empty($id) && $id != 0 ) {
-            $embarqueQuery->where('id',$id);                
-        }
+        // if (!empty($id) && $id != 0 ) {
+        //     $embarqueQuery->where('id',$id);                
+        // }
 
-        if (!empty($keyword)) {
-            $embarqueQuery->where('numero_tarimas', 'LIKE', '%' . $keyword . '%');
-            $embarqueQuery->where('precio_total', 'LIKE', '%' . $keyword . '%');
-        }
+        // if (!empty($keyword)) {
+        //     $embarqueQuery->where('numero_tarimas', 'LIKE', '%' . $keyword . '%');
+        // }
 
         
 
-        return EmbarqueResource::collection($embarqueQuery->with('ProyectosProductos.Producto','Cliente','Documentos.Documento_tipo','Documentos.Usuario')->paginate($limit));
+        return EmbarqueResource::collection(Embarque::getEmbarquesList($keyword,$id));
         //return EmbarqueResource::collection(Embarque::all());
     }
 
@@ -69,6 +68,7 @@ class embarquesController extends Controller
             $currentEmbarque['fecha_salida'] = Carbon::parse($currentEmbarque['fecha_salida']);
             $embarque = $embarque ->fill($currentEmbarque)
                                                 ->updateOrCreate(['id' => $currentEmbarque['id']],$embarque->toArray());
+            $embarque->numero_parte = 'EMB-'.$embarque->id;
 
             $embarque->storeProyectosProductos($proyectosProductos);                                                
             return new EmbarqueResource($embarque);

@@ -21,7 +21,8 @@ class Embarque extends Model
         'compania_transporte',
         'nombre_chofer',
         'placas_transporte',
-        'cliente_id'    
+        'cliente_id',
+        'numero_parte' 
     ];
 
     public function Cliente()
@@ -41,6 +42,27 @@ class Embarque extends Model
     public function getProyectosProductosIdsAttribute()
     {
         return $this->ProyectosProductos()->select('proyecto_producto.id')->get()->pluck('id')->toArray();
+    }
+
+    public static function getEmbarquesList($keyword,$id){
+        //$embarqueQuery->orderBy('fecha_salida', 'desc')->with('ProyectosProductos.Producto','Cliente','Documentos.Documento_tipo','Documentos.Usuario')->paginate($limit)
+        $embarques = Embarque::orderBy('fecha_salida','DESC')
+                                ->with('ProyectosProductos.Producto',
+                                        'Cliente',
+                                        'Documentos.Documento_tipo',
+                                        'Documentos.Usuario')
+                                ->get();
+
+         if (!empty($id) && $id != 0 ) {
+            $embarques = $embarques->where('id',$id);                
+        }  
+
+        // if (!empty($keyword)) {
+        //     $embarques = $embarques->where('ProyectosProductos.Producto.numero_parte_cliente', 'LIKE', '%' . $keyword . '%');
+        //     //$embarqueQuery->where('numero_tarimas', 'LIKE', '%' . $keyword . '%');
+        // }
+
+        return $embarques;            
     }
 
 

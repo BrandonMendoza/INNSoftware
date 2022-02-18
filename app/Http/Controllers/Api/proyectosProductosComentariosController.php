@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\Api;
-
+    
 use App\Http\Resources\ProyectoProductoComentarioResource;
 use Illuminate\Http\Request;
 use App\ProyectoProductoComentario;
@@ -25,7 +25,7 @@ class proyectosProductosComentariosController extends BaseController
             $proyectoProductoComentario->fill($currentProyectoProductoComentario);
             ProyectoProductoComentario::create($proyectoProductoComentario->toArray());
             return new ProyectoProductoComentarioResource($proyectoProductoComentario);
-        });;        
+        });     
 	}
 
 	public function getProyectoProducoComentarioByProyectoProducto($proyecto_producto_id)

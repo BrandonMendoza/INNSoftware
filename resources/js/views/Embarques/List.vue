@@ -3,13 +3,28 @@
 
         
         <div class="filter-container">
-            <!-- BUSCAR INPUT -->
+            <!-- BUSCAR INPUT 
             <div class="filter-item">
                 <el-input class="input-with-select" size="small" placeholder="buscar" v-model="query.keyword"  @keyup.enter.native="handleFilter" clearable> 
                     <el-button slot="append" size="small" v-waves type="primary" icon="el-icon-search" 
                         @click="handleFilter"></el-button>    
                 </el-input>
+            </div>-->
+
+            <div class="filter-item">
+                <el-input class="input-with-select" size="small" placeholder="Buscar"  v-model="presearch" @change="handleSearch()" clearable>
+                    <el-select v-model="selectSearch" size="small" slot="prepend" placeholder="Select" >
+                        <el-option label="Núm. de Parte (Producto)"      value="numero_parte_cliente"></el-option>
+                        <el-option label="Núm. de Parte (Embarque)"      value="numero_parte_embarque"></el-option>
+
+                    </el-select>
+                    <!--<el-button  slot="append" size="small" v-waves type="primary" icon="el-icon-search"  @click="handleSearch" ></el-button> -->
+                </el-input>
             </div>
+        </div>
+
+        <div class="filter-container">
+
             <!-- AGREGAR -->
             <el-button class="filter-item" type="primary" size="small" icon="el-icon-plus"  style="margin-left:0px;"  
                 @click="handleCreateForm()"> {{ $t('table.add') }} </el-button>
@@ -34,11 +49,28 @@
                 <el-button type="primary" size="small" class="filter-item"  style="margin-left:0px;"  :disabled="disableEditar">
                     Generar Hoja de Salida
                 </el-button>
-            </router-link> -->
+            </router-link> 
+            
+            <div class="block">
+                <span class="demonstration">With quick options</span>
+                <el-date-picker
+                v-model="value2"
+                type="monthrange"
+                align="right"
+                unlink-panels
+                range-separator="To"
+                start-placeholder="Start month"
+                end-placeholder="End month"
+                :picker-options="pickerOptions">
+                </el-date-picker>
+            </div>
+            
+            
+            -->
         </div>
         <el-row >
             <el-table
-            :data="list"
+            :data="displayData"
             ref="tableList" 
             highlight-current-row
             @current-change="handleCurrentChangeTable"
@@ -56,17 +88,24 @@
                         
                     </template>
                 </el-table-column>
-                
+
                 <af-table-column
-                type="index"
-                align="center"
-                sortable
-                fixed/>
+                prop="numero_parte"
+                label="Numero Parte"
+                show-overflow-tooltip
+                width="110"/> 
 
                 <el-table-column 
                 prop="fecha_salida"
                 label="Fecha de Salida"
-                show-overflow-tooltip/>
+                width="110">
+                    <template slot-scope="scope">
+                        <el-tag>
+                            {{scope.row.fecha_salida | moment("YYYY-MMM-DD")}}
+                        </el-tag>
+                    </template>
+                </el-table-column >
+
 
                 <el-table-column 
                 prop="cantidad_bultos"
@@ -93,9 +132,19 @@
             </el-table>
         </el-row>    
         
+        <!-- PAGINATION -->
         <el-row type="flex" justify="end">
-            <pagination layout="prev, pager, next" v-show="total>0" :total="total" :page.sync="query.page" :limit.sync="query.limit" @pagination="getList" />
+            <el-pagination
+                background
+                layout="total, sizes, prev, pager, next"
+                @size-change="handleSizeChange"
+                @current-change="handleCurrentChangePagination"
+                :page-size="pageSize"
+                :page-sizes="pagesSizeOptions"
+                :total="total">
+            </el-pagination>
         </el-row>
+
 
         <!-- CREATE DIALOG -->
         <el-dialog :title="formTitle" :visible.sync="formVisible" width="60%">
@@ -223,6 +272,8 @@
         <el-dialog title="Agregar Ordenes" :visible.sync="agregarOrdenesVisible" width="60%">
             <div class="form-container">
                 <el-transfer
+                filterable
+                :filter-method="filterMethod"
                 @change="handleChangeTransfer"
                 :titles="['Ordenes Terminadas', 'Embarque']"
                 :button-texts="['Quitar', 'Embarcar']"
@@ -461,9 +512,17 @@ const proyectoProductoResource = new ProyectoProductoResource('proyectosProducto
                 loading : true,
                 list:[],
                 page: 1,
-                pageSize: 10,
+                pageSize: 100,
                 total: 0,
+                pagesSizeOptions: [
+                    100,
+                    300,
+                    600,
+                    1000,
+                ],
                 selectSearch: 'numero_parte_cliente',
+                presearch:'',
+                search:'',
                 query: {
                     page: 1,
                     limit: 15,
@@ -531,6 +590,7 @@ const proyectoProductoResource = new ProyectoProductoResource('proyectosProducto
                 perfil_empresa:{
                     id: 0
                 },
+                
             }
         },
         components: { 
@@ -550,8 +610,56 @@ const proyectoProductoResource = new ProyectoProductoResource('proyectosProducto
                 }
                 return false;
             },
+            searching() {
+                this.loading = true;
+                if (!this.search) {
+                    this.loading = false;
+                    this.total = this.list.length;                
+                    return this.list;
+                }
+                this.page = 1;
+                let dataReturned = [];
+
+                if(this.selectSearch == "numero_parte_cliente"){
+                    this.list.forEach(embarque => {
+                        embarque['proyectos_productos'].forEach(proyecto_producto => {
+                            if(proyecto_producto['producto']['numero_parte_cliente'].toLowerCase().includes(this.search.toLowerCase())){
+                                dataReturned.push(embarque);
+                            }
+                        });
+                    });
+                }
+                else if(this.selectSearch == "numero_parte_embarque"){
+                   dataReturned = this.list.filter(data => !!data['numero_parte'].toLowerCase().includes(this.search.toLowerCase()));
+                }
+                
+                this.loading = false;
+                return dataReturned;
+
+            },
+            displayData() {
+                this.total = this.searching.length;
+                return this.searching.slice(this.pageSize * this.page - this.pageSize, this.pageSize * this.page);
+            },
         },
         methods:{
+            /* pagination*/
+            
+            handleSizeChange(val){
+                this.pageSize = val;
+            },
+            handleCurrentChangePagination (val) {
+                this.page = val;
+            },
+            handlePresearchChange(){
+                if(!this.presearch){
+                    this.search = '';
+                }
+            },
+            handleSearch () {
+                this.getList();
+                this.search = this.presearch;
+            },
             /* Documentos*/
             async getDocumentoTipos(){
                 const { data, meta } = await documentoTipoResource.list();
@@ -737,7 +845,10 @@ const proyectoProductoResource = new ProyectoProductoResource('proyectosProducto
             },
             /* Transfer */
             filterMethod(query, item) {
-                return item.initial.toLowerCase().indexOf(query.toLowerCase()) > -1;
+                console.log("ITEM");
+                console.log(item);
+                return item.label.toLowerCase().includes(query.toLowerCase());
+                //dataReturned = this.list.filter(data => !!data['proyecto']['cliente']['nombre_cliente'].toLowerCase().includes(this.query.toLowerCase()));
             },
             handleChangeTransfer(){
                 console.log(this.ordenesAbiertasSeleccionadas);
@@ -780,16 +891,17 @@ const proyectoProductoResource = new ProyectoProductoResource('proyectosProducto
             /** Acceso a la BD */
             /** Listado principal */
             async getList() {
-                const { limit, page } = this.query;
                 this.loading = true;
+                const { limit, page } = this.query;
                 const { data, meta } = await embarqueResource.list(this.query);
                 console.log("GET LIST DATA");
                 console.log(data);
                 this.list = data;
-                this.list.forEach((element, index) => {
-                    element['index'] = (page - 1) * limit + index + 1;
-                });
-                this.total = meta.total;
+
+                this.pagesSizeOptions = [ 100, 300, 600, 1000]
+                this.pagesSizeOptions.push(this.list.length);
+                this.pageSize = this.list.length;
+                
                 this.loading = false;
             },
             /**Obtener ordenes abiertas disponibles */

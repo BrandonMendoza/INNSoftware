@@ -42,14 +42,16 @@ class proyectosProductosController extends BaseController
 
 	/**PRINCIPAL */
 	public function getOrdenesAbiertasList(Request $request)
-    {		
+    {	
+		
         $searchParams = $request->all();
         $limit = Arr::get($searchParams, 'limit', static::ITEM_PER_PAGE);
 		$mostrarTerminados = Arr::get($searchParams, 'mostrarTerminados', 0);
+		$rangoFechas = Arr::get($searchParams, 'rangoFechas', '');
 		$keyword = Arr::get($searchParams, 'keyword', '');
 		$selectSearch = Arr::get($searchParams, 'selectSearch', '');
 
-        return ProyectoProductoResource::collection(ProyectoProducto::getOrdenesAbiertasList($mostrarTerminados));
+        return ProyectoProductoResource::collection(ProyectoProducto::getOrdenesAbiertasList($mostrarTerminados,$rangoFechas));
 	}
 
 

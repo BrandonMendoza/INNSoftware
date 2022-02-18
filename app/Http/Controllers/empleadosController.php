@@ -64,7 +64,7 @@ class empleadosController extends Controller
                                     ->updateOrCreate(['id' => $currentEmpleado['id']],$empleado->toArray());
                         
             if(request()->get('numero_empleado') == ""){
-                $empleado->numero_empleado = 'EM-'.$empleado->id;
+                $empleado->numero_empleado = 'EMP-'.$empleado->id;
                 $empleado->update();
             }
 

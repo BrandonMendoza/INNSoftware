@@ -124,9 +124,11 @@ class ProyectoProducto extends Pivot
                                     ->get();
     }
 
-    public static function getOrdenesAbiertasList($mostrarTerminados){
+    public static function getOrdenesAbiertasList($mostrarTerminados,$rangoFechas){
         //$date = Carbon::today()->addYears(2);
-        $ordenes = ProyectoProducto::orderBy('fecha_promesa','ASC')
+        $ordenes = ProyectoProducto::where('fecha_promesa', '>=', $rangoFechas[0])
+                                    ->where('fecha_promesa', '<=', $rangoFechas[1])
+                                    ->orderBy('fecha_promesa','ASC')
                                     ->with(['Producto',
                                             'Proyecto',
                                             'Proyecto.Cliente',

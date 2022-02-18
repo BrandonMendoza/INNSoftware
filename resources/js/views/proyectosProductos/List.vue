@@ -27,7 +27,29 @@
             :trigger-on-focus="false"
             @select="handleSearch"
             ></el-autocomplete> -->
-            
+            <el-date-picker
+                class="filter-item" 
+                size="small"
+                v-model="rangoFechas"
+                type="monthrange"
+                align="right"
+                unlink-panels
+                range-separator="A"
+                start-placeholder="Inicio"
+                end-placeholder="Fin"
+                :picker-options="pickerOptions"
+                @change="changeRangoFechas()">
+            </el-date-picker>
+                
+
+            <el-switch 
+            class="filter-item" 
+            active-text="Mostrar Ordenes Terminadas"
+            style="margin-left:15px;" 
+            @change="handleSearch"
+            v-model="query.mostrarTerminados"  
+            :active-value="1" 
+            :inactive-value="0"></el-switch>
         </div>
             <!-- DRAWER PARA COMENTARIOS POR PROCESO -->
             <el-drawer
@@ -94,6 +116,23 @@
             <el-button v-waves type="primary" size="small" class="filter-item" icon="el-icon-document" slot="reference" @click="menuReportes()" style="margin-left:0px;">
                 Reportes
             </el-button>
+
+             <!-- pdf example button
+                <div class="block">
+                    <span class="demonstration">With quick options</span>
+                    <el-date-picker
+                    v-model="value2"
+                    type="monthrange"
+                    align="right"
+                    unlink-panels
+                    range-separator="To"
+                    start-placeholder="Start month"
+                    end-placeholder="End month"
+                    :picker-options="pickerOptions">
+                    </el-date-picker>
+                </div>
+            -->
+
             <!-- IMPORTAR BUTTON 
             <router-link v-permission="['importar ordenes abiertas']" class="filter-item"  :to="'/ordenesAbiertas/UploadExcel'">
                 <el-button type="primary" size="small" icon="el-icon-edit">
@@ -144,6 +183,9 @@
                 
                 <el-button type="primary" size="small" icon="el-icon-setting" slot="reference"></el-button>
             </el-popover>
+
+
+            
             
             <!-- <el-button class="filter-item" type="primary" icon="el-icon-plus" @click="$refs.myForm.clearFields();$refs.myForm.open()" hidden>Agregar</el-button> -->
         </div>
@@ -273,6 +315,8 @@
                     </el-tag>
                 </template>
             </af-table-column>
+
+            
 
             <af-table-column
             prop="fecha_entrega" 
@@ -464,7 +508,7 @@ const proyectoProductoComentarioResource = new ProyectoProductoComentarioResourc
         },
         data(){
             return{
-                rangoFechas:'',
+                
                 /*EXPORTAR*/
                 downloading:false,
                 /*TIME LINE*/
@@ -506,7 +550,35 @@ const proyectoProductoComentarioResource = new ProyectoProductoComentarioResourc
                 query: {
                     role: '',
                     mostrarTerminados:0,
+                    rangoFechas:[],
                 },
+                /* MONTH RANGE */
+                rangoFechas:[],
+                pickerOptions: {
+                    shortcuts: [{
+                        text: 'Mes Actual',
+                        onClick(picker) {
+                        picker.$emit('pick', [new Date(), new Date()]);
+                        }
+                    }, {
+                        text: 'Año Actual',
+                        onClick(picker) {
+                            const end = new Date(new Date().getFullYear(), 12);
+                            const start = new Date(new Date().getFullYear(), 0);
+                            picker.$emit('pick', [start, end]);
+                        }
+                    }, {
+                        text: 'Ultimos 6 Meses',
+                        onClick(picker) {
+                            const end = new Date();
+                            const start = new Date();
+                            start.setMonth(start.getMonth() - 6);
+                            picker.$emit('pick', [start, end]);
+                        }
+                    }]
+                },
+                value1: '',
+                value2: '',
             }
         },
         components: { 
@@ -590,6 +662,18 @@ const proyectoProductoComentarioResource = new ProyectoProductoComentarioResourc
                        this.menuCodigoBarras(dataReturned[0]);
                     }
             },
+            changeRangoFechas(){
+                if(this.rangoFechas == '' || this.rangoFechas == null){
+                    this.rangoFechas = [];
+                    this.setRangeDateDefault();
+                }else{
+                    this.rangoFechas[0].setMonth(this.rangoFechas[0].getMonth(),1);
+                    this.rangoFechas[1].setMonth(this.rangoFechas[1].getMonth() + 1,0);
+
+                    this.query.rangoFechas = this.rangoFechas;
+                }
+                this.getList();
+            },
             // Create callback function to receive barcode when the scanner is already done
             onBarcodeScanned (barcodeInput) {
                 if(barcodeInput.length > 5){
@@ -634,16 +718,37 @@ const proyectoProductoComentarioResource = new ProyectoProductoComentarioResourc
                 this.query.page = 1;
                 //this.getList();
             },
+            setRangeDateDefault(){
+                const start = new Date();
+                const end = new Date();
+                start.setMonth(start.getMonth() - 6,1);
+                end.setMonth(end.getMonth() + 7,0);
+
+                // var FirstDay = new Date(year, month, 1);
+                // var LastDay = new Date(year, month + 1, 0);
+
+                this.query.rangoFechas[0] = start;
+                this.query.rangoFechas[1] = end;
+                this.rangoFechas[0] = start;
+                this.rangoFechas[1] = end;
+            },
             async getList(){
                 //const { data, meta } = await proyectoProductoResource.getOrdenesAbiertasList();
+
                 console.log("INICIO DE GET LIST");
+                console.log("QUERY CON FECHAS");
+                console.log(this.query);
                 this.loading = true;
+                if(this.rangoFechas == '' || this.rangoFechas == null){
+                    this.setRangeDateDefault();
+                }
                 const { limit, page } = this.query;
-                
                 const { data, meta } = await proyectoProductoResource.getOrdenesAbiertasList(this.query);
+                //var data = await proyectoProductoResource.getOrdenesAbiertasList(this.query);
                 console.log("FIN DE GET ORDENES ABIERTAS LIST");
                 console.log("DATA");
                 console.log(data);
+                
                 this.list = data;
                 
                 // if(this.mostrarTerminados == 0){
