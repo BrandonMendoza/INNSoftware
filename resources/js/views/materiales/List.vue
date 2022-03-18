@@ -16,22 +16,18 @@
             highlight-current-row
             v-loading="loading"
             style="width: 100%">
-                <el-table-column
-                type="index"
-                align="center" 
-                width="80"/>
 
                 <el-table-column
                 prop="numero_parte"
                 label="Número de Parte"/>
 
                 <el-table-column
-                prop="medidas"
-                label="Medidas"/>
-
-                <el-table-column
                 prop="tipo_material.nombre"
                 label="Tipo de Material"/>
+
+                <el-table-column
+                prop="medidas"
+                label="Medidas"/>
 
                 <el-table-column
                 prop="acero.nombre"
@@ -112,6 +108,8 @@ import Pagination from '@/components/Pagination';
                 this.$refs.myForm.form.medida_2 = data.medida_2;
                 this.$refs.myForm.form.medida_3 = data.medida_3;
                 this.$refs.myForm.form.medida_4 = data.medida_4;
+                this.$refs.myForm.form.medidas = data.medidas;
+
 
                 this.$refs.myForm.open();
             },

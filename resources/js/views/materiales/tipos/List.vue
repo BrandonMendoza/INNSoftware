@@ -12,16 +12,23 @@
             fit
             highlight-current-row
             v-loading="loading"
-            style="width: 40%">
+            style="width: 60%">
                 <el-table-column
                 type="index"
                 align="center"
                 width="80"/>
 
                 <el-table-column
-                    prop="nombre"
-                    label="Nombre"
+                    prop="nombre_spanish"
+                    label="Nombre Español"
                     width="180"/>
+
+                <el-table-column
+                    prop="nombre"
+                    label="Nombre Ingles"
+                    width="180"/>
+
+                
 
                 <el-table-column
                     prop="simbolo"

@@ -13,9 +13,6 @@
             <input v-model="form.catalogo" hidden/>
             
 
-            <el-form-item label="Número de Parte" prop="numero_parte">
-                <el-input v-model="form.numero_parte" />
-            </el-form-item>
 
             <el-form-item label="Descripción" prop="descripcion">
                 <el-input v-model="form.descripcion" />

@@ -2,7 +2,7 @@
 
     <el-form  :model="form" :rules="rules" ref="form" label-position="top"   label-width="100px" >
         <el-dialog
-        width="20%"
+        width="25%"
         :ref="dialogRef"
         :before-close="handleClose"
         :visible.sync="dialogoAgregar">
@@ -11,11 +11,6 @@
             <!-- Id del proceso que se esta editando ("0" si es agregar) -->
             <input v-model="form.id" hidden/>
             <input v-model="form.catalogo" hidden/>
-            
-
-            <el-form-item label="Número de Parte" prop="numero_parte">
-                <el-input v-model="form.numero_parte" />
-            </el-form-item>
 
             <el-form-item label="Tipo de Material" prop="tipo_material_id">
                 <el-select 
@@ -46,7 +41,7 @@
             </el-form-item>
 
             <el-row :gutter="20" align="bottom">
-                <el-col :span="10">
+                <el-col>
                     <el-form-item label="Peso(kg)" prop="peso_kg">
                         <el-input v-model="form.peso_kg" />
                     </el-form-item>
@@ -58,24 +53,9 @@
                 <label class="el-form-item__label">Medidas</label>
             </el-row>
             <el-row :gutter="20" align="bottom">
-                <el-col :span="6">
-                    <el-form-item prop="medida_1">
-                        <el-input v-model="form.medida_1"  />
-                    </el-form-item>
-                </el-col>
-                <el-col :span="6">
-                    <el-form-item prop="medida_2">
-                        <el-input v-model="form.medida_2" />
-                    </el-form-item>
-                </el-col>
-                <el-col :span="6">
-                    <el-form-item prop="medida_3">
-                        <el-input v-model="form.medida_3"/>
-                    </el-form-item>
-                </el-col>
-                <el-col :span="6">
-                    <el-form-item prop="medida_4">
-                        <el-input v-model="form.medida_4" :precision="2" :controls="false" :min="0" style="width:80px;"/>
+                <el-col >
+                    <el-form-item prop="medidas">
+                        <el-input v-model="form.medidas"  />
                     </el-form-item>
                 </el-col>
             </el-row>
@@ -129,6 +109,7 @@
             medida_2:"",
             medida_3:"",
             medida_4:"",
+            medidas:"",
         },
         rules: {
             numero_parte: [
@@ -148,6 +129,9 @@
             ],
             medida_2: [
                 { required: true, message: 'Ingresa medida 2', trigger: 'blur' },
+            ],
+            medidas: [
+                { required: true, message: 'Ingresa las medidas', trigger: 'blur' },
             ],
         },
         dialogoAgregar: false,
@@ -235,6 +219,8 @@
             this.form.medida_2 = "";
             this.form.medida_3 = "";
             this.form.medida_4 = "";
+            this.form.medidas = "";
+
         },
         handleClose(done) {
             this.$confirm('Está seguro que deseas salir?')

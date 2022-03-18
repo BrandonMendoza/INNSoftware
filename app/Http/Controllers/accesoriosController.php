@@ -23,11 +23,13 @@ class accesoriosController extends Controller
         /*Aqui se actualiza/crea con la informacion que enviamos al request*/
         $accesorio = $accesorio     ->fill(request()->all())
                                         ->updateOrCreate(['id' => request()->get('id')],$accesorio->toArray());
+
+        $accesorio->numero_parte = 'ACC-'.$accesorio->id;
         /**Crear numero parte si esta vacia */
-        if(request()->get('numero_parte') == ""){
-            $accesorio->numero_parte = 'ACC-'.str_pad($proyecto->id + 1, 8, "0", STR_PAD_LEFT);
-            $accesorio->update();
-        }
+        // if(request()->get('numero_parte') == ""){
+        //     $accesorio->numero_parte = 'ACC-'.str_pad($proyecto->id + 1, 8, "0", STR_PAD_LEFT);
+        //     $accesorio->update();
+        // }
     }
 
     /* Funcion para eliminar con id */

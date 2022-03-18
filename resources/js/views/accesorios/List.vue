@@ -5,7 +5,7 @@
             
         </el-row>
         <div class="filter-container">
-            <el-button class="filter-item" type="primary" icon="el-icon-plus" @click="$refs.myForm.open();$refs.myForm.clearFields();">Agregar</el-button>
+            <el-button class="filter-item" size="small" type="primary" icon="el-icon-plus" @click="$refs.myForm.open();$refs.myForm.clearFields();">Agregar</el-button>
         </div>
         <el-row >
             <el-table
@@ -15,10 +15,6 @@
             highlight-current-row
             v-loading="loading"
             style="width: 100%">
-                <el-table-column
-                type="index"
-                align="center" 
-                width="80"/>
 
                 <el-table-column
                 prop="numero_parte"

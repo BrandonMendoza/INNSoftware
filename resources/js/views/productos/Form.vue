@@ -1,6 +1,6 @@
 <template>
 
-    <el-form  :model="form" :rules="rules" ref="form" label-position="top"  label-width="150px" >
+    <el-form  :model="form" :rules="rules" ref="form" label-position="top"  label-width="150px" id="form_agregar" >
         <el-dialog
         width="60%"
         :ref="dialogRef"
@@ -14,58 +14,97 @@
             <input v-model="form.id" hidden/>
             <span style="margin-right: 5px;"><b>Núm. de Parte (Local): </b> {{form.numero_parte}}</span>
             <br>
-            <el-row :gutter="20">
-                <el-col :span="6">
-                    <el-form-item label="Cliente" prop="cliente_id">
-                        <el-select 
-                        :disabled="!checkPermission(['editar productos'])"
-                        v-model="form.cliente_nombre" 
-                        value-key="nombre_cliente"
-                        @change="changeCliente()"
-                        filterable>
-                            <el-option 
-                            v-for="cliente in clientes"
-                            :key="cliente.id"
-                            :label="cliente.nombre_cliente" 
-                            :value="cliente.nombre_cliente"/>
-                        </el-select>
-                    </el-form-item>
-
-
-                    <el-form-item label="Número de Parte (Cliente)" prop="numero_parte_cliente">
-                        <el-input v-model="form.numero_parte_cliente" :disabled="!checkPermission(['editar productos'])"/>
-                    </el-form-item>  
-
-                    <el-form-item label="Pintura" prop="pintura_id">
-                        <el-select 
-                        v-model="form.pintura_nombre" 
-                        value-key="nombre"
-                        @change="changePintura()"
-                        :disabled="!checkPermission(['editar productos'])"
-                        filterable>
-                            <el-option 
-                            v-for="pintura in pinturas"
-                            :key="pintura.id"
-                            :label="pintura.nombre" 
-                            :value="pintura.nombre"/>
-                        </el-select>
-                    </el-form-item>
-
-                    <el-form-item label="Peso (kg)" prop="peso_kg">
-                        <vue-numeric :disabled="!checkPermission(['editar productos'])" class="el-input__inner" v-bind:precision="2" separator="," v-model="form.peso_kg" @blur="calcularKgsToLbs()"></vue-numeric>
-                    </el-form-item> 
-
-                    <el-form-item label="Peso (lbs)" prop="peso_lbs">
-                        <vue-numeric :disabled="!checkPermission(['editar productos'])" class="el-input__inner" v-bind:precision="2" separator="," v-model="form.peso_lbs" @blur="calcularLbsToKgs()"></vue-numeric>
-                    </el-form-item> 
-                </el-col>
-                <el-col :span="18">
+            
                     <el-tabs v-model="activeName" @tab-click="handleClick">
-                        <!-- Tab Descripcion -->
-                        <el-tab-pane label="Descripción" name="first">
-                            <el-input type="textarea" 
-                            v-model="form.descripcion"
-                            :autosize="{ minRows: 16, maxRows: 16}"/>
+                        <!-- Tab GENERAL -->
+                        <el-tab-pane label="General" name="first">
+                            <el-row :gutter="20">
+                                <el-col :span="12">
+                                    <el-form-item label="Cliente" prop="cliente_id">
+                                        <el-select 
+                                        :disabled="!checkPermission(['editar productos'])"
+                                        v-model="form.cliente_nombre" 
+                                        value-key="nombre_cliente"
+                                        @change="changeCliente()"
+                                        filterable>
+                                            <el-option 
+                                            v-for="cliente in clientes"
+                                            :key="cliente.id"
+                                            :label="cliente.nombre_cliente" 
+                                            :value="cliente.nombre_cliente"/>
+                                        </el-select>
+                                    </el-form-item>
+                                </el-col>
+                                <el-col :span="12">
+                                    <el-form-item label="Número de Parte (Cliente)" prop="numero_parte_cliente">
+                                        <el-input v-model="form.numero_parte_cliente" :disabled="!checkPermission(['editar productos'])"/>
+                                    </el-form-item>  
+                                </el-col>
+                            </el-row>  
+
+                            <el-row :gutter="20">
+                                <el-col :span="24">
+                                    <el-form-item label="Nombre del Producto" prop="nombre_producto">
+                                        <el-input v-model="form.nombre_producto" :disabled="!checkPermission(['editar productos'])"/>
+                                    </el-form-item> 
+                                </el-col>
+                            </el-row> 
+
+                            <el-row :gutter="20">
+                                <el-col :span="12">
+                                    <el-form-item label="Pintura" prop="pintura_id">
+                                        <el-select 
+                                        v-model="form.pintura_nombre" 
+                                        value-key="nombre"
+                                        @change="changePintura()"
+                                        :disabled="!checkPermission(['editar productos'])"
+                                        filterable>
+                                            <el-option 
+                                            v-for="pintura in pinturas"
+                                            :key="pintura.id"
+                                            :label="pintura.nombre" 
+                                            :value="pintura.nombre"/>
+                                        </el-select>
+                                    </el-form-item>
+                                </el-col>
+                                <el-col :span="12">
+                                    <el-form-item label="Categoria" prop="categoria">
+                                        <el-select
+                                            v-model="form.categorias"
+                                            value-key="categoria"
+                                            multiple
+                                            filterable
+                                            allow-create
+                                            placeholder="Elige categorias">
+                                            <el-option
+                                            v-for="categoria in categorias_list"
+                                            :key="categoria.id"
+                                            :label="categoria.categoria"
+                                            :value="categoria">
+                                            </el-option>
+                                        </el-select>
+                                    </el-form-item> 
+                                </el-col>
+                            </el-row> 
+
+                            <el-row :gutter="20">
+                                <el-col :span="12">
+                                    <el-form-item label="Peso (kg)" prop="peso_kg">
+                                        <vue-numeric :disabled="!checkPermission(['editar productos'])" class="el-input__inner" v-bind:precision="2" separator="," v-model="form.peso_kg" @blur="calcularKgsToLbs()"></vue-numeric>
+                                    </el-form-item>     
+                                </el-col>
+                                <el-col :span="12">
+                                    <el-form-item label="Peso (lbs)" prop="peso_lbs">
+                                        <vue-numeric :disabled="!checkPermission(['editar productos'])" class="el-input__inner" v-bind:precision="2" separator="," v-model="form.peso_lbs" @blur="calcularLbsToKgs()"></vue-numeric>
+                                    </el-form-item>
+                                </el-col>
+                            </el-row> 
+                            </el-tab-pane>
+                            <!-- Tab Descripcion -->
+                            <el-tab-pane label="Descripción">
+                                <el-input type="textarea" 
+                                v-model="form.descripcion"
+                                :autosize="{ minRows: 16, maxRows: 16}"/>
                         </el-tab-pane>
                         <!-- Tab Materiales -->
                         <el-tab-pane label="Materiales" name="second">
@@ -147,8 +186,6 @@
                         </el-tab-pane>
                         
                     </el-tabs>
-                </el-col>
-            </el-row>
 
             <span slot="footer" class="dialog-footer">
                 <el-button @click="clearFields();close();" class="float-left">Cancelar</el-button>
@@ -218,6 +255,9 @@
     .color {
         width: 100%;
     }
+
+    
+
 </style>
 
 <style>
@@ -232,6 +272,10 @@
   .el-table .warning-row {
     background: #E1F3E5;
   }
+  
+
+  
+
 </style>
 <script>
 import VueNumeric from 'vue-numeric';
@@ -239,11 +283,24 @@ import waves from '@/directive/waves'; // Waves directive
 import permission from '@/directive/permission/index.js';
 import role from '@/directive/role/index.js';
 import checkPermission from '@/utils/permission';
+import Resource from '@/api/resource';
+
+const categoriaResource = new Resource('categorias');
 
   export default {
     data() {
       return {
-          
+          options: [{
+            value: 'HTML',
+            label: 'HTML'
+        }, {
+            value: 'CSS',
+            label: 'CSS'
+        }, {
+            value: 'JavaScript',
+            label: 'JavaScript'
+        }],
+        value: [],
         clientes:[],
         pinturas:[],
         materialesSelect:[],
@@ -262,6 +319,8 @@ import checkPermission from '@/utils/permission';
             peso_lbs:"",
             materiales:[],
             accesorios:[],
+            nombre_producto:"",
+            categorias:[],
         },
         materialAgregar:{
             material:"",
@@ -289,6 +348,8 @@ import checkPermission from '@/utils/permission';
         dialogoAccesorios:false,
         loadingCliente:false,
         loadingPinturas:false,
+        /** categorias **/
+        categorias_list:[],
       };
     },
     directives: { waves, permission, role  },
@@ -300,6 +361,10 @@ import checkPermission from '@/utils/permission';
             this.getClientes();
             this.getMateriales();
             this.getAccesorios();
+            this.getCategorias();
+
+            console.log("FORM");
+            console.log(this.form)
             
             this.dialogoAgregar = true;
         },
@@ -320,6 +385,9 @@ import checkPermission from '@/utils/permission';
                         me.close(); 
                         loadingInstance.close();
                         me.$message.success('Guardado correctamente.');
+                        console.log("RESPUESTA");
+                        console.log(response);
+                        
                     })
                     .catch(function (error) {
                         me.$message.error('Hubo un error.');
@@ -341,6 +409,7 @@ import checkPermission from '@/utils/permission';
             this.form.peso_lbs = "";
             this.form.materiales = [];
             this.form.accesorios = [];
+            this.form.categorias = [];
         },
         handleClose(done) {
             this.$confirm('Está seguro que deseas salir?')
@@ -349,6 +418,12 @@ import checkPermission from '@/utils/permission';
                 this.close(); //cerramos modal
             })
             .catch(_ => {});
+        },
+        async getCategorias(){
+            const { data, meta } = await categoriaResource.list();                
+            this.categorias_list = data;
+            console.log("CATEGORIAS");
+            console.log(data);
         },
         getMateriales(){
             let me =this;

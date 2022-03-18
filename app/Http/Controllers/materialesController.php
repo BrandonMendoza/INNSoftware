@@ -12,7 +12,8 @@ class materialesController extends Controller
 {
     /** Funcion para obtener todos los materiales */
     public function materiales(){
-        return (Material::with('Acero','Tipo_material')->get())->each->loadMedidas();
+        //return (Material::with('Acero','Tipo_material')->get())->each->loadMedidas();
+        return (Material::with('Acero','Tipo_material')->get());
     }
     
     public function materialesWithNombreCompleto(){
@@ -26,6 +27,8 @@ class materialesController extends Controller
         /*Aqui se actualiza/crea con la informacion que enviamos al request*/
         $material = $material     ->fill(request()->all())
                                         ->updateOrCreate(['id' => request()->get('id')],$material->toArray());
+        $material->numero_parte = 'MAT-'.$material->id;
+        $material->save();
     }
 
     /* Funcion para eliminar con id */

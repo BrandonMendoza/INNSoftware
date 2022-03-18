@@ -6,7 +6,7 @@
         </el-row>
         <div class="filter-container">
             <!-- BUSCAR INPUT -->
-            <div class="filter-item">
+            <div class="filter-item" id="barra_busqueda">
                 <el-input class="input-with-select" size="small" placeholder="buscar" v-model="presearch" @change="handlePresearchChange()" clearable>
                     <el-select v-model="selectSearch" slot="prepend" size="small" placeholder="Select">
                         <el-option label="Núm. de Parte (Cliente)"  value="numero_parte_cliente"></el-option>
@@ -54,10 +54,31 @@
                 fixed/> 
 
                 <el-table-column
+                prop="nombre_producto"
+                label="Nombre del Producto"
+                fixed/> 
+
+                <el-table-column
                 prop="cliente.nombre_cliente"
                 label="Cliente"
                 show-overflow-tooltip
                 fixed/>
+
+                <el-table-column
+                prop="categorias"
+                label="Categoria"
+                show-overflow-tooltip
+                align="center" 
+                fixed>
+                    <template slot-scope="scope">
+                        <el-tag
+                        v-for="categoria in scope.row.categorias"
+                        effect="plain"
+                        style="margin-left:2px;">
+                        {{ categoria.categoria }}
+                        </el-tag>
+                    </template>
+                </el-table-column>
 
                 <el-table-column
                 prop="peso_kg"
@@ -99,8 +120,13 @@
 </template>
 
 <style>
-    .el-select .el-input {
+
+    #barra_busqueda .el-select {
         width: 180px;
+    }
+
+    .el-dialog .el-select{
+        width:430px;
     }
 
     .input-with-select .el-input-group__prepend {
@@ -228,9 +254,11 @@ import role from '@/directive/role/index.js';
                 this.$refs.myForm.form.numero_parte = data.numero_parte;
                 this.$refs.myForm.form.numero_parte_cliente = data.numero_parte_cliente;
                 this.$refs.myForm.form.peso_kg = data.peso_kg;
+                this.$refs.myForm.form.nombre_producto = data.nombre_producto;
                 this.$refs.myForm.form.peso_lbs = data.peso_lbs;
                 this.$refs.myForm.form.descripcion = data.descripcion;
 
+                this.$refs.myForm.form.categorias = JSON.parse(JSON.stringify(data.categorias));
                 this.$refs.myForm.form.materiales = JSON.parse(JSON.stringify(data.materiales));
                 this.$refs.myForm.form.accesorios = JSON.parse(JSON.stringify(data.accesorios));
 

@@ -97,6 +97,7 @@ Route::apiResource('empleados', 'empleadosController');
 Route::apiResource('departamentos', 'departamentosController');
 Route::apiResource('puestos', 'puestosController');
 Route::apiResource('estados', 'estadosController');
+Route::apiResource('categorias', 'categoriasController');
 Route::apiResource('documentoTipo', 'documentoTipoController');
 Route::apiResource('perfilEmpresa', 'perfilEmpresaController');
 Route::apiResource('contratoEmpleado', 'ContratosEmpleadoController');

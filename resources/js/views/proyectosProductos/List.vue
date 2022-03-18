@@ -245,6 +245,8 @@
             v-if="showProducto"
             fixed/>
 
+            
+
             <af-table-column
             prop="proyecto.orden_compra" 
             label="Orden de Compra"
@@ -254,6 +256,13 @@
             <af-table-column
             prop="producto.numero_parte_cliente" 
             label="Producto (cliente)"
+            show-overflow-tooltip
+            width="110"
+            fixed/>
+
+            <af-table-column
+            prop="producto.nombre_producto" 
+            label="Nombre del Producto"
             show-overflow-tooltip
             width="110"
             fixed/>
@@ -285,19 +294,7 @@
             width="100"
             show-overflow-tooltip/> -->
             
-            <af-table-column
-            prop="work_order" 
-            label="Orden de Trabajo"
-            align="center"
-            width="100"
-            show-overflow-tooltip/>
-
-            <af-table-column
-            prop="item" 
-            label="Item"
-            align="center"
-            width="80"
-            show-overflow-tooltip/>
+            
 
             <af-table-column
             prop="fecha_promesa" 
@@ -335,6 +332,36 @@
                     </el-tag>
                 </template>
             </af-table-column>
+
+            <af-table-column
+            prop="categorias"
+            label="Categoria"
+            show-overflow-tooltip
+            align="center" 
+            fixed>
+                <template slot-scope="scope">
+                    <el-tag
+                    v-for="categoria in scope.row.producto.categorias"
+                    effect="plain"
+                    style="margin-left:2px;">
+                    {{ categoria.categoria }}
+                    </el-tag>
+                </template>
+            </af-table-column>
+
+            <af-table-column
+            prop="work_order" 
+            label="Orden de Trabajo"
+            align="center"
+            width="100"
+            show-overflow-tooltip/>
+
+            <af-table-column
+            prop="item" 
+            label="Item"
+            align="center"
+            width="80"
+            show-overflow-tooltip/>
             
 
             <el-table-column
@@ -536,7 +563,7 @@ const proyectoProductoComentarioResource = new ProyectoProductoComentarioResourc
                 terminadasSinEmbarcarlist:[],
                 mostrarTerminados:0,
                 showProyecto:false,
-                showProducto:false,
+                showProducto:true,
                 procesosFiltroList:[],
                 clientesFiltroList:[],
                 presearch:'',

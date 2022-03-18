@@ -11,8 +11,12 @@
             <input v-model="form.id" hidden/>
             
 
-            <el-form-item label="Nombre" prop="nombre">
+            <el-form-item label="Nombre Ingles" prop="nombre">
                 <el-input v-model="form.nombre" />
+            </el-form-item>
+
+            <el-form-item label="Nombre Español" prop="nombre">
+                <el-input v-model="form.nombre_spanish" />
             </el-form-item>
 
             <el-form-item label="Simbolo" prop="simbolo">
@@ -57,6 +61,7 @@
         form:{
             id:0,
             nombre:"",
+            nombre_spanish:"",
             simbolo:"",
             cantidad_datos:"",
         },
@@ -106,6 +111,7 @@
         clearFields(){/*Limpia los campos e inicializa la variable update a 0*/
             this.form.id = 0;
             this.form.nombre = "";
+            this.form.nombre_spanish = "";
             this.form.simbolo = "";
             this.form.cantidad_datos = "";
         },

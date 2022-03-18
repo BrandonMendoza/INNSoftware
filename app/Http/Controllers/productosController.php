@@ -17,7 +17,7 @@ class productosController extends Controller
     
 	/** Funcion para obtener todos los materiales */
     public function productos(){
-		$productos = Producto::orderBy('id','DESC')->with(['Cliente','Accesorios','Materiales','Materiales.Tipo_material','Materiales.Acero','Accesorios.Acero','Documentos','Pintura'])->get();
+		$productos = Producto::orderBy('id','DESC')->with(['Cliente','Accesorios','Materiales','Materiales.Tipo_material','Materiales.Acero','Accesorios.Acero','Documentos','Pintura','Categorias'])->get();
 		foreach ($productos as $key => $producto) {
 			($producto->materiales)->each->loadNombreCompleto();
 		}
@@ -39,12 +39,14 @@ class productosController extends Controller
 				$producto->numero_parte = 'PD-'.$producto->id;
 				$producto->update();
 			}
+			/* insertmaos las categorias del producto*/
+			$producto->insertCategorias(request()->get('categorias'));
 
 			/* insertmaos los materiales del producto*/
-			$producto->insertMateriales(request()->get('materiales'),$producto);
+			$producto->insertMateriales(request()->get('materiales'));
 
 			/* insertmaos accesorios del producto*/
-			$producto->insertAccesorios(request()->get('accesorios'),$producto);
+			$producto->insertAccesorios(request()->get('accesorios'));
 		});
 	}
 

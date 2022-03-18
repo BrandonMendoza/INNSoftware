@@ -8,7 +8,7 @@ class Material extends Model
 {
     protected $table = 'materiales'; 
 
-    protected $fillable = ['id','numero_parte','peso_kg','tipo_material_id','acero_id','medida_1','medida_2','medida_3','medida_4','catalogo'];
+    protected $fillable = ['id','numero_parte','peso_kg','tipo_material_id','acero_id','medida_1','medida_2','medida_3','medida_4','catalogo','medidas'];
 
     public function Acero()
     {

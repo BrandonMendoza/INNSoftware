@@ -69,7 +69,7 @@ class embarquesController extends Controller
             $embarque = $embarque ->fill($currentEmbarque)
                                                 ->updateOrCreate(['id' => $currentEmbarque['id']],$embarque->toArray());
             $embarque->numero_parte = 'EMB-'.$embarque->id;
-
+            $embarque->save();
             $embarque->storeProyectosProductos($proyectosProductos);                                                
             return new EmbarqueResource($embarque);
         });

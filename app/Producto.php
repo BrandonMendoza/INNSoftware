@@ -4,12 +4,28 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Storage;
+use App\Categoria;
 
 class Producto extends Model
 {
     protected $table = 'productos'; 
 
-    protected $fillable = ['id','cliente_id','numero_parte_cliente','numero_parte','descripcion','peso_kg','peso_lbs','deleted_at','created_at','updated_at','pintura_id'];
+    protected $fillable = ['id',
+							'cliente_id',
+							'numero_parte_cliente',
+							'numero_parte',
+							'descripcion',
+							'peso_kg',
+							'peso_lbs',
+							'deleted_at',
+							'created_at',
+							'updated_at',
+							'pintura_id',
+							'nombre_producto'];
+
+	public function Categorias(){
+		return $this->belongsToMany('App\Categoria', 'producto_categoria','producto_id', 'categoria_id')->withTimestamps();
+	}
 
     public function Materiales(){
 	    return $this->belongsToMany('App\Material', 'productos_materiales','producto_id', 'material_id')->withPivot('cantidad')->withTimestamps();
@@ -42,6 +58,7 @@ class Producto extends Model
 		/**Detach */
 		$this->Materiales()->detach();
 		$this->Accesorios()->detach();
+		$this->Categorias()->detach();
 		$this->deleteAllDocumentos();
 		/**Delete producto*/
 		$this->delete();
@@ -56,8 +73,32 @@ class Producto extends Model
 		return $productos;
 	}
 
-	public function insertMateriales($materiales,$producto){
-		$producto->Materiales()->detach();
+	public function insertCategorias($categorias){
+		$this->Categorias()->detach();
+		//return $categorias;
+		if(isset($categorias)){
+			//return $categorias;
+			foreach ($categorias as $key => $categoria) {
+				
+				if(isset($categoria['id'])){
+					$this->Categorias()->attach($categoria['id']);
+				}else{
+					if (Categoria::where('categoria', $categoria )->doesntExist()) {
+						$categoria_insert = new Categoria;
+						$categoria_insert->categoria = strtoupper($categoria);
+						$categoria_insert->save();
+						$this->Categorias()->attach($categoria_insert->id);
+					}
+					
+				}
+			}
+			// $categorias_list = Categoria::get();
+			// return $categorias_list;
+		}
+	}
+
+	public function insertMateriales($materiales){
+		$this->Materiales()->detach();
 		if(isset($materiales)){
 			foreach ($materiales as $key => $material) {
 				$this->Materiales()->attach($material['id'], ['cantidad' => $material['pivot']['cantidad']]);
@@ -65,8 +106,8 @@ class Producto extends Model
 		}
 	}
 
-	public function insertAccesorios($accesorios,$producto){
-		$producto->Accesorios()->detach();
+	public function insertAccesorios($accesorios){
+		$this->Accesorios()->detach();
 		if(isset($accesorios)){
 			foreach ($accesorios as $key => $accesorio) {
 				$this->Accesorios()->attach($accesorio['id'], ['cantidad' => $accesorio['pivot']['cantidad']]);

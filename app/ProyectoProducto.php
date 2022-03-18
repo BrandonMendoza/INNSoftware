@@ -129,7 +129,7 @@ class ProyectoProducto extends Pivot
         $ordenes = ProyectoProducto::where('fecha_promesa', '>=', $rangoFechas[0])
                                     ->where('fecha_promesa', '<=', $rangoFechas[1])
                                     ->orderBy('fecha_promesa','ASC')
-                                    ->with(['Producto',
+                                    ->with(['Producto.Categorias',
                                             'Proyecto',
                                             'Proyecto.Cliente',
                                             //'ProyectoProcesoProducto.ProyectoProceso.Proceso',
@@ -151,7 +151,7 @@ class ProyectoProducto extends Pivot
     public static function getOrdenesTerminadasSinEmbarcarList($mostrarTerminados){
         //$date = Carbon::today()->addYears(2);
         $ordenes = ProyectoProducto::orderBy('fecha_promesa','ASC')
-                                    ->with(['Producto',
+                                    ->with(['Producto.Categorias',
                                             'Proyecto',
                                             'Proyecto.Cliente',
                                             //'ProyectoProcesoProducto.ProyectoProceso.Proceso',
