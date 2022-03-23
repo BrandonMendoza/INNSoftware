@@ -13,20 +13,21 @@ class clientesController extends Controller
 
 	/** Funcion para obtener todos los materiales */
     public function clientes(){
-        return Cliente::get();
+        return Cliente::orderBy('created_at','DESC')->get();
 	}
 
     /*Funcion para insertar o Actualizar un proyecto*/
     public function insert()
     {
 		$cliente = new Cliente;
-		//Agregamos la clave del cliente, la cual consiste en la palabra 'CLI' seguido de la fecha con segundo y milesimas de hoy(asi sera inrepetible)
-		if(!request()->get('clave_cliente')) //Si es un agregar se creara nueva clave, si es editar no. 
-			request()->merge(['clave_cliente' => 'CLI-'.date('YmdHis')]);
-        
         /*Aqui se actualiza/crea con la informacion que enviamos al request*/
         $cliente = $cliente     ->fill(request()->all())
                                 ->updateOrCreate(['id' => request()->get('id')],$cliente->toArray());
+
+		if(request()->get('clave_cliente') == ""){
+			$cliente->clave_cliente = 'CLI-'.$cliente->id;
+			$cliente->update();
+		}	
     }
 
     /* Funcion para eliminar con id */

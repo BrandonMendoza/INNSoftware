@@ -254,7 +254,7 @@
             show-overflow-tooltip/>
 
             <af-table-column
-            prop="producto.numero_parte_cliente" 
+            prop="numero_parte_cliente" 
             label="Producto (cliente)"
             show-overflow-tooltip
             width="110"
@@ -264,7 +264,6 @@
             prop="producto.nombre_producto" 
             label="Nombre del Producto"
             show-overflow-tooltip
-            width="110"
             fixed/>
 
             <af-table-column
@@ -278,7 +277,8 @@
             prop="proyecto.cliente.nombre_cliente" 
             :filters="clientesFiltroList"
             :filter-method="filterClienteHandler"
-            label="Cliente"/> 
+            label="Cliente"
+            fixed/> 
 
             <af-table-column
             prop="cantidad" 
@@ -333,35 +333,7 @@
                 </template>
             </af-table-column>
 
-            <af-table-column
-            prop="categorias"
-            label="Categoria"
-            show-overflow-tooltip
-            align="center" 
-            fixed>
-                <template slot-scope="scope">
-                    <el-tag
-                    v-for="categoria in scope.row.producto.categorias"
-                    effect="plain"
-                    style="margin-left:2px;">
-                    {{ categoria.categoria }}
-                    </el-tag>
-                </template>
-            </af-table-column>
-
-            <af-table-column
-            prop="work_order" 
-            label="Orden de Trabajo"
-            align="center"
-            width="100"
-            show-overflow-tooltip/>
-
-            <af-table-column
-            prop="item" 
-            label="Item"
-            align="center"
-            width="80"
-            show-overflow-tooltip/>
+            
             
 
             <el-table-column
@@ -379,6 +351,35 @@
                     </el-tag>
                 </template>
             </el-table-column>
+
+            <el-table-column
+            prop="categorias"
+            label="Categoria"
+            show-overflow-tooltip
+            align="center" >
+                <template slot-scope="scope">
+                    <el-tag
+                    v-for="categoria in scope.row.producto.categorias"
+                    effect="plain"
+                    style="margin-left:2px;">
+                    {{ categoria.categoria }}
+                    </el-tag>
+                </template>
+            </el-table-column>
+
+            <af-table-column
+            prop="work_order" 
+            label="Orden de Trabajo"
+            align="center"
+            width="100"
+            show-overflow-tooltip/>
+
+            <af-table-column
+            prop="item" 
+            label="Item"
+            align="center"
+            width="80"
+            show-overflow-tooltip/>
 
             <af-table-column
             label="Peso (kgs)"
@@ -563,7 +564,7 @@ const proyectoProductoComentarioResource = new ProyectoProductoComentarioResourc
                 terminadasSinEmbarcarlist:[],
                 mostrarTerminados:0,
                 showProyecto:false,
-                showProducto:true,
+                showProducto:false,
                 procesosFiltroList:[],
                 clientesFiltroList:[],
                 presearch:'',
@@ -724,7 +725,7 @@ const proyectoProductoComentarioResource = new ProyectoProductoComentarioResourc
             calculateWeeks(date){
                 if(date == null)
                     return '—';
-                return moment(date).week();
+                return moment(date).week()+' - '+moment(date).year();
             },
             handleSizeChange(val){
                 this.pageSize = val;

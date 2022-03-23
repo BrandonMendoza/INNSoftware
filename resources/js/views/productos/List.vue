@@ -36,12 +36,7 @@
             v-loading="loading"
             style="width: 100%"
             :row-class-name="tableRowClassName">
-                <el-table-column
-                type="index"
-                align="center" 
-                width="80"
-                sortable
-                fixed/>
+                
 
                 <el-table-column
                 prop="numero_parte"

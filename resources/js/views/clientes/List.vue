@@ -19,17 +19,17 @@
             v-loading="loading"
             style="width: 100%">
                 <el-table-column
-                type="index"
-                align="center" 
-                width="80"/>
-
-                <el-table-column
                 prop="clave_cliente"
                 label="Clave"/>
 
                 <el-table-column
                 prop="nombre_cliente"
                 label="Nombre Comercial"
+                show-overflow-tooltip/>
+
+                 <el-table-column
+                prop="nombre_corto"
+                label="Nombre Corto"
                 show-overflow-tooltip/>
 
                 <el-table-column

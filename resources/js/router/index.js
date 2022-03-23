@@ -128,6 +128,42 @@ export const asyncRoutes = [
       },
     ],
   },
+  /**PRODUCTOS */
+  {
+    path: '/productos',
+    component: Layout,
+    redirect: '/Productos',
+    meta: { title: 'productos', icon: 'product' , permissions: ['view menu productos'] },
+    children: [
+      {
+        path: 'list',
+        component: () => import('@/views/productos/List'),
+        name: 'Productos',
+        meta: { title: 'productos', icon: 'product'},
+      },
+    ],
+  },
+  /**PROYECTOS */
+  {
+    path: '/proyectos',
+    component: Layout,
+    redirect: '/Proyectos',
+    meta: { title: 'proyectos', icon: 'proyectos' , permissions: ['view menu proyectos'] },
+    children: [
+      {
+        path: 'list',
+        component: () => import('@/views/proyectos/List'),
+        name: 'Proyectos',
+        meta: { title: 'proyectos', icon: 'proyectos' },
+      },
+      // {
+      //   path: 'list',
+      //   component: () => import('@/views/proyectosCosteo/List'),
+      //   name: 'Costeos',
+      //   meta: { title: 'Costeos', icon: 'proyectos' },
+      // },
+    ],
+  },
   /**ORDENES ABIERTAS */
   {
 
@@ -228,42 +264,8 @@ export const asyncRoutes = [
       },
     ],
   },
-  /**PROYECTOS */
-  {
-    path: '/proyectos',
-    component: Layout,
-    redirect: '/Proyectos',
-    meta: { title: 'proyectos', icon: 'proyectos' , permissions: ['view menu proyectos'] },
-    children: [
-      {
-        path: 'list',
-        component: () => import('@/views/proyectos/List'),
-        name: 'Proyectos',
-        meta: { title: 'proyectos', icon: 'proyectos' },
-      },
-      // {
-      //   path: 'list',
-      //   component: () => import('@/views/proyectosCosteo/List'),
-      //   name: 'Costeos',
-      //   meta: { title: 'Costeos', icon: 'proyectos' },
-      // },
-    ],
-  },
-  /**PRODUCTOS */
-  {
-    path: '/productos',
-    component: Layout,
-    redirect: '/Productos',
-    meta: { title: 'productos', icon: 'product' , permissions: ['view menu productos'] },
-    children: [
-      {
-        path: 'list',
-        component: () => import('@/views/productos/List'),
-        name: 'Productos',
-        meta: { title: 'productos', icon: 'product'},
-      },
-    ],
-  },
+  
+  
   /**CATALOGOS */
   {
     path: '/catalogos',

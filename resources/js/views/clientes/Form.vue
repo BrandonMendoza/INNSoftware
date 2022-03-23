@@ -19,6 +19,10 @@
                     <el-input v-model="form.nombre_cliente"/>
                 </el-form-item>
 
+                <el-form-item label="Nombre Corto" prop="nombre_corto">
+                    <el-input v-model="form.nombre_corto"/>
+                </el-form-item>
+
                 <el-form-item label="Giro" prop="giro">
                     <el-input v-model="form.giro" />
                 </el-form-item>
@@ -141,6 +145,7 @@
             foto_cliente:"",
             clave_cliente:"",
             nombre_cliente:"",
+            nombre_corto:"",
             giro:"",
             rfc:"",
             razon_social:"",
@@ -154,6 +159,9 @@
         rules: {
             nombre_cliente: [
                 { required: true, message: 'Ingresa un nombre de cliente', trigger: 'blur' },
+            ],
+            nombre_corto: [
+                { required: true, message: 'Ingresa un nombre corto', trigger: 'blur' },
             ],
             giro: [
                 { required: true, message: 'Ingresa un giro', trigger: 'blur' },
@@ -198,6 +206,7 @@
             this.form.foto_cliente = "";
             this.form.clave_cliente = "";
             this.form.nombre_cliente = "";
+            this.form.nombre_corto = "";
             this.form.giro = "";
             this.form.rfc = "";
             this.form.direccion = "";

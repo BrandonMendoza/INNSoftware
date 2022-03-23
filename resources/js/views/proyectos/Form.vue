@@ -22,7 +22,7 @@
                         <el-tag type="info"> {{ form.numero_parte == '' ? '—' :  form.numero_parte}}</el-tag>
                     </el-form-item>
                 </el-col>
-                <el-col :span="5">
+                <el-col :span="12">
                     <el-form-item label="Cliente" prop="cliente_id" >
                         <el-select 
                         id="cliente_select"
@@ -47,7 +47,7 @@
             </el-row>
 
             <el-row :gutter="20">
-                <el-col :span="5" v-if="checkPermission(['ver fecha entrega proyectos'])">
+                <el-col :span="10" v-if="checkPermission(['ver fecha entrega proyectos'])">
                     <el-form-item label="Fecha de Entrega" prop="fecha_entrega">
                         <el-date-picker
                         :disabled="!checkPermission(['editar proyectos'])"
@@ -55,7 +55,7 @@
                         type="date"/>
                     </el-form-item>
                 </el-col>
-                <el-col :span="5" >
+                <el-col :span="10" >
                     <el-form-item label="Fecha de Promesa" prop="fecha_promesa">
                         <el-date-picker
                         :disabled="!checkPermission(['editar proyectos'])"
@@ -135,6 +135,11 @@
                                                 <el-table-column
                                                 prop="proyecto_producto.numero_parte"
                                                 label="Orden"
+                                                show-overflow-tooltip/>
+
+                                                <el-table-column
+                                                prop="proyecto_producto.numero_parte_cliente"
+                                                label="NP Cliente"
                                                 show-overflow-tooltip/>
 
                                                 <el-table-column
@@ -242,7 +247,7 @@
             </el-form-item>
             
             <el-row :gutter="20">
-                <el-col :span="12">
+                <el-col :span="24">
 
                    <el-form-item label="Producto" v-if="currentProyectoProducto.id != 0">
                         {{ currentProyectoProducto.nombre_producto}}
@@ -256,13 +261,24 @@
                             <el-option 
                                 v-for="producto in productosSelect" 
                                 :key="producto.id"
-                                :label="producto.numero_parte+'/'+producto.numero_parte_cliente" 
+                                :label="producto.numero_parte_cliente+' - '+producto.nombre_producto" 
                                 :value="producto.id" 
                                 :disabled="producto.disabled"/>
                         </el-select>
                     </el-form-item>
 
                 </el-col>
+            </el-row>
+
+            <el-row :gutter="20">
+                <el-col :span="24">
+                    <el-form-item label="Num. de parte Cliente">
+                        <el-input  v-model="currentProyectoProducto.numero_parte_cliente" />
+                    </el-form-item>
+                </el-col>
+            </el-row>
+
+            <el-row :gutter="20">
                 <el-col :span="12">
                     <el-form-item label="Cantidad">
                         <el-input-number :min="1" v-model="currentProyectoProducto.cantidad" />
@@ -372,6 +388,10 @@
     .el-input-number--mini {
         width: 100%;
     }
+
+    .el-dialog .el-select{
+        width:430px;
+    }
 </style>
 
 <script>
@@ -453,6 +473,7 @@ export default {
             plan_corte:"",
             fecha_entrega:"",
             fecha_promesa:"",
+            numero_parte_cliente:"",
         },
         dialogoProyectoProductoEdit:false,
       };
@@ -662,6 +683,7 @@ export default {
                     proyecto_id:this.form.id,
                     producto_id: "",
                     nombre_producto:"",
+                    numero_parte_cliente:"",
                     agrupar:1,
                     plan_corte:"",
                     fecha_entrega: moment(),
@@ -699,9 +721,11 @@ export default {
         },
         /* TABLE */
         handleCurrentChangeTable(val) {
+            console.log("VAL:::");
+            console.log(val);
             if(val != null){
                 this.currentProyectoProducto = val.proyecto_producto;
-                this.currentProyectoProducto.nombre_producto = val.numero_parte+' / '+val.numero_parte_cliente;
+                this.currentProyectoProducto.nombre_producto = val.numero_parte_cliente+' - '+val.nombre_producto;
                 this.currentProyectoProducto.proyecto_id = this.form.id;
             }else{
                 this.clearCurrent();
