@@ -84,6 +84,7 @@ Route::namespace('Api')->group(function() {
     Route::post('/proyectosProductos/deleteFromProject', 'proyectosProductosController@deleteFromProject');
     Route::post('/proyectosProductos/updateMultiplePlanCorte', 'proyectosProductosController@updateMultiplePlanCorte');
     Route::post('/proyectosProductos/deleteMultipleFromProject', 'proyectosProductosController@deleteMultipleFromProject');
+    Route::post('/proyectosProductos/insertMultipleOrdenesAbiertas', 'proyectosProductosController@insertMultipleOrdenesAbiertas');
 
     /* Productos */
     Route::get('productos/{cliente}/getProductosByCliente', 'productosController@getProductosByCliente');

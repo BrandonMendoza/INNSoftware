@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\ProyectoProducto;
 use App\ProyectoProceso;
 use App\ProyectoProcesoProducto;
+use App\ProyectoProductoComentario;
 use App\Proyecto;
 use App\Cliente;
 use App\Proceso;
@@ -261,6 +262,74 @@ class proyectosProductosController extends BaseController
 	/** Funcion para obtener todos los procesos de un porducto con sus fechas */
 	public function getHistorialProcesos(){
 		return 	(ProyectoProcesoProducto::orderBy('created_at','DESC')->with('ProyectoProceso.Proceso','User')->where('proyecto_producto_id',request()->get('id'))->get());
+	}
+
+	/* Funcion para insertar multiple cambios en ordenes abiertas */
+	public function insertMultipleOrdenesAbiertas(Request $request){
+		DB::transaction(function () { 
+			/* Actualizando los procesos de cada Proyecto producto */
+			foreach (request()->get('productosSelect') as $key => $proyectoProcesoProducto) {
+				/*Se busca el PPP de el producto y el proceso*/
+				$proyectoProcesoProductoActual = ProyectoProcesoProducto::	orderBy('created_at','DESC') ->where([ 
+																				['proyecto_proceso_id',$proyectoProcesoProducto['Proceso']['proyecto_proceso_id']],
+																				['proyecto_producto_id',$proyectoProcesoProducto['Proceso']['proyecto_producto_id']]
+																			])	
+																			->first();
+
+
+				if($proyectoProcesoProductoActual['proyecto_proceso_id'] != $proyectoProcesoProducto['Proceso']['proyecto_proceso']['id']){
+					/*Se actualiza  el proceso anterior*/
+					$proyectoProcesoProductoActual['terminado_el'] = Carbon::now()->toDateTimeString();
+					$proyectoProcesoProductoActual->update();
+
+					/*Se preparan los datos del From para introducirse a la BD*/
+					$proyectoProcesoProductoNuevo = new ProyectoProcesoProducto;
+					$proyectoProcesoProductoNuevo = [
+						'proyecto_proceso_id' => $proyectoProcesoProducto['Proceso']['proyecto_proceso']['id'],
+						'proyecto_producto_id' => $proyectoProcesoProducto['Proceso']['proyecto_producto_id'],
+						'user_id' => Auth::id(),
+						'iniciado_el' => Carbon::now()->toDateTimeString(),
+					];
+					ProyectoProcesoProducto::create($proyectoProcesoProductoNuevo);
+				}
+
+				/*Agregamos el comentario */
+				if(request()->get('comentario_general') != ""){
+					$proyectoProductoComentario = new ProyectoProductoComentario;
+					$proyectoProductoComentario->comentario = request()->get('comentario_general');
+					$proyectoProductoComentario->usuario_id = Auth::id();
+					$proyectoProductoComentario->proyecto_producto_id = $proyectoProcesoProducto['Proceso']['proyecto_producto_id'];
+					$proyectoProductoComentario->proyecto_proceso_id = $proyectoProcesoProducto['Proceso']['proyecto_proceso']['id'];
+					ProyectoProductoComentario::create($proyectoProductoComentario->toArray());
+				}
+				
+
+				/*Actualizamos todos los demas datos */
+				$proyectoProducto = ProyectoProducto::find($proyectoProcesoProducto['Proceso']['proyecto_producto_id']);
+
+				if(request()->get("fecha_entrega") != "")
+					$proyectoProducto->fecha_entrega = Carbon::parse(request()->get("fecha_entrega"));
+
+				if(request()->get("fecha_promesa") != "")
+					$proyectoProducto->fecha_promesa = Carbon::parse(request()->get("fecha_promesa"));
+
+				if(request()->get('work_order') != "")
+					$proyectoProducto->work_order = request()->get('work_order');
+
+				if(request()->get('item') != "")
+					$proyectoProducto->item = request()->get('item');
+
+				if(request()->get('precio_pesos') != "")
+					$proyectoProducto->precio_pesos = request()->get('precio_pesos');
+
+				if(request()->get('precio_dlls') != "")
+					$proyectoProducto->precio_dlls = request()->get('precio_dlls');
+
+				$proyectoProducto->update();
+
+			}
+
+		});
 	}
 
     

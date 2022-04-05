@@ -6,6 +6,14 @@ class ProyectoProductoResource extends Resource {
     super('proyectosProductos');
   }
 
+  insertMultipleOrdenesAbiertas(resource){
+    return request({
+      url: '/proyectosProductos/insertMultipleOrdenesAbiertas' ,
+      method: 'post',
+      data: resource,
+    });
+  }
+
   arreglarListado(){
     return request({
       url: '/proyectosProductos/arreglarListado' ,

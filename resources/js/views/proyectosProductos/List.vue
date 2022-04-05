@@ -100,7 +100,7 @@
             <!-- EDIT -->
             <el-button  v-waves type="primary" size="small" class="filter-item" icon="el-icon-edit" :disabled="disableEditar"  @click="loadFieldsUpdate(currentRow)">Editar</el-button>
             <!-- PROCESO -->
-            <el-button v-waves v-permission="['cambiar proceso ordenes abiertas']" type="primary" size="small" class="filter-item" title="Cambiar proceso" :disabled="disableEditar" style="margin-left:0px;" @click="cambiarProceso(currentRow);">
+            <el-button v-waves v-permission="['cambiar proceso ordenes abiertas']" type="primary" size="small" class="filter-item" title="Cambiar proceso" :disabled="disableCambiarProceso" style="margin-left:0px;" @click="cambiarProceso(currentRow);">
                 <svg-icon icon-class="process"/> Cambiar Proceso
             </el-button>
             <!-- CODIGO DE BARRAS 
@@ -108,9 +108,9 @@
                 Codigo de Barras
             </el-button>-->
             <!-- Documentos -->
-            <el-button v-waves v-permission="['ver documentos proyectos']" type="primary" size="small" class="filter-item" icon="el-icon-document" style="margin-left:0px;" :disabled="disableEditar" @click="loadDocumentos(currentRow)">Documentos</el-button>
+            <el-button v-waves v-permission="['ver documentos proyectos']" type="primary" size="small" class="filter-item" icon="el-icon-document" style="margin-left:0px;" :disabled="disableDocumentos" @click="loadDocumentos(currentRow)">Documentos</el-button>
             <!-- DELETE -->
-            <el-button v-waves v-permission="['eliminar ordenes abiertas']" type="danger" size="small" class="filter-item" icon="el-icon-delete" style="margin-left:0px;" :disabled="disableEditar"
+            <el-button v-waves v-permission="['eliminar ordenes abiertas']" type="danger" size="small" class="filter-item" icon="el-icon-delete" style="margin-left:0px;" :disabled="disableDelete"
                         @click="deleteRow(currentRow.id,currentRow.numero_parte,currentRow.numero_parte_cliente);">Eliminar</el-button>
 
             <el-button v-waves type="primary" size="small" class="filter-item" icon="el-icon-document" slot="reference" @click="menuReportes()" style="margin-left:0px;">
@@ -184,6 +184,14 @@
                 <el-button type="primary" size="small" icon="el-icon-setting" slot="reference"></el-button>
             </el-popover>
 
+            <!-- MULTISELECCION -->
+
+            <el-switch 
+            active-text="Multiseleccion"
+            v-model="showMultipleSelection"  
+            :active-value="true" 
+            :inactive-value="false"></el-switch>
+
 
             
             
@@ -201,6 +209,7 @@
         @row-dblclick="dbSelected"
         highlight-current-row
         @current-change="handleCurrentChangeTable"
+        @selection-change="handleSelectionChange"
         sortable
         border
         tooltip-effect="light"
@@ -212,6 +221,12 @@
             align="center"
             sortable
             fixed/> -->
+
+            <el-table-column
+            type="selection"
+            align="center"
+            v-if="showMultipleSelection"
+            width="55"/>
 
             <af-table-column
             label="Proceso"
@@ -304,11 +319,11 @@
                 <template slot-scope="scope">
                     
                     <el-tag v-if="scope.row.Proceso.proyecto_proceso.es_ultimo == 1" type="success">
-                        {{scope.row.fecha_promesa | moment("YYYY-MMM-DD")}}
+                        {{scope.row.fecha_promesa | moment("DD-MMMM-YYYY")}}
                     </el-tag>
 
                     <el-tag v-else :type="compareDates(scope.row.fecha_promesa)">
-                        {{scope.row.fecha_promesa | moment("YYYY-MMM-DD")}}
+                        {{scope.row.fecha_promesa | moment("DD-MMMM-YYYY")}}
                     </el-tag>
                 </template>
             </af-table-column>
@@ -324,11 +339,11 @@
                 <template slot-scope="scope">
                     
                     <el-tag v-if="scope.row.Proceso.proyecto_proceso.es_ultimo == 1" type="success">
-                        {{scope.row.fecha_entrega | moment("YYYY-MMM-DD")}}
+                        {{scope.row.fecha_entrega | moment("DD-MMMM-YYYY")}}
                     </el-tag>
 
                     <el-tag v-else :type="compareDates(scope.row.fecha_entrega)">
-                        {{scope.row.fecha_entrega | moment("YYYY-MMM-DD")}}
+                        {{scope.row.fecha_entrega | moment("DD-MMMM-YYYY")}}
                     </el-tag>
                 </template>
             </af-table-column>
@@ -451,6 +466,7 @@
 
         <!-- DIALOGS -->
         <formDialog  ref="myForm" />
+        <formMultipleUpdateDialog  ref="formMultipleUpdate" />
         <cambiarProcesoDialog  ref="cambiarProcesoDialog" />
         <codigoBarrasDialog  ref="codigoBarrasDialog" />
         <menuCodigoBarrasDialog  ref="menuCodigoBarrasDialog" />
@@ -503,6 +519,7 @@
 </style>
 <script>
 import formDialog from './Form';
+import formMultipleUpdateDialog from './UpdateMultipleProyectosProductos';
 import documentosDialog from './documentos';
 import cambiarProcesoDialog from './cambiarProceso';
 import codigoBarrasDialog from './codigoBarras';
@@ -536,7 +553,9 @@ const proyectoProductoComentarioResource = new ProyectoProductoComentarioResourc
         },
         data(){
             return{
-                
+                /* MULTISELECCION */
+                showMultipleSelection:false,
+                multipleSelection: [],
                 /*EXPORTAR*/
                 downloading:false,
                 /*TIME LINE*/
@@ -611,6 +630,7 @@ const proyectoProductoComentarioResource = new ProyectoProductoComentarioResourc
         },
         components: { 
             formDialog : formDialog,
+            formMultipleUpdateDialog : formMultipleUpdateDialog,
             documentosDialog : documentosDialog,
             cambiarProcesoDialog : cambiarProcesoDialog,
             codigoBarrasDialog : codigoBarrasDialog,
@@ -667,7 +687,32 @@ const proyectoProductoComentarioResource = new ProyectoProductoComentarioResourc
                 return this.searching.slice(this.pageSize * this.page - this.pageSize, this.pageSize * this.page);
             },
             disableEditar() {
-                if(this.currentRow == null){
+                if(this.showMultipleSelection == true){
+                    if(this.multipleSelection.length > 0){
+                        return false;
+                    }
+                    return true;
+                }else{
+                    if(this.currentRow == null){
+                        return true;
+                    }
+                    return false;
+                }
+            },
+            disableCambiarProceso() {
+                if(this.currentRow == null || this.showMultipleSelection == true){
+                    return true;
+                }
+                return false;
+            },
+            disableDocumentos() {
+                if(this.currentRow == null || this.showMultipleSelection == true){
+                    return true;
+                }
+                return false;
+            },
+            disableDelete() {
+                if(this.currentRow == null || this.showMultipleSelection == true){
                     return true;
                 }
                 return false;
@@ -680,6 +725,9 @@ const proyectoProductoComentarioResource = new ProyectoProductoComentarioResourc
             },
         },
         methods:{
+            handleSelectionChange(val) {
+                this.multipleSelection = val;
+            },
             checkPermission,
             //funcion para buscar con barcode
             barcodeSearch(barcodeInput){
@@ -841,28 +889,31 @@ const proyectoProductoComentarioResource = new ProyectoProductoComentarioResourc
                 var auxList = _.uniqBy(this.clientesFiltroList, 'value')
                 this.clientesFiltroList = auxList;
             },
-            loadFieldsUpdate(data){ 
-                this.$refs.myForm.form.id = data.id;
-                this.$refs.myForm.form.cantidad = data.cantidad;
-                this.$refs.myForm.form.item = data.item;
-                this.$refs.myForm.form.work_order = data.work_order;
-                this.$refs.myForm.form.heat_number = data.heat_number;
-                this.$refs.myForm.form.fecha_entrega = data.fecha_entrega;
-                this.$refs.myForm.form.fecha_promesa = data.fecha_promesa;
-                this.$refs.myForm.form.proyecto = data.proyecto.numero_parte;
-                this.$refs.myForm.form.producto = data.producto.numero_parte_cliente;
-                this.$refs.myForm.form.producto_local = data.producto.numero_parte;
-                this.$refs.myForm.form.notas = data.notas;
-                this.$refs.myForm.form.precio_dlls = data.precio_dlls;
-                this.$refs.myForm.form.precio_pesos = data.precio_pesos;
-                this.$refs.myForm.form.numero_parte = data.numero_parte;
-                this.$refs.myForm.form.plan_corte = data.plan_corte;
-
-                //Documentos
-                //this.$refs.myForm.form.documentos = JSON.parse(JSON.stringify(data.documentos));
-                
-
-                this.$refs.myForm.open();
+            loadFieldsUpdate(data){                 
+                if(this.showMultipleSelection > 0){
+                    console.log("MULTI SELECCION: ");
+                    console.log(this.multipleSelection);
+                    this.$refs.formMultipleUpdate.form.productosSelect = this.multipleSelection;
+                    this.$refs.formMultipleUpdate.form.productosActuales = this.multipleSelection;
+                    this.$refs.formMultipleUpdate.open();    
+                }else{
+                    this.$refs.myForm.form.id = data.id;
+                    this.$refs.myForm.form.cantidad = data.cantidad;
+                    this.$refs.myForm.form.item = data.item;
+                    this.$refs.myForm.form.work_order = data.work_order;
+                    this.$refs.myForm.form.heat_number = data.heat_number;
+                    this.$refs.myForm.form.fecha_entrega = data.fecha_entrega;
+                    this.$refs.myForm.form.fecha_promesa = data.fecha_promesa;
+                    this.$refs.myForm.form.proyecto = data.proyecto.numero_parte;
+                    this.$refs.myForm.form.producto = data.producto.numero_parte_cliente;
+                    this.$refs.myForm.form.producto_local = data.producto.numero_parte;
+                    this.$refs.myForm.form.notas = data.notas;
+                    this.$refs.myForm.form.precio_dlls = data.precio_dlls;
+                    this.$refs.myForm.form.precio_pesos = data.precio_pesos;
+                    this.$refs.myForm.form.numero_parte = data.numero_parte;
+                    this.$refs.myForm.form.plan_corte = data.plan_corte;
+                    this.$refs.myForm.open();
+                }
             },
             menuCodigoBarras(data){ 
                 this.$refs.menuCodigoBarrasDialog.data = data;

@@ -34,12 +34,12 @@
                             <el-row :gutter="20">
                                 <el-col :span="12" v-if="checkPermission(['ver fecha entrega proyectos'])">
                                     <el-form-item label="Fecha de Entrega" prop="fecha_entrega">
-                                        <el-date-picker :disabled="!checkPermission(['editar ordenes abiertas'])" v-model="form.fecha_entrega" type="date" />
+                                        <el-date-picker :disabled="!checkPermission(['editar ordenes abiertas'])" v-model="form.fecha_entrega" type="date" format="dd-MMMM-yyyy"/>
                                     </el-form-item>
                                 </el-col>
                                 <el-col :span="12">
                                     <el-form-item label="Fecha Promesa" prop="fecha_promesa">
-                                        <el-date-picker :disabled="!checkPermission(['editar ordenes abiertas'])" v-model="form.fecha_promesa" type="date" />
+                                        <el-date-picker :disabled="!checkPermission(['editar ordenes abiertas'])" v-model="form.fecha_promesa" type="date" format="dd-MMMM-yyyy"/>
                                     </el-form-item>
                                 </el-col>
                             </el-row>

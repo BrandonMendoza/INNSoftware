@@ -77,7 +77,7 @@
                 align="center"> 
                     <template slot-scope="scope">
                         <el-tag>
-                            {{scope.row.fecha_entrega | moment("YYYY-MMM-DD")}}
+                            {{scope.row.fecha_entrega | moment("DD-MMMM-YYYY")}}
                         </el-tag>
                     </template>
                 </el-table-column>
@@ -89,7 +89,7 @@
                 align="center"> 
                     <template slot-scope="scope">
                         <el-tag>
-                            {{scope.row.fecha_promesa | moment("YYYY-MMM-DD")}}
+                            {{scope.row.fecha_promesa | moment("DD-MMMM-YYYY")}}
                         </el-tag>
                     </template>
                 </el-table-column>
