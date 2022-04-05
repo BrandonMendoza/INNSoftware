@@ -45,15 +45,16 @@
                                 fixed> 
                                     <template slot-scope="scope">
                                         <el-select 
-                                        v-model="scope.row.Proceso.proyecto_proceso.id" 
-                                        value-key="proyecto_proceso.id"
+                                        v-model="scope.row.Proceso.proyecto_proceso.proceso.nombre"
+                                        @change="changeProyectoProceso(scope)"
+                                        value-key="proyecto_proceso.proceso.nombre"
                                         placeholder="Select">
                                             <el-option
                                             :style="'font-weight: bold;background-color:'+procesoProy.color+';color:'+procesoProy.texto_color+';'"
                                             v-for="procesoProy in scope.row.proyecto.procesos"
                                             :key="procesoProy.pivot.id"
                                             :label="procesoProy.nombre"
-                                            :value="procesoProy.pivot.id">
+                                            :value="procesoProy.nombre">
                                             </el-option>
                                         </el-select>
                                         <!--
@@ -172,6 +173,10 @@
     .color {
         width: 100%;
     }
+
+    .el-input--suffix {
+        background-color: #FF0000;
+    }
 </style>
 
 <script>
@@ -214,6 +219,7 @@ const proyectoProductoResource = new ProyectoProductoResource('proyectosProducto
             comentario_general:"",
             productosSelect:[],
             productosActuales:[],
+
         },
         rules: {
             // numero_parte_cliente: [
@@ -252,6 +258,39 @@ const proyectoProductoResource = new ProyectoProductoResource('proyectosProducto
             this.close();
             loadingInstance.close();
             //this.productosSelect = data;
+        },
+        changeProyectoProceso(scope) {
+
+            //  <el-select 
+            //     v-model="scope.row.Proceso.proyecto_proceso.proceso.nombre"
+            //     @change="changeProyectoProceso(scope)"
+            //     value-key="proyecto_proceso.proceso.nombre"
+            //     placeholder="Select">
+            //         <el-option
+            //         :style="'font-weight: bold;background-color:'+procesoProy.color+';color:'+procesoProy.texto_color+';'"
+            //         v-for="procesoProy in scope.row.proyecto.procesos"
+            //         :key="procesoProy.pivot.id"
+            //         :label="procesoProy.nombre"
+            //         :value="procesoProy.pivot.nombre">
+            //         </el-option>
+            // </el-select>
+
+
+
+            console.log("SCOPE");
+            console.log(scope);
+            //$proyectoProcesoProducto['Proceso']['proyecto_proceso']['id']
+
+            console.log(scope.row.Proceso.proyecto_proceso.proceso.nombre);
+
+            if(scope.row.Proceso.proyecto_proceso.proceso.nombre != ""){
+                scope.row.proyecto.procesos.forEach(proceso => {
+                    console.log();
+                    if(proceso['nombre'] == scope.row.Proceso.proyecto_proceso.proceso.nombre){
+                        scope.row.Proceso.proyecto_proceso.id = proceso.pivot.id;
+                    }
+                });
+            }
         },
         open() {
             console.log("SI LLEGA A OPEN");
