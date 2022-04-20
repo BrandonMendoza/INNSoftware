@@ -42,6 +42,26 @@
                 </el-col>
                 <el-col :span="14"/>
             </el-row>
+            <el-row :gutter="20" align="bottom">
+                <el-col :span="12">
+                    <el-form-item label="Categoria" prop="categoria">
+                        <el-select
+                            v-model="form.categorias"
+                            value-key="categoria"
+                            multiple
+                            filterable
+                            allow-create
+                            placeholder="Elige categorias">
+                            <el-option
+                            v-for="categoria in categorias_list"
+                            :key="categoria.id"
+                            :label="categoria.categoria"
+                            :value="categoria">
+                            </el-option>
+                        </el-select>
+                    </el-form-item> 
+                </el-col>
+            </el-row> 
             
 
             <!-- <input v-model="message" v-on:keypress="isNumber(event)"> -->
@@ -63,6 +83,10 @@
     }
 </style>
 <script>
+import Resource from '@/api/resource';
+const categoriaResource = new Resource('categorias');
+
+
     var esNumero = (rule, value, callback) => {
         if (!value) {
             return callback(new Error('Ingresa peso'));
@@ -90,7 +114,10 @@
             acero_id:"",
             acero_nombre:"",
             peso_kg:"",
+            categorias:[],
         },
+        /** categorias **/
+        categorias_list:[],
         rules: {
             numero_parte: [
                 { required: true, message: 'Ingresa un número de parte', trigger: 'blur' },
@@ -115,6 +142,7 @@
     methods: {
         open() {
             this.getAceros();
+            this.getCategorias();
             this.dialogoAgregar = true;
         },
         close() {
@@ -129,6 +157,8 @@
                     let me = this;
                     
                     axios.put('/accesorios/insert',me.form).then(function (response) {
+                        console.log("RESPONSE");
+                        console.log(response);
                         me.$parent.getList();
                         me.clearFields();
                         me.close(); 
@@ -143,6 +173,12 @@
                     return false;
                 }
             });
+        },
+        async getCategorias(){
+            const { data, meta } = await categoriaResource.list();                
+            this.categorias_list = data;
+            console.log("CATEGORIAS");
+            console.log(data);
         },
         getAceros(){
             let me =this;
@@ -169,6 +205,7 @@
             this.form.acero_id = "";
             this.form.acero_nombre = "";
             this.form.peso_kg = "";
+            this.form.categorias = [];
             //this.$refs['form'].resetFields();
         },
         handleClose(done) {

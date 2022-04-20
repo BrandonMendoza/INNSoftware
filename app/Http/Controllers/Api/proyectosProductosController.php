@@ -276,7 +276,7 @@ class proyectosProductosController extends BaseController
 																			])	
 																			->first();
 
-
+				
 				if($proyectoProcesoProductoActual['proyecto_proceso_id'] != $proyectoProcesoProducto['Proceso']['proyecto_proceso']['id']){
 					/*Se actualiza  el proceso anterior*/
 					$proyectoProcesoProductoActual['terminado_el'] = Carbon::now()->toDateTimeString();
@@ -330,6 +330,11 @@ class proyectosProductosController extends BaseController
 			}
 
 		});
+	}
+
+	/* Funcion para obtener los procesos de un ProyectoProducto */
+	public function getProcesosFromProyectoProducto(Request $request){
+		return ProyectoProceso::orderBy('orden','ASC')->where([	['proyecto_id',request()->get('proyecto_id')],['es_estatico',0]])->with('Proceso')->get();
 	}
 
     

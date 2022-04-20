@@ -117,14 +117,14 @@ export const asyncRoutes = [
     redirect: '/Ordenes Timsa',
     name: 'Ordenes Timsa',
     meta: { 
-      title: 'Ordenes Timsa', icon: 'ordenesAbiertas', permissions: ['view menu ordenes abiertas timsa']
+      title: 'ordenesTimsa', icon: 'ordenesAbiertas', permissions: ['view menu ordenes abiertas timsa']
     },
     children: [
       {
         path: 'listClient',
         component: () => import('@/views/proyectosProductos/ListClient'),
         name: 'ordenesAbiertasClient',
-        meta: { title: 'ordenes Abiertas Timsa', icon: 'ordenesAbiertas', permissions: ['view menu ordenes abiertas timsa']},
+        meta: { title: 'ordenesTimsa', icon: 'ordenesAbiertas', permissions: ['view menu ordenes abiertas timsa']},
       },
     ],
   },
@@ -172,7 +172,7 @@ export const asyncRoutes = [
     redirect: '/Ordenes',
     name: 'Ordenes',
     meta: { 
-      title: 'Ordenes', icon: 'ordenesAbiertas', permissions: ['view menu ordenes abiertas']
+      title: 'ordenes', icon: 'ordenesAbiertas', permissions: ['view menu ordenes abiertas']
     },
     children: [
       {
@@ -185,7 +185,7 @@ export const asyncRoutes = [
         path: 'embarques',
         component: () => import('@/views/Embarques/List'),
         name: 'Embarques',
-        meta: { title: 'Embarques', icon: 'list' },
+        meta: { title: 'embarques', icon: 'list' },
       },
       {
         path: 'UploadExcel',
@@ -203,7 +203,7 @@ export const asyncRoutes = [
     redirect: '/Administracion',
     name: 'Administracion',
     meta: { 
-      title: 'Administración', icon: 'list', permissions: ['view menu ordenes abiertas']
+      title: 'administracion', icon: 'list', permissions: ['view menu ordenes abiertas']
     },
     
     children: [
@@ -211,7 +211,7 @@ export const asyncRoutes = [
         path: 'perfilEmpresa',
         component: () => import('@/views/PerfilEmpresa/List'),
         name: 'perfilEmpresa',
-        meta: { title: 'Perfil de Empresa',icon: 'form' , permissions: ['view menu perfil empresa']  },
+        meta: { title: 'perfilEmpresa',icon: 'form' , permissions: ['view menu perfil empresa']  },
       },
       
     ],
@@ -223,7 +223,7 @@ export const asyncRoutes = [
     redirect: '/RecursosHumanos',
     name: 'Recursos Humanos',
     meta: { 
-      title: 'Recursos Humanos', icon: 'el-icon-user-solid', permissions: ['manage recursos humanos']
+      title: 'recursosHumanos', icon: 'el-icon-user-solid', permissions: ['manage recursos humanos']
     },
     
     children: [
@@ -231,19 +231,19 @@ export const asyncRoutes = [
         path: '/empleadosList',
         component: () => import('@/views/Empleados/List'),
         name: 'Empleados Activos',
-        meta: { title: 'Empleados Activos', icon: 'el-icon-user-solid',permissions: ['view menu empleados activos'] },
+        meta: { title: 'empleadosActivos', icon: 'el-icon-user-solid',permissions: ['view menu empleados activos'] },
       },
       {
         path: '/empleadosBajas',
         component: () => import('@/views/Empleados/ListBajas'),
         name: 'Bajas',
-        meta: { title: 'Empleados Bajas', icon: 'el-icon-user-solid',permissions: ['view menu empleados bajas'] },
+        meta: { title: 'empleadosBajas', icon: 'el-icon-user-solid',permissions: ['view menu empleados bajas'] },
       },
       {
         path: '/departamentos',
         component: () => import('@/views/Departamentos/List'),
         name: 'Departamentos y puestos',
-        meta: { title: 'Departamentos y puestos', icon: 'list' },
+        meta: { title: 'departamentosPuestos', icon: 'list' },
       },
     ],
   },

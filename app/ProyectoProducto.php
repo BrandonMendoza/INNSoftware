@@ -133,7 +133,7 @@ class ProyectoProducto extends Pivot
                                     ->where('fecha_promesa', '<=', $rangoFechas[1])
                                     ->orderBy('fecha_promesa','ASC')
                                     ->with(['Producto.Categorias',
-                                            'Proyecto.Procesos',
+                                            //'Proyecto.Procesos',
                                             'Proyecto.Cliente',
                                             //'ProyectoProcesoProducto.ProyectoProceso.Proceso',
                                             'ProyectoProductoComentario'])

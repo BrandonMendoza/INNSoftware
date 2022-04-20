@@ -341,6 +341,9 @@ const categoriaResource = new Resource('categorias');
             cliente_id: [
                 { required: true, message: 'Selecciona un cliente', trigger: 'change' },
             ],
+            pintura_id: [
+                { required: true, message: 'Selecciona una pintura', trigger: 'change' },
+            ],
         },
         dialogoAgregar: false,
         dialogRef: 'myForm',

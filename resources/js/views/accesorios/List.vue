@@ -35,6 +35,21 @@
                 width="120"/>
 
                 <el-table-column
+                prop="categorias"
+                label="Categoria"
+                show-overflow-tooltip
+                align="center">
+                    <template slot-scope="scope">
+                        <el-tag
+                        v-for="categoria in scope.row.categorias"
+                        effect="plain"
+                        style="margin-left:2px;">
+                        {{ categoria.categoria }}
+                        </el-tag>
+                    </template>
+                </el-table-column>
+
+                <el-table-column
                 fixed="right"
                 label=""
                 align="center"
@@ -101,6 +116,8 @@ import Pagination from '@/components/Pagination';
                 this.$refs.myForm.form.acero_nombre = data.acero.nombre;
                 this.$refs.myForm.form.peso_kg = data.peso_kg;
                 this.$refs.myForm.open();
+
+                this.$refs.myForm.form.categorias = JSON.parse(JSON.stringify(data.categorias));
             },
             deleteRow(id){
                 let me = this;

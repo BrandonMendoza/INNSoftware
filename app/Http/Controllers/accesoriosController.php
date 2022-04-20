@@ -11,25 +11,26 @@ class accesoriosController extends Controller
 
     /** Funcion para obtener todos los materiales */
     public function accesorios(){
-        return Accesorio::with('Acero')->get();
+        return Accesorio::with('Acero','Categorias')->get();
 	}
 
     /*Funcion para insertar o Actualizar un proyecto*/
     public function insert()
     {
         $accesorio = new Accesorio;
-        /*Creando sus procesos*/
         
         /*Aqui se actualiza/crea con la informacion que enviamos al request*/
         $accesorio = $accesorio     ->fill(request()->all())
                                         ->updateOrCreate(['id' => request()->get('id')],$accesorio->toArray());
+        
+        if(request()->get('numero_parte') == ""){ 
+            $accesorio->numero_parte = 'AC-'.$accesorio->id;
+            $accesorio->update();
+        }
+        /* insertmaos las categorias del accesorio*/
+		$accesorio->insertCategorias(request()->get('categorias'));
 
-        $accesorio->numero_parte = 'ACC-'.$accesorio->id;
-        /**Crear numero parte si esta vacia */
-        // if(request()->get('numero_parte') == ""){
-        //     $accesorio->numero_parte = 'ACC-'.str_pad($proyecto->id + 1, 8, "0", STR_PAD_LEFT);
-        //     $accesorio->update();
-        // }
+       
     }
 
     /* Funcion para eliminar con id */

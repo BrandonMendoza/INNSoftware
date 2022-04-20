@@ -6,11 +6,13 @@
                 <el-input class="input-with-select" size="small" placeholder="Buscar"  v-model="presearch" @change="handleSearch()" clearable>
                     <el-select v-model="selectSearch" size="small" slot="prepend" placeholder="Select" >
                         <el-option label="Núm. de Parte (Cliente)"      value="numero_parte_cliente"></el-option>
-                        <el-option label="Núm. de Parte (Local)"     value="numero_parte_producto"></el-option>
+                        <el-option label="Nombre del Producto"      value="nombre_producto"></el-option>
+                        <el-option label="Núm. de Orden"     value="numero_orden"></el-option>
                         <el-option label="Proyecto"                     value="proyecto"></el-option>
                         <el-option label="Cliente"                      value="nombre_cliente"></el-option>
                         <el-option label="Codigo de Barras (Local)"     value="codigo_barras"></el-option>
                         <el-option label="Codigo de Barras (Cliente)"   value="codigo_barras_cliente"></el-option>
+                        
                         <!-- <el-option label="Orden de Compra"          value="orden_compra"></el-option> -->
                         <!-- <el-option label="Orden de Trabajo"         value="work_order"></el-option> -->
                     </el-select>
@@ -230,8 +232,6 @@
 
             <af-table-column
             label="Proceso"
-            :filters="procesosFiltroList"
-            :filter-method="filterProcesoHandler"
             fixed>
                 <template slot-scope="scope">
                 <el-badge  class="notificaciones_badge" :value="scope.row.proyecto_producto_comentario.length">
@@ -290,8 +290,6 @@
 
             <af-table-column
             prop="proyecto.cliente.nombre_cliente" 
-            :filters="clientesFiltroList"
-            :filter-method="filterClienteHandler"
             label="Cliente"
             fixed/> 
 
@@ -650,11 +648,21 @@ const proyectoProductoComentarioResource = new ProyectoProductoComentarioResourc
                 }
                 this.page = 1;
                 let dataReturned = [];
+                //  <el-option label="Cliente"                      value="nombre_cliente"></el-option>
+                //  <el-option label="Proyecto"                     value="proyecto"></el-option>
+                //  <el-option label="Núm. de Parte (Cliente)"      value="numero_parte_cliente"></el-option>
+
+                //  <el-option label="Núm. de Orden"                value="numero_parte_producto"></el-option>
+                //  <el-option label="Codigo de Barras (Local)"     value="codigo_barras"></el-option>
+                //  <el-option label="Codigo de Barras (Cliente)"   value="codigo_barras_cliente"></el-option>
 
                 if(this.selectSearch == "nombre_cliente"){
                    dataReturned = this.list.filter(data => !!data['proyecto']['cliente']['nombre_cliente'].toLowerCase().includes(this.search.toLowerCase()));
                 }
                 else if(this.selectSearch == "proyecto"){
+                   dataReturned = this.list.filter(data => !!data['proyecto']['numero_parte_cliente'].toLowerCase().includes(this.search.toLowerCase()));
+                }
+                else if(this.selectSearch == "nombre_producto"){
                    dataReturned = this.list.filter(data => !!data['proyecto']['numero_parte_cliente'].toLowerCase().includes(this.search.toLowerCase()));
                 }
                 else if(this.selectSearch == "orden_compra"){
@@ -663,10 +671,16 @@ const proyectoProductoComentarioResource = new ProyectoProductoComentarioResourc
                    //!!data['proyecto']['orden_compra'].toLowerCase().includes(this.search.toLowerCase())
                 }
                 else if(this.selectSearch == "numero_parte_cliente"){
-                   dataReturned = this.list.filter(data => !!data['producto']['numero_parte_cliente'].toLowerCase().includes(this.search.toLowerCase()));
+                    const me = this;
+                    dataReturned = this.list.filter(data => !!data['producto']['numero_parte_cliente'].toLowerCase().includes(this.search.toLowerCase()));
+                    this.list.filter(function (data) {
+                        if(data['numero_parte_cliente'] != null)
+                            if(!!data['numero_parte_cliente'].toLowerCase().includes(me.search.toLowerCase()))
+                                dataReturned.push(data);
+                    });
                 }
-                else if(this.selectSearch == "numero_parte_producto"){
-                   dataReturned = this.list.filter(data => !!data['producto']['numero_parte'].toLowerCase().includes(this.search.toLowerCase()));
+                else if(this.selectSearch == "numero_orden"){
+                   dataReturned = this.list.filter(data => !!data['numero_parte'].toLowerCase().includes(this.search.toLowerCase()));
                 }
                 else if(this.selectSearch == "codigo_barras"){
                    dataReturned = this.list.filter(data => data['numero_parte'].toLowerCase().includes(this.search.toLowerCase()));
@@ -889,13 +903,11 @@ const proyectoProductoComentarioResource = new ProyectoProductoComentarioResourc
                 var auxList = _.uniqBy(this.clientesFiltroList, 'value')
                 this.clientesFiltroList = auxList;
             },
-            loadFieldsUpdate(data){                 
-                if(this.showMultipleSelection > 0){
-                    console.log("MULTI SELECCION: ");
-                    console.log(this.multipleSelection);
-                    this.$refs.formMultipleUpdate.form.productosSelect = this.multipleSelection;
-                    this.$refs.formMultipleUpdate.form.productosActuales = this.multipleSelection;
-                    this.$refs.formMultipleUpdate.open();    
+            async loadFieldsUpdate(data){                 
+                if(this.showMultipleSelection > 0){                    
+                        this.$refs.formMultipleUpdate.form.productosSelect = this.multipleSelection;
+                        this.$refs.formMultipleUpdate.form.productosActuales = this.multipleSelection;
+                        this.$refs.formMultipleUpdate.open();
                 }else{
                     this.$refs.myForm.form.id = data.id;
                     this.$refs.myForm.form.cantidad = data.cantidad;

@@ -5,7 +5,12 @@
             
         </el-row>
         <div class="filter-container">
-            <el-button class="filter-item" type="primary" icon="el-icon-plus" @click="$refs.myForm.clearFields();$refs.myForm.open()">Agregar</el-button>
+            <el-button class="filter-item" size="small" type="primary" icon="el-icon-plus" @click="$refs.myForm.clearFields();$refs.myForm.open()">Agregar</el-button>
+            <!-- EDIT -->
+            <el-button  v-waves type="primary" size="small" class="filter-item" icon="el-icon-edit" :disabled="disableEditar"  @click="loadFieldsUpdate(currentRow)">Editar</el-button>
+            <!-- DELETE -->
+            <el-button v-waves type="danger" size="small" class="filter-item" icon="el-icon-delete" style="margin-left:0px;" :disabled="disableEditar"
+                        @click="deleteRow(currentRow.id);">Eliminar</el-button>
         </div>
         
         <el-row >
@@ -15,6 +20,7 @@
             fit
             highlight-current-row
             v-loading="loading"
+            @current-change="handleCurrentChangeTable"
             style="width: 100%">
 
                 <el-table-column
@@ -37,16 +43,7 @@
                 prop="peso_kg"
                 label="Peso(kg)"/>
 
-                <el-table-column
-                fixed="right"
-                label=""
-                align="center"
-                width="180">
-                    <template slot-scope="scope">
-                        <el-button type="primary" size="mini" @click="loadFieldsUpdate(scope.row);">Editar</el-button>
-                        <el-button type="danger" size="mini" @click="deleteRow(scope.row.id);">Eliminar</el-button>
-                    </template>
-                </el-table-column>
+                
             </el-table>
         </el-row>    
         
@@ -60,6 +57,7 @@
 <script>
 import formDialog from './Form';
 import Pagination from '@/components/Pagination'; 
+import waves from '@/directive/waves'; // Waves directive
 
 
     export default {
@@ -75,14 +73,27 @@ import Pagination from '@/components/Pagination';
                     type: undefined,
                     sort: '+id',
                 },
+                currentRow: null,
                 materiales:[], //Este array contendrá las tareas de nuestra bd
             }
         },
+        computed: {
+            disableEditar() {
+                if(this.currentRow == null){
+                    return true;
+                }
+                return false;
+            }
+        },
+        directives: { waves },
         components: { 
             formDialog : formDialog,
             Pagination
         },
         methods:{
+            handleCurrentChangeTable(val) {
+                this.currentRow = val;
+            },
             async getList(){
                 let me =this;
                 let url = '/materiales';
@@ -104,10 +115,6 @@ import Pagination from '@/components/Pagination';
                 this.$refs.myForm.form.acero_id = data.acero_id;
                 this.$refs.myForm.form.acero_nombre = data.acero.nombre;
                 this.$refs.myForm.form.peso_kg = data.peso_kg;
-                this.$refs.myForm.form.medida_1 = data.medida_1;
-                this.$refs.myForm.form.medida_2 = data.medida_2;
-                this.$refs.myForm.form.medida_3 = data.medida_3;
-                this.$refs.myForm.form.medida_4 = data.medida_4;
                 this.$refs.myForm.form.medidas = data.medidas;
 
 

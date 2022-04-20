@@ -38,11 +38,6 @@
             fit
             v-loading="loading"
             style="width: 100%">
-                <el-table-column
-                type="index"
-                align="center"
-                sortable
-                fixed/>
 
                 <el-table-column
                 prop="numero_parte"

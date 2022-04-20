@@ -45,16 +45,21 @@
                                 fixed> 
                                     <template slot-scope="scope">
                                         <el-select 
+                                        :loading="loadingProductoSelected"
                                         v-model="scope.row.Proceso.proyecto_proceso.proceso.nombre"
                                         @change="changeProyectoProceso(scope)"
+                                        @focus="focusProductSelect(scope)"
                                         value-key="proyecto_proceso.proceso.nombre"
                                         placeholder="Select">
                                             <el-option
                                             :style="'font-weight: bold;background-color:'+procesoProy.color+';color:'+procesoProy.texto_color+';'"
                                             v-for="procesoProy in scope.row.proyecto.procesos"
-                                            :key="procesoProy.pivot.id"
-                                            :label="procesoProy.nombre"
-                                            :value="procesoProy.nombre">
+                                            :key="procesoProy.id"
+                                            :label="procesoProy.proceso.nombre"
+                                            :value="procesoProy.proceso.nombre">
+                                                <span :style="'font-weight: bold;background-color:'+procesoProy.color+';color:'+procesoProy.texto_color+';'">
+                                                    {{ procesoProy.proceso.nombre }}
+                                                </span>
                                             </el-option>
                                         </el-select>
                                         <!--
@@ -199,6 +204,7 @@ const proyectoProductoResource = new ProyectoProductoResource('proyectosProducto
         productosSelect:[],
         procesosByProducto:[],
         activeName: 'first',
+        loadingProductoSelected:true,
         form:{
             id:0,
             numero_parte:"",
@@ -242,62 +248,74 @@ const proyectoProductoResource = new ProyectoProductoResource('proyectosProducto
       };
     },
     directives: { waves, permission, role  },
+    mounted() {
+        
+    },
     methods: {
         checkPermission,
         async insertMultipleOrdenesAbiertas(){
             console.log("INSERT FORM");
             console.log(this.form);
-            
             var loadingInstance = this.$loading({
-                    target: '#updateMultipleProyectosProductos > .el-dialog'
-                });
+                target: '#updateMultipleProyectosProductos > .el-dialog'
+            });
             const data = await proyectoProductoResource.insertMultipleOrdenesAbiertas(this.form);
             this.$parent.getList();
             this.$parent.showMultipleSelection = false;            
             this.clearFields();
             this.close();
             loadingInstance.close();
-            //this.productosSelect = data;
         },
         changeProyectoProceso(scope) {
-
-            //  <el-select 
-            //     v-model="scope.row.Proceso.proyecto_proceso.proceso.nombre"
-            //     @change="changeProyectoProceso(scope)"
-            //     value-key="proyecto_proceso.proceso.nombre"
-            //     placeholder="Select">
-            //         <el-option
-            //         :style="'font-weight: bold;background-color:'+procesoProy.color+';color:'+procesoProy.texto_color+';'"
-            //         v-for="procesoProy in scope.row.proyecto.procesos"
-            //         :key="procesoProy.pivot.id"
-            //         :label="procesoProy.nombre"
-            //         :value="procesoProy.pivot.nombre">
-            //         </el-option>
-            // </el-select>
-
-
-
-            console.log("SCOPE");
-            console.log(scope);
-            //$proyectoProcesoProducto['Proceso']['proyecto_proceso']['id']
-
-            console.log(scope.row.Proceso.proyecto_proceso.proceso.nombre);
-
             if(scope.row.Proceso.proyecto_proceso.proceso.nombre != ""){
                 scope.row.proyecto.procesos.forEach(proceso => {
-                    console.log();
-                    if(proceso['nombre'] == scope.row.Proceso.proyecto_proceso.proceso.nombre){
-                        scope.row.Proceso.proyecto_proceso.id = proceso.pivot.id;
+                    if(proceso.proceso['nombre'] == scope.row.Proceso.proyecto_proceso.proceso.nombre){
+                        scope.row.Proceso.proyecto_proceso.id = proceso.id;
                     }
                 });
             }
         },
-        open() {
-            console.log("SI LLEGA A OPEN");
-            console.log("PRODUCTOS SELECT:");
-            console.log(this.productosSelect);
+        async focusProductSelect(scope) {
+            this.loadingProductoSelected = true;
+            var aux = scope.row;
+            console.log("SI ENTRA");
+            console.log(aux)
+            await this.getProcesos(scope.row).then(response => {
+                scope.row.proyecto.procesos = response;
+            });
+            this.loadingProductoSelected = false;
+            this.$forceUpdate();
+            console.log(scope.row)
+        },
+        ForcesUpdateComponent() {
+            this.$forceUpdate();
+        },
+         open() {
+            // var loadingInstance = this.$loading({target: '#updateMultipleProyectosProductos > .el-dialog'});
+
+            // this.form.productosSelect.forEach(proyectoProducto => {
+            //     this.getProcesos(proyectoProducto).then(function (response) {
+            //         console.log("RESPONSE GET PROCESOS");
+            //         console.log(response);
+            //         proyectoProducto.proyecto.procesos = response;
+            //     });
+            //     proyectoProducto.proyecto.procesos = this.getProcesos(proyectoProducto);
+            // });
+            // console.log("DESPUES DE GET PROCESOS");
+            // console.log(this.form.productosSelect);
+            
+            // this.cargandoProcesosSelect = false;
+            // loadingInstance.close();
+            // this.form.productosSelect.forEach(async proyectoProducto => {
+            //     proyectoProducto.proyecto.procesos = await this.getProcesos(proyectoProducto);
+            // });
+            this.loadingSelectProceso = false;
+            
             this.activeName = 'first';
+            this.ForcesUpdateComponent();
             this.dialogoAgregar = true;
+            
+            
         },
         close() {
             this.$parent.setCurrent();
@@ -319,6 +337,11 @@ const proyectoProductoResource = new ProyectoProductoResource('proyectosProducto
             this.form.precio_pesos = 0;
             this.form.precio_dlls = 0;
             this.form.plan_corte = "";
+        },
+        async getProcesos(proyectoProducto){
+            const data = await proyectoProductoResource.getProcesosFromProyectoProducto(proyectoProducto);
+            return data;
+
         },
         handleClose(done) {
             this.$confirm('Está seguro que deseas salir?')
