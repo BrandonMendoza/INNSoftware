@@ -7,7 +7,8 @@
         :ref="dialogRef"
         :before-close="handleClose"
         :visible.sync="dialogoAgregar">
-            <span slot="title"><svg-icon icon-class="process"/> Cambiar Proceso </span>
+            <span slot="title"> <svg-icon icon-class="process" style="color:white;"/> Cambiar Proceso </span> 
+                                
              
             
             <!-- Id del proceso que se esta editando ("0" si es agregar) -->
@@ -25,13 +26,19 @@
             <!-- Titulo de porcentaje -->
             <el-row type="flex"  justify="space-around" style="font-size: 12px;">
                 <el-col>
-                    Núm. de Parte: <span style="font-weight: bold;">{{form.numero_parte}}</span>
+                    Núm. de Orden: <span style="font-weight: bold;">{{form.numero_orden}}</span>
                 </el-col>
             </el-row>
             <!-- Titulo de porcentaje -->
             <el-row type="flex"  justify="space-around" style="font-size: 12px;">
                 <el-col>
-                    Núm. de Parte (cliente): <span style="font-weight: bold;">{{form.numero_parte_cliente}}</span>
+                    Producto (cliente): <span style="font-weight: bold;">{{form.numero_parte_cliente}}</span>
+                </el-col>
+            </el-row>
+            <!-- Titulo de porcentaje -->
+            <el-row type="flex"  justify="space-around" style="font-size: 12px;">
+                <el-col>
+                    Nombre del Producto (cliente): <span style="font-weight: bold;">{{form.nombre_producto}}</span>
                 </el-col>
             </el-row>
             
@@ -165,8 +172,10 @@ import moment from 'moment';
           /**Default variables  */
         form:{
             id:0,
+            numero_orden:"",
             numero_parte:"",
             numero_parte_cliente:"",
+            nombre_producto:"",
             proyecto_id:0,
             proceso_actual:0,
             proceso_nuevo:0,
@@ -240,8 +249,6 @@ import moment from 'moment';
             var loadingInstance = this.$loading({ target: '#dialogoCambiarProceso > .el-dialog' });
             let url = '/proyectosProductos/getProcesosByProducto';
             axios.put(url,me.form).then(function (response) {
-                console.log("RESPUESTA: ");
-                console.log(response);
                 //creamos un array y guardamos el contenido que nos devuelve el response
                 //procesos
                 me.procesos = response.data.procesos;
@@ -263,8 +270,6 @@ import moment from 'moment';
                 } else if(me.procesoActual.es_ultimo == 1){
                     me.orden = (me.ordenMax + 1);
                 }else{
-                    console.log("PROCESO ACTUAL");
-                    console.log(me.procesoActual);
                     me.orden = me.procesoActual.orden
                 }
 
@@ -298,14 +303,10 @@ import moment from 'moment';
                 this.form.proceso_nuevo = this.procesoUltimo.id;
                 return false;
             }
-            console.log("FOR PROCESOS: ----");
             for (var proceso of this.procesos) {
                 if(parseInt(proceso.porcentaje) != 0){
                     this.percentage += parseInt(proceso.porcentaje);
                 }
-                console.log("---------------------");
-                console.log(proceso);
-                console.log(this.orden);
                 if(this.orden == proceso.orden){
                     //cuando encuentras el proceso lo guardas en el proceso actual
                     this.procesoActual = proceso.proceso;

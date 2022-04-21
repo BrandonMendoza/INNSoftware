@@ -334,7 +334,15 @@ class proyectosProductosController extends BaseController
 
 	/* Funcion para obtener los procesos de un ProyectoProducto */
 	public function getProcesosFromProyectoProducto(Request $request){
-		return ProyectoProceso::orderBy('orden','ASC')->where([	['proyecto_id',request()->get('proyecto_id')],['es_estatico',0]])->with('Proceso')->get();
+		$procesos = ProyectoProceso::orderBy('orden','ASC')->where([	['proyecto_id',request()->get('proyecto_id')],['es_estatico',0]])->with('Proceso')->get();
+
+		$primerProceso = ProyectoProceso::where([['proyecto_id',request()->get('proyecto_id')],['es_primero',1]])->with('Proceso')->first();
+		$ultimoProceso = ProyectoProceso::where([['proyecto_id',request()->get('proyecto_id')],['es_ultimo',1]])->with('Proceso')->first();
+
+		$procesos->prepend($primerProceso);
+		$procesos->push($ultimoProceso);
+		
+		return $procesos;
 	}
 
     

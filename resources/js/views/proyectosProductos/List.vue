@@ -293,6 +293,10 @@
             label="Cliente"
             fixed/> 
 
+            numero_parte:"",
+            numero_parte_cliente:"",
+            nombre_producto:"",
+
             <af-table-column
             prop="cantidad" 
             label="Cantidad"
@@ -824,18 +828,13 @@ const proyectoProductoComentarioResource = new ProyectoProductoComentarioResourc
             },
             async getList(){
                 //const { data, meta } = await proyectoProductoResource.getOrdenesAbiertasList();
-
-                console.log("INICIO DE GET LIST");
-                console.log("QUERY CON FECHAS");
-                console.log(this.query);
                 this.loading = true;
                 if(this.rangoFechas == '' || this.rangoFechas == null){
                     this.setRangeDateDefault();
                 }
                 const { limit, page } = this.query;
                 const { data, meta } = await proyectoProductoResource.getOrdenesAbiertasList(this.query);
-                //var data = await proyectoProductoResource.getOrdenesAbiertasList(this.query);
-                console.log("FIN DE GET ORDENES ABIERTAS LIST");
+                
                 console.log("DATA");
                 console.log(data);
                 
@@ -854,7 +853,6 @@ const proyectoProductoComentarioResource = new ProyectoProductoComentarioResourc
                 
                 this.cargarProcesosFiltro();
                 this.cargarClientesFiltro();
-                console.log("FIN DE CARGAR FILTROS");
                 this.loading = false;
             },
             async getListTerminadasSinEmbarcar(){
@@ -933,9 +931,12 @@ const proyectoProductoComentarioResource = new ProyectoProductoComentarioResourc
             },
             cambiarProceso(data){
                 this.$refs.cambiarProcesoDialog.form.id = data.id;
+                this.$refs.cambiarProcesoDialog.form.numero_orden = data.numero_parte;
                 this.$refs.cambiarProcesoDialog.form.numero_parte = data.producto.numero_parte;
-                this.$refs.cambiarProcesoDialog.form.numero_parte_cliente = data.producto.numero_parte_cliente;
+                this.$refs.cambiarProcesoDialog.form.numero_parte_cliente = data.numero_parte_cliente;
+                this.$refs.cambiarProcesoDialog.form.nombre_producto = data.producto.nombre_producto;
                 this.$refs.cambiarProcesoDialog.form.proyecto_id = data.proyecto_id;
+
                 // this.$refs.cambiarProcesoDialog.form.documentos = JSON.parse(JSON.stringify(data.documentos));
                 this.$refs.cambiarProcesoDialog.open()
             },
