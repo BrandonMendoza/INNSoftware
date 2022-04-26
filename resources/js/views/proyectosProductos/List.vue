@@ -232,6 +232,9 @@
 
             <af-table-column
             label="Proceso"
+            :filters="procesosFiltroList"
+            :filter-method="filterProcesoHandler"
+            filter-placement="bottom-end"
             fixed>
                 <template slot-scope="scope">
                 <el-badge  class="notificaciones_badge" :value="scope.row.proyecto_producto_comentario.length">
@@ -292,10 +295,6 @@
             prop="proyecto.cliente.nombre_cliente" 
             label="Cliente"
             fixed/> 
-
-            numero_parte:"",
-            numero_parte_cliente:"",
-            nombre_producto:"",
 
             <af-table-column
             prop="cantidad" 
@@ -998,6 +997,7 @@ const proyectoProductoComentarioResource = new ProyectoProductoComentarioResourc
 
                 return '';
             },
+            
             filterProcesoHandler(value, row, column) {
                 const property = column['property'];
                 return row["Proceso"]["proyecto_proceso"]["proceso"]["nombre"] === value;
@@ -1058,35 +1058,42 @@ const proyectoProductoComentarioResource = new ProyectoProductoComentarioResourc
             handleDownload() {
             this.downloading = true;
                 import('@/vendor/Export2Excel').then(excel => {
+                  console.log("HANDLE DOWNLOAD");
+
                     var tHeader = [
-                        'Proceso', 
-                        'Orden', 
-                        'Producto', 
-                        'Orden de Compra', 
-                        'Cliente',
-                        'Cantidad',
-                        'Plan de corte',
-                        'Orden de Trabajo',
-                        'Item',
-                        'Fecha Promesa',
-                        'Peso (KGS)',
-                        'Peso (LBS)',];
+                        'Proceso', //1
+                        'Orden', //2
+                        'Numero Parte Cliente', //3
+                        'Producto Nombre', //4
+                        'Numero Parte Producto', //5 
+                        'Orden de Compra', //6
+                        'Cliente', //7
+                        'Cantidad', //8
+                        'Plan de corte', //9
+                        'Orden de Trabajo', //10
+                        'Item', //11
+                        'Fecha Promesa', //12
+                        'Peso (KGS)', //13
+                        'Peso (LBS)',]; //14
+
 
 
                     var filterVal = [
-                        //'proyecto_proceso_producto[0].proyecto_proceso.proceso.nombre', 
-                        'excel_proceso', 
-                        'numero_parte', 
-                        'excel_producto_numero_parte', 
-                        'excel_proyecto_orden_compra', 
-                        'excel_proyecto_nombre_cliente',
-                        'cantidad',
-                        'plan_corte',
-                        'work_order',
-                        'item',
-                        'excel_fecha_promesa',
-                        'excel_producto_peso_lbs',
-                        'excel_producto_peso_kgs',];
+                        'excel_proceso', //1
+                        'numero_parte', //2
+                        'excel_producto_numero_parte_cliente', //3   
+                        'excel_nombre_producto', //4
+                        'excel_producto_numero_parte', //5
+                        'excel_proyecto_orden_compra', //6
+                        'excel_proyecto_nombre_cliente',//7
+                        'cantidad', //8
+                        'plan_corte', //9
+                        'work_order', //10
+                        'item', //11
+                        'excel_fecha_promesa', //12
+                        'excel_producto_peso_lbs', //13
+                        'excel_producto_peso_kgs', //14
+                    ];
 
                     if(checkPermission(['ver fecha entrega proyectos'])){
                         tHeader.push('Fecha entrega');
@@ -1102,6 +1109,8 @@ const proyectoProductoComentarioResource = new ProyectoProductoComentarioResourc
                     this.list.forEach((value, index) => {
                         value.excel_proceso = value.Proceso.proyecto_proceso.proceso.nombre;
                         value.excel_producto_numero_parte = value.producto.numero_parte_cliente;
+                        value.excel_nombre_producto = value.producto.nombre_producto;
+                        value.excel_producto_numero_parte_cliente = value.numero_parte_cliente;
                         value.excel_proyecto_orden_compra = value.proyecto.orden_compra;
                         value.excel_proyecto_nombre_cliente = value.proyecto.cliente.nombre_cliente;
                         value.excel_fecha_entrega = this.formatMomentDate(value.fecha_entrega);
@@ -1130,6 +1139,7 @@ const proyectoProductoComentarioResource = new ProyectoProductoComentarioResourc
                         'Proceso', 
                         'Orden', 
                         'Producto', 
+                        'Producto Numer', 
                         'Orden de Compra', 
                         'Cliente',
                         'Cantidad',

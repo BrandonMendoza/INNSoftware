@@ -3,7 +3,7 @@
     <el-form  :model="form" :rules="rules" ref="formUpdateMultiple" label-position="top"  label-width="150px" >
         <el-dialog
         id="updateMultipleProyectosProductos"
-        width="50%"
+        width="75%"
         :ref="dialogRef"
         :before-close="handleClose"
         :visible.sync="dialogoAgregar">
@@ -19,7 +19,7 @@
 
                         <el-tab-pane label="Procesos" name="first">
 
-                            <el-row :gutter="20" v-permission="['view finanzas']">
+                            <el-row :gutter="20">
                                 <el-col :span="24">
                                     <el-form-item label="Comentarios">
                                         <el-input 
@@ -30,6 +30,18 @@
                                         :autosize="{ minRows: 3, maxRows: 16}"/>
                                     </el-form-item>
                                 </el-col>
+                            </el-row>
+
+
+                            <el-row>
+                                <div class="filter-container"> 
+                                    <el-button size="small" class="filter-item" style="margin-left:0px;" type="primary" icon="el-icon-d-arrow-left">
+                                        Retroceder de Proceso
+                                    </el-button>
+                                    <el-button @click="avanzarProceso();" size="small" class="filter-item" style="margin-left:0px;" type="primary" icon="el-icon-d-arrow-right">
+                                        Avanzar de Proceso 
+                                    </el-button>
+                                </div>
                             </el-row>
 
 
@@ -48,6 +60,7 @@
                                         :loading="loadingProductoSelected"
                                         v-model="scope.row.Proceso.proyecto_proceso.proceso.nombre"
                                         @change="changeProyectoProceso(scope)"
+                                        ref="selectProceso"
                                         @focus="focusProductSelect(scope)"
                                         value-key="proyecto_proceso.proceso.nombre"
                                         placeholder="Select">
@@ -63,6 +76,7 @@
                                             </el-option>
                                         </el-select>
                                         <!--
+                                        
                                         <el-tag  :style="'font-weight: bold;background-color:'+scope.row.Proceso.proyecto_proceso.proceso.color+';color:'+scope.row.Proceso.proyecto_proceso.proceso.texto_color+';'">
                                             <svg-icon icon-class="process" :style="'background-color:'+scope.row.Proceso.proyecto_proceso.proceso.color+';color:'+scope.row.Proceso.proyecto_proceso.proceso.texto_color+';'"/>
                                             {{scope.row.Proceso.proyecto_proceso.proceso.nombre}}
@@ -204,7 +218,7 @@ const proyectoProductoResource = new ProyectoProductoResource('proyectosProducto
         productosSelect:[],
         procesosByProducto:[],
         activeName: 'first',
-        loadingProductoSelected:true,
+        loadingProductoSelected:false,
         form:{
             id:0,
             numero_parte:"",
@@ -286,6 +300,15 @@ const proyectoProductoResource = new ProyectoProductoResource('proyectosProducto
             this.loadingProductoSelected = false;
             this.$forceUpdate();
             console.log(scope.row)
+        },
+        async avanzarProceso(){
+            this.$refs['selectProceso'].focus();     
+            console.log("AVANZAR PROCESO");
+            this.form.productosSelect.forEach(async proyectoProducto => {
+                await this.getProcesos(proyectoProducto).then(function (response) {
+                    proyectoProducto.Proceso.proyecto_proceso.proceso.nombre = 'Terminado';
+                });
+            });
         },
         ForcesUpdateComponent() {
             this.$forceUpdate();
