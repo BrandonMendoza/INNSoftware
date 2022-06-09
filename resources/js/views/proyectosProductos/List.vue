@@ -1202,7 +1202,9 @@ const proyectoProductoComentarioResource = new ProyectoProductoComentarioResourc
                 return jsonData.map(v => filterVal.map(j => v[j]));
             },
             async arreglarListado(){
-                const { data, meta } = await proyectoProductoResource.arreglarListado();
+
+                const { limit, page } = this.query;
+                const { data, meta } = await proyectoProductoResource.arreglarListado(this.query);
                 this.getList();
             }
         },

@@ -136,8 +136,13 @@ class proyectosProductosController extends BaseController
 		return Proyecto::where('id',request()->get('proyecto_id'))->with(['Productos'])->get();
 	}
 
-	public function arreglarListado(){
-		$proyectoProducto_list = ProyectoProducto::getOrdenesAbiertasList(0);
+	public function arreglarListado(Request $request){
+		$searchParams = $request->all();
+		$mostrarTerminados = Arr::get($searchParams, 'mostrarTerminados', 0);
+		$rangoFechas = Arr::get($searchParams, 'rangoFechas', '');
+
+
+		$proyectoProducto_list = ProyectoProducto::getOrdenesAbiertasList($mostrarTerminados,$rangoFechas);
 		foreach ($proyectoProducto_list as $key => $proyectoProducto) {
 			if($proyectoProducto->ProyectoProcesoProducto->count() == 0){
 				$user_id = Auth::id();

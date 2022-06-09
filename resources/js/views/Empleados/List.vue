@@ -204,13 +204,13 @@
 
                                 <el-col :span="5">
                                     <el-form-item label="CURP" prop="curp">
-                                        <el-input v-model="current.curp" maxlength="13"/>
+                                        <el-input v-model="current.curp" maxlength="18"/>
                                     </el-form-item>
                                 </el-col>
                             </el-row>
 
                         </el-tab-pane>
-                        <el-tab-pane label="Dirección" >
+                        <el-tab-pane label="Direcciónes" >
                             <el-row :gutter="20">
                                 <el-col :span="10">
                                     <el-form-item label="Calle y Numero" prop="direccion">

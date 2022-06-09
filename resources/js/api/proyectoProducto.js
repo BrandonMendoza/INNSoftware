@@ -22,10 +22,12 @@ class ProyectoProductoResource extends Resource {
     });
   }
 
-  arreglarListado(){
+  arreglarListado(query){
     return request({
       url: '/proyectosProductos/arreglarListado' ,
       method: 'post',
+//      method: 'get',
+      params: query,
     });
   }
 
