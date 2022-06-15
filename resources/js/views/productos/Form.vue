@@ -35,11 +35,13 @@
                                         </el-select>
                                     </el-form-item>
                                 </el-col>
+                                <!-- 
                                 <el-col :span="12">
-                                    <el-form-item label="Número de Parte (Cliente)" prop="numero_parte_cliente">
+                                    <el-form-item label="Número de Parte (Cliente)" >
                                         <el-input v-model="form.numero_parte_cliente" :disabled="!checkPermission(['editar productos'])"/>
                                     </el-form-item>  
                                 </el-col>
+                                -->
                             </el-row>  
 
                             <el-row :gutter="20">

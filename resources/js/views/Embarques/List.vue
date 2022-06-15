@@ -83,7 +83,9 @@
                 <el-table-column type="expand">
                     <template slot-scope="props">
                         <li  v-for="(proyecto_producto, index) of props.row.proyectos_productos">
-                            <p>Numero de Parte (Local): {{ proyecto_producto.numero_parte }} - Numero de Parte (Cliente): {{ proyecto_producto.producto.numero_parte_cliente }}</p>
+                            <p>Numero de Parte (Local): {{ proyecto_producto.numero_parte }} - 
+                                Numero de Parte (Cliente): {{ proyecto_producto.numero_parte_cliente }} - 
+                                Nombre del producto : {{ proyecto_producto.producto.nombre_producto }}</p>
                         </li>
                         
                     </template>
@@ -147,7 +149,7 @@
 
 
         <!-- CREATE DIALOG -->
-        <el-dialog :title="formTitle" :visible.sync="formVisible" width="60%">
+        <el-dialog :title="formTitle" :visible.sync="formVisible" width="80%">
             <div class="form-container">
                 <el-form ref="form" :model="current" :rules="rules" label-position="top" label-width="150px" style="">
                     <el-row :gutter="20">
@@ -227,11 +229,7 @@
                                             tooltip-effect="light"
                                             fit
                                             style="width: 100%; word-wrap: break-word;">
-                                                <af-table-column
-                                                type="index"
-                                                align="center"
-                                                sortable
-                                                fixed/>
+                                                
 
                                                 <el-table-column 
                                                 prop="numero_parte"
@@ -239,8 +237,13 @@
                                                 show-overflow-tooltip/>
 
                                                 <el-table-column 
-                                                prop="producto.numero_parte_cliente"
+                                                prop="numero_parte_cliente"
                                                 label="Numero de Parte (Cliente)"
+                                                show-overflow-tooltip/>
+
+                                                <el-table-column 
+                                                prop="producto.nombre_producto"
+                                                label="Producto"
                                                 show-overflow-tooltip/>
 
                                                 <el-table-column
@@ -269,7 +272,7 @@
 
 
         <!-- DIALOGO AGREGAR ORDENES -->
-        <el-dialog title="Agregar Ordenes" :visible.sync="agregarOrdenesVisible" width="60%">
+        <el-dialog title="Agregar Ordenes" :visible.sync="agregarOrdenesVisible" width="80%">
             <div class="form-container">
                 <el-transfer
                 filterable
@@ -916,7 +919,7 @@ const proyectoProductoResource = new ProyectoProductoResource('proyectosProducto
                     if(ordenAbierta.Proceso.proyecto_proceso.es_ultimo == 1){
                         this.ordenesAbiertasList.push({
                             key: ordenAbierta.id,
-                            label: 'Orden: '+ordenAbierta.numero_parte+' - '+ordenAbierta.producto.numero_parte_cliente,
+                            label: ordenAbierta.numero_parte+' - '+ordenAbierta.numero_parte_cliente+' - '+ordenAbierta.producto.nombre_producto,
                             disabled: false,
                         });
                     }

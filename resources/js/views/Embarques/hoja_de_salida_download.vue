@@ -114,7 +114,17 @@
                   align="center"/>
 
                   <el-table-column 
-                  prop="producto.numero_parte_cliente"
+                  prop="cantidad"
+                  label="Cantidad"
+                  align="center"/>
+
+                  <el-table-column 
+                  prop="numero_parte_cliente"
+                  label="Num de Parte"
+                  align="center"/>
+
+                  <el-table-column 
+                  prop="producto.nombre_producto"
                   label="Producto"
                   align="center"/>
 
@@ -128,10 +138,7 @@
                   label="Work Order"
                   align="center"/>
 
-                  <el-table-column 
-                  prop="cantidad"
-                  label="Cantidad"
-                  align="center"/>
+                  
                   
 
               </el-table>

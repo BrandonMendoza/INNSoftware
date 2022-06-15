@@ -309,7 +309,7 @@ const empleadoBajaResource = new Resource('bajaEmpleado');
         ],
         vacaciones:[
           {  id: 1, tiempo_anos: 1, dias_vacaciones: 6  }, 
-          {  id: 2, tiempo_anos: 2, dias_vacaciones: 6  }, 
+          {  id: 2, tiempo_anos: 2, dias_vacaciones: 8  }, 
           {  id: 3, tiempo_anos: 3, dias_vacaciones: 10  }, 
           {  id: 4, tiempo_anos: 4, dias_vacaciones: 12  }, 
           {  id: 5, tiempo_anos: 9, dias_vacaciones: 14  }, 
