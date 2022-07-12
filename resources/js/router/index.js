@@ -347,6 +347,12 @@ export const asyncRoutes = [
     hidden: true,
   },
   {
+    path: '/carta_responsiva_empleado_download/:fechaCartaResponsiva/:currentEmpleado',
+    name: 'carta_responsiva_empleado_download',
+    component: () => import('@/views/empleados/components/carta_responsiva_empleado_download'),
+    hidden: true,
+  },
+  {
     path: '/renuncia_empleado_download/:fechaRenuncia/:currentBajaEmpleado/:currentEmpleado',
     name: 'renuncia_empleado_download',
     component: () => import('@/views/empleados/components/renuncia_empleado_download'),

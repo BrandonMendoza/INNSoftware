@@ -106,7 +106,7 @@
             prima_vacacional:0,
             aguinaldo:0,
           -->
-          <el-tab-pane label="Finiquito/liquidación" name="first">
+          <el-tab-pane label="Finiquito" name="first">
           
           <table style="border: 0px; width:100%;">
             <tr>

@@ -72,17 +72,22 @@
                 prop="numero_empleado"
                 label="Núm. de Empleado"
                 align="center"
-                show-overflow-tooltip/>
+                show-overflow-tooltip
+                sortable/>
 
-                <el-table-column 
-                prop="nombre"
-                label="Nombre"
-                show-overflow-tooltip/>
-
-                <el-table-column 
+                <af-table-column 
                 prop="apellidos"
                 label="Apellidos"
-                show-overflow-tooltip/>
+                show-overflow-tooltip
+                sortable/>
+
+                <af-table-column 
+                prop="nombre"
+                label="Nombre"
+                show-overflow-tooltip
+                sortable/>
+
+                
 
                 <af-table-column 
                 prop="Puesto.no"
@@ -683,16 +688,11 @@ const estadoResource = new Resource('estados');
                 this.query.bajas = 1;
                 this.loading = true;
                 const { data, meta } = await empleadoResource.list(this.query);
-                console.log("META: ");
-                console.log(meta);
                 console.log("GET LIST DATA");
                 console.log(data);
                 
                 this.list = data;
-                this.list.forEach((element, index) => {
-                    element['index'] = (page - 1) * limit + index + 1;
-                });
-                this.total = meta.total;
+                
                 this.loading = false;
             },
             handleSubmit() {

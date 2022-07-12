@@ -143,7 +143,7 @@
                                                 show-overflow-tooltip/>
 
                                                 <el-table-column
-                                                prop="numero_parte_cliente"
+                                                prop="proyecto_producto.numero_parte_cliente"
                                                 label="Producto"
                                                 show-overflow-tooltip/>
 

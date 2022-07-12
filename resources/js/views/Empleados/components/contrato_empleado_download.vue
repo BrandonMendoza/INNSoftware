@@ -29,7 +29,7 @@
   <div class="titulo"><u><b>D E C L A R A C I O N E S:</b></u></div>
   <br> <br>
  <dd><b>PRIMERA.</b> - Declara “LA EMPRESA” lo siguiente:<br></dd>
-A).- Ser Mexicano con capacidad legal para celebrar el presente contrato, y que tiene su domicilio fiscal en Av. de los Rocíos Numero 3868 Fracc Villa Florida de esta ciudad de Mexicali, Baja California.<br>
+A).- Ser Mexicano con capacidad legal para celebrar el presente contrato, y que tiene su domicilio fiscal en Av. Calle Tercera S/N, Ejido Sinaloa de esta ciudad de Mexicali, Baja California.<br>
 B).- Que necesita los servicios de una persona para el puesto de <b> {{ empleado.puesto.nombre.toUpperCase() }} </b> para cubrir un periodo de <b>{{ duracionContrato.toUpperCase() }}</b>.<br> <br>
 La cual cuenta con Registro Federal de Contribuyente: METB940228K52.<br><br>
 <dd><b>SEGUNDA.</b> - Declara el trabajador: <b>{{empleado.apellidos.toUpperCase()+" "+empleado.nombre.toUpperCase()}}</b>, de 
@@ -71,14 +71,13 @@ La relación de trabajo y este contrato, se darán por terminados automáticamen
 cantidad de $ {{ formatPrice(contrato.sueldo) }} ( {{ NumeroALetras(contrato.sueldo, { plural: 'Pesos', singular: 'Peso', centPlural: 'centavos', centSingular: 'centavo' }) }} 00/100 M.N) Semanalmente incluyendo su 
 séptimo día, asimismo podrá recibir otras cantidades adicionales por prestaciones de seguridad 
 social, como son bono de productividad y bono de puntualidad, horas extras y despensa. El 
-salario será pagado los sábados de cada semana, mediante transferencia electrónica a la cuenta 
-asignada por “LA EMPRESA” al “EL TRABAJADOR”.</dd>
+salario será pagado los sábados de cada semana, en efectivo.</dd>
 <br>
 
 <dd><b>CUARTA. </b>- “EL TRABAJADOR” Se obliga a cumplir con una jornada de trabajo de ocho 
 horas diarias, trabajando de lunes a sábado, comprendiendo la jornada de trabajo, entrando a 
-laboral a las 8:00 horas, por lo que su descanso comprenderá de 12:00 horas a 13:00 horas, 
-terminando su jornada de trabajo de lunes a viernes a las 17:00 horas. <br>
+laboral a las 7:00 horas, por lo que su descanso comprenderá de 12:00 horas a 13:00 horas, 
+terminando su jornada de trabajo de lunes a viernes a las 17:00 horas, y los días sabados terminando a las 12:00 horas . <br>
 Convienen expresamente las partes, que es facultad de “LA EMPRESA” repartir, cambiar 
 o modificar en cualquier tiempo, y por necesidades del servicio llevar a cabo las modificaciones 
 de jornada, turnos, domicilio, día de descanso, y horarios de trabajo de “EL TRABAJADOR” 

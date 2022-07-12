@@ -31,6 +31,11 @@
             <el-button v-waves type="primary" v-permission="['historial sueldos empleados activos']" size="small" class="filter-item" icon="el-icon-money"  style="margin-left:0px;"  :disabled="disableEditar"  @click="handleHistorialSueldoForm()">
                Historial Sueldos</el-button>
 
+            <!-- IMPRIMIR CARTA RESPONSIVA 
+            <el-button class="filter-item"  type="primary" size="small" icon="el-icon-printer" @click="handlePrintCartaResponsiva()" :disabled="disableEditar">
+                Imprimir Carta Responsiva
+            </el-button>-->
+
 
             <!-- pdf example button
             <router-link target="_blank" :to="{ name: 'hoja_de_salida_download', params: { id: current.id } }">
@@ -58,7 +63,7 @@
 
                         <ul style="list-style: none;"> 
                             <li>
-                                <p><b>Dirección:</b>  {{scope.row.direccion }},{{scope.row.colonia }}. {{scope.row.ciudad }}, {{scope.row.estado.estado }}.</p>
+                                <p><b>Dirección:</b>  {{capitalizeFirstLetter(scope.row.direccion) }},{{ capitalizeFirstLetter(scope.row.colonia) }}. {{capitalizeFirstLetter(scope.row.ciudad )}}, {{capitalizeFirstLetter(scope.row.estado.estado) }}.</p>
                             </li>
                             <li>
                                 <p><b>Contacto:</b> {{ scope.row.telefono_casa }} - {{scope.row.telefono_celular }} - {{scope.row.email }}</p>
@@ -73,27 +78,43 @@
                 prop="numero_empleado"
                 label="Núm. de Empleado"
                 align="center"
-                show-overflow-tooltip/>
+                show-overflow-tooltip
+                sortable/>
+
+                
+
+                <af-table-column 
+                prop="apellidos"
+                label="Apellidos"
+                show-overflow-tooltip
+                sortable>
+                    <template slot-scope="scope">
+                        {{ capitalizeFirstLetter(scope.row.apellidos) }}
+                    </template>
+                </af-table-column>
+
+                <af-table-column 
+                prop="nombre"
+                label="Nombre"
+                show-overflow-tooltip
+                sortable>
+                    <template slot-scope="scope">
+                        {{ capitalizeFirstLetter(scope.row.nombre) }}
+                    </template>
+                </af-table-column>
 
                 <el-table-column
                 prop="fecha_entrada"
                 label="Fecha de Entrada"
                 align="center" 
-                show-overflow-tooltip>
+                show-overflow-tooltip
+                sortable>
                     <template slot-scope="scope">
                         {{scope.row.fecha_entrada | moment("YYYY-MMM-DD")}}
                     </template>
                 </el-table-column>
 
-                <el-table-column 
-                prop="nombre"
-                label="Nombre"
-                show-overflow-tooltip/>
-
-                <el-table-column 
-                prop="apellidos"
-                label="Apellidos"
-                show-overflow-tooltip/>
+                
                 
                 <el-table-column
                 prop="tipo_empleado_id"
@@ -415,6 +436,34 @@
             </span>
         </el-dialog>
 
+        <el-dialog
+        id="dialogoPrePrint"
+        title="Imprimir Carta Responsiva"
+        :visible.sync="dialogoPrintCartaResponsiva"
+        width="30%">
+        
+            <!-- FECHA CON LA QUE SALDRA EL DOCUMENTO -->
+            <el-row :gutter="20">
+                <el-col :span="10">
+                Fecha Carta Responsiva:
+                </el-col>
+                <el-col :span="10">
+                <el-date-picker format="yyyy-MMM-dd" v-model="fechaCartaResponsiva" type="date" />
+                </el-col>
+            </el-row>
+            
+            <span slot="footer" class="dialog-footer">
+                <el-button size="small" @click="dialogoPrintCartaResponsiva = false;fileList = [];" class="float-left">Cancelar</el-button>
+                <!-- pdf example button -->
+                
+                <router-link target="_blank"  :to="{ name: 'carta_responsiva_empleado_download', params: {fechaCartaResponsiva:JSON.stringify(fechaCartaResponsiva), currentEmpleado: JSON.stringify(current)} }">
+                    <el-button type="primary" size="small" class="filter-item"  style="margin-left:0px;"  :disabled="disableImprimir">
+                        Imprimir Contrato
+                    </el-button>
+                </router-link>
+            </span>
+        </el-dialog>
+
         <!-- CONTRATOS -->
         <EmpleadosContratosDialog  ref="EmpleadosContratosDialog" />
 
@@ -547,6 +596,9 @@ const estadoResource = new Resource('estados');
                         nombre: 'Empleado eventual'
                     }, 
                 ],
+                /*Dialog Print Carta Responsiva*/
+                dialogoPrintCartaResponsiva:false,
+                fechaCartaResponsiva:'',
                 /* Validations */
                 rules: {
                     fecha_entrada: [
@@ -600,6 +652,12 @@ const estadoResource = new Resource('estados');
                 }
                 return false;
             },
+            disableImprimir(){
+                if(this.fechaCartaResponsiva == '' || this.fechaCartaResponsiva == null){
+                return true;
+                }
+                return false;
+            },
         },
         methods:{
             /* Form*/
@@ -630,6 +688,9 @@ const estadoResource = new Resource('estados');
             },
             changeDepartamentos(){
                 this.getPuestos();
+            },
+            capitalizeFirstLetter: (str) => {
+                return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
             },
             /* TABLE */
             handleCurrentChangeTable(val) {
@@ -717,6 +778,9 @@ const estadoResource = new Resource('estados');
                 this.query.page = 1;
                 this.getList();
             },
+            handlePrintCartaResponsiva(){
+                this.dialogoPrintCartaResponsiva = true;
+            },
 
             /** PRINCIPALES ---------
                 1. GET LIST  2. SUBMIT 3. DELETE ROW 4. CLEAR CURRENT
@@ -730,10 +794,10 @@ const estadoResource = new Resource('estados');
                 console.log("GET LIST DATA");
                 console.log(data);
                 this.list = data;
-                this.list.forEach((element, index) => {
-                    element['index'] = (page - 1) * limit + index + 1;
-                });
-                this.total = meta.total;
+                // this.list.forEach((element, index) => {
+                //     element['index'] = (page - 1) * limit + index + 1;
+                // });
+                //this.total = meta.total;
                 this.loading = false;
             },
             handleSubmit() {

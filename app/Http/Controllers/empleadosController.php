@@ -28,7 +28,7 @@ class empleadosController extends Controller
         $limit = Arr::get($searchParams, 'limit', static::ITEM_PER_PAGE);
         $keyword = Arr::get($searchParams, 'keyword', '');
         $id = Arr::get($searchParams, 'id', '');
-        $bajas = Arr::get($searchParams, 'bajas', 0);
+        $soloBajas = Arr::get($searchParams, 'bajas', 0);
 
         /*Si viene con ID se filtra */
         if (!empty($id) && $id != 0 ) {
@@ -40,10 +40,11 @@ class empleadosController extends Controller
             //$empleadoQuery->where('precio_total', 'LIKE', '%' . $keyword . '%');
         }
         /*Si viene con ID se filtra */
-        if ($bajas == 1) {
-            return EmpleadoResource::collection($empleadoQuery->onlyTrashed()->with('Estado','Puesto.Departamento')->paginate($limit));
-        }
-        return EmpleadoResource::collection($empleadoQuery->with('Estado','Puesto.Departamento')->paginate($limit));
+        //return EmpleadoResource::collection($empleadoQuery->onlyTrashed()->with('Estado','Puesto.Departamento')->paginate($limit));
+        
+        //return EmpleadoResource::collection($empleadoQuery->with('Estado','Puesto.Departamento')->paginate($limit));
+        
+        return EmpleadoResource::collection(Empleado::getEmpleados($soloBajas));
     }
 
     /**
