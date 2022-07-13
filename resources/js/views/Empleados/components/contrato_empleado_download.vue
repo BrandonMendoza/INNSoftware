@@ -52,20 +52,39 @@ Asimismo, se estipula en el presente contrato que se aplicara de común acuerdo 
 actuado por la empresa en términos del artículo 19 de la ley federal del trabajo y demás relativos
  al mismo.
  </dd><br>
-
-<dd><b>SEGUNDA.</b> - Este contrato de trabajo se celebra en términos del artículo 35 de la Ley
- Federal del Trabajo, por tiempo determinado que será por un periodo comprendido de <b> {{ duracionContrato.toUpperCase() }} </b>, a partir del día  
- <b> {{contrato.inicio_contrato | moment("DD")}} del mes de {{contrato.inicio_contrato | moment("MMMM")}} del {{contrato.inicio_contrato | moment("YYYY")}}</b>, con fecha de terminación 
- contractual el <b> {{contrato.termino_contrato | moment("DD")}} del mes de {{contrato.termino_contrato | moment("MMMM")}} del {{contrato.termino_contrato | moment("YYYY")}}</b>.
+<!-- CONTRATO INDEFINIDO -->
+ <template v-if="contrato.duracion == -1">
+  <dd><b>SEGUNDA.</b> - Este contrato de trabajo se celebra en términos del artículo 35 de la Ley Federal del Trabajo, por tiempo indeterminado,  a partir del día  
+ <b> {{contrato.inicio_contrato | moment("DD")}} del mes de {{contrato.inicio_contrato | moment("MMMM")}} del {{contrato.inicio_contrato | moment("YYYY")}}</b>.
  <br>
  <br>
-La relación de trabajo y este contrato, se darán por terminados automáticamente sin necesidad
+ La relación de trabajo y este contrato, se darán por terminados automáticamente sin necesidad
  de aviso, ni responsabilidad u obligación alguna para “LA EMPRESA” de acuerdo al artículo 53
   fracción III de la Ley Federal Del Trabajo, esto de conformidad con los numerales 36 y 37 de la
    misma Ley Federal del Trabajo, teniendo por lo tanto “EL TRABAJADOR” el carácter de 
    trabajador temporal o de tiempo determinado como se estipula en el presente contrato y bajo 
    la tesitura jurídica de la presente ley en cita.</dd>
    <br>
+ </template>
+ <!-- CONTRATO TIEMPO DEFINIDO -->
+ <template v-else>
+  <dd><b>SEGUNDA.</b> - Este contrato de trabajo se celebra en términos del artículo 35 de la Ley
+ Federal del Trabajo, por tiempo determinado que será por un periodo comprendido de <b> {{ duracionContrato.toUpperCase() }} </b>, a partir del día  
+ <b> {{contrato.inicio_contrato | moment("DD")}} del mes de {{contrato.inicio_contrato | moment("MMMM")}} del {{contrato.inicio_contrato | moment("YYYY")}}</b>, con fecha de terminación 
+ contractual el <b> {{contrato.termino_contrato | moment("DD")}} del mes de {{contrato.termino_contrato | moment("MMMM")}} del {{contrato.termino_contrato | moment("YYYY")}}</b>.
+ <br>
+ <br>
+ La relación de trabajo y este contrato, se darán por terminados automáticamente sin necesidad
+ de aviso, ni responsabilidad u obligación alguna para “LA EMPRESA” de acuerdo al artículo 53
+  fracción III de la Ley Federal Del Trabajo, esto de conformidad con los numerales 36 y 37 de la
+   misma Ley Federal del Trabajo, teniendo por lo tanto “EL TRABAJADOR” el carácter de 
+   trabajador temporal o de tiempo determinado como se estipula en el presente contrato y bajo 
+   la tesitura jurídica de la presente ley en cita.</dd>
+   <br>
+ </template>
+
+
+
 
 <dd><b>TERCERA.</b> -“LA EMPRESA” se obliga a pagar al trabajador por concepto de salario la 
 cantidad de $ {{ formatPrice(contrato.sueldo) }} ( {{ NumeroALetras(contrato.sueldo, { plural: 'Pesos', singular: 'Peso', centPlural: 'centavos', centSingular: 'centavo' }) }} 00/100 M.N) Semanalmente incluyendo su 
